@@ -101,10 +101,10 @@ const personalLeft = computed(() => [...personalFields.value.slice(4, 8), ...per
 <style scoped>
 .details {
   background: var(--c-surface);
-  padding: 30px 30px 30px 90px;
+  padding: 24px 30px;
   display: flex;
   flex-direction: column;
-  gap: 30px;
+  gap: 20px;
 }
 .indent {
   padding-inline-start: 19px;
@@ -118,7 +118,7 @@ const personalLeft = computed(() => [...personalFields.value.slice(4, 8), ...per
   font-weight: 600;
   color: var(--c-text);
   opacity: 0.5;
-  margin-bottom: 10px;
+  margin-bottom: 6px;
 }
 .toggle:hover {
   opacity: 0.75;
@@ -180,6 +180,13 @@ const personalLeft = computed(() => [...personalFields.value.slice(4, 8), ...per
 .split {
   display: flex;
 }
+/* Each group takes width in proportion to its column count, so the fields span the full row. */
+.split > .cols-2 {
+  flex: 2;
+}
+.split > .cols-4 {
+  flex: 4;
+}
 .split > .grid + .grid {
   margin-inline-start: 15px;
   padding-inline-start: 15px;
@@ -188,25 +195,26 @@ const personalLeft = computed(() => [...personalFields.value.slice(4, 8), ...per
 hr {
   border: 0;
   border-top: 1px solid var(--c-divider);
-  margin: 40px 0;
+  margin: 22px 0;
 }
 .grid {
   display: grid;
-  gap: 40px 0;
+  gap: 20px 16px;
+  min-width: 0;
 }
 .cols-2 {
-  grid-template-columns: repeat(2, 145px);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 .cols-4 {
-  grid-template-columns: repeat(4, 145px);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 .cols-7 {
-  grid-template-columns: repeat(7, 145px);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
 }
 dt {
   font-size: 14px;
   color: var(--c-text);
-  margin-bottom: 8px;
+  margin-bottom: 4px;
   min-height: 19px;
 }
 dd {
