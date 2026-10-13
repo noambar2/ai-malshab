@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { nextTick, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import RichText from './RichText.vue'
 import { QUICK_QUESTIONS, answer, greeting } from './answers'
 import { malshab } from '@/data/mock'
@@ -22,6 +22,10 @@ let composerObserver: ResizeObserver | undefined
 let nextId = 0
 let alive = true
 let typer: ReturnType<typeof setInterval> | undefined
+
+// A chip question that was already asked drops off the list.
+const asked = ref(new Set<string>())
+const chips = computed(() => QUICK_QUESTIONS.filter((q) => !asked.value.has(q)))
 
 const delay = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
@@ -83,6 +87,7 @@ function send() {
   if (!text || busy.value) return
   stopTyper()
   msgs.value.push({ id: nextId++, role: 'user', text })
+  if (QUICK_QUESTIONS.includes(text)) asked.value = new Set(asked.value).add(text)
   draft.value = ''
   scrollDown()
   say([answer(text)])
@@ -111,6 +116,7 @@ function stopTyper() {
 function reset() {
   stopTyper()
   msgs.value = []
+  asked.value = new Set()
   draft.value = ''
   say(greeting())
 }
@@ -160,8 +166,8 @@ onBeforeUnmount(() => {
 
       <div ref="composer" class="composer">
         <Transition name="chips">
-        <div v-if="!busy && nearBottom" class="chips" role="group" aria-label="שאלות נפוצות">
-          <button v-for="q in QUICK_QUESTIONS" :key="q" class="chip" @click="useChip(q)">{{ q }}</button>
+        <div v-if="!busy && nearBottom && chips.length" class="chips" role="group" aria-label="שאלות נפוצות">
+          <button v-for="q in chips" :key="q" class="chip" @click="useChip(q)">{{ q }}</button>
         </div>
         </Transition>
         <form class="field" @submit.prevent="send">
