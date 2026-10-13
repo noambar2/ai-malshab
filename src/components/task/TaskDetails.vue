@@ -18,9 +18,30 @@ const personalFields = computed(() => {
   }
   return personal.map((f) => ({ ...f, value: fill[f.label] ?? f.value }))
 })
-// The design splits the 8-column grid into two halves with a divider between them.
-const personalRight = computed(() => [...personalFields.value.slice(0, 4), ...personalFields.value.slice(8, 12)])
-const personalLeft = computed(() => [...personalFields.value.slice(4, 8), ...personalFields.value.slice(12, 16)])
+// Every block sits on one shared 8-column grid, split into two halves by a divider
+// between columns 4 and 5, so fields line up vertically across all rows.
+type Cell = { label: string; value: string } | null
+const COLS = 8
+const pad = (cells: Cell[]) => [...cells, ...Array<Cell>(COLS - cells.length).fill(null)]
+
+const byLabel = (labels: string[]) =>
+  labels.map((l) => [...candidateStatus, ...candidateScores].find((f) => f.label === l) ?? null)
+
+const personalRows = computed(() => [
+  personalFields.value.slice(0, 8),
+  personalFields.value.slice(8, 16),
+])
+
+// Right half: candidate status and scores. Left half: the medical fields.
+const statusRows = computed(() => [
+  [
+    ...byLabel(['טווח מועמד', 'סטטוס', 'סיבת סטטוס', 'תוקף סטטוס']),
+    ...byLabel(['פרופיל', 'קה״ס', 'מדרג הגנה נפשי', 'סעיפי ליקוי']),
+  ],
+  pad(byLabel(['ציון ר״פ', 'התש', 'פטור שבת וחג'])),
+])
+
+const addressRows = computed(() => [pad(address)])
 </script>
 
 <template>
@@ -45,38 +66,24 @@ const personalLeft = computed(() => [...personalFields.value.slice(4, 8), ...per
       </ol>
     </div>
 
-    <div class="block indent">
+    <div class="block">
       <button class="toggle" :aria-expanded="open.personal" @click="open.personal = !open.personal">
         <span>פרטים אישיים</span>
         <AppIcon :name="open.personal ? 'chevron-up' : 'chevron-down'" :size="18" />
       </button>
       <template v-if="open.personal">
-        <div class="split">
-          <dl class="grid cols-4">
-            <div v-for="f in personalRight" :key="f.label">
-              <dt>{{ f.label }}</dt>
-              <dd>{{ f.value }}</dd>
-            </div>
-          </dl>
-          <dl class="grid cols-4">
-            <div v-for="f in personalLeft" :key="f.label">
-              <dt>{{ f.label }}</dt>
-              <dd>{{ f.value }}</dd>
+        <div class="rows">
+          <dl v-for="(row, r) in personalRows" :key="r" class="row8 halves">
+            <div v-for="(f, i) in row" :key="i">
+              <template v-if="f"><dt>{{ f.label }}</dt><dd>{{ f.value }}</dd></template>
             </div>
           </dl>
         </div>
         <hr />
-        <div class="split">
-          <dl class="grid cols-2">
-            <div v-for="f in candidateStatus" :key="f.label">
-              <dt>{{ f.label }}</dt>
-              <dd>{{ f.value }}</dd>
-            </div>
-          </dl>
-          <dl class="grid cols-4">
-            <div v-for="(f, i) in candidateScores" :key="i">
-              <dt>{{ f.label }}</dt>
-              <dd>{{ f.value }}</dd>
+        <div class="rows">
+          <dl v-for="(row, r) in statusRows" :key="r" class="row8 halves">
+            <div v-for="(f, i) in row" :key="i">
+              <template v-if="f"><dt>{{ f.label }}</dt><dd>{{ f.value }}</dd></template>
             </div>
           </dl>
         </div>
@@ -88,12 +95,13 @@ const personalLeft = computed(() => [...personalFields.value.slice(4, 8), ...per
         <span>כתובת</span>
         <AppIcon :name="open.address ? 'chevron-up' : 'chevron-down'" :size="18" />
       </button>
-      <dl v-if="open.address" class="grid cols-7">
-        <div v-for="f in address" :key="f.label">
-          <dt>{{ f.label }}</dt>
-          <dd>{{ f.value }}</dd>
-        </div>
-      </dl>
+      <div v-if="open.address" class="rows">
+        <dl v-for="(row, r) in addressRows" :key="r" class="row8">
+          <div v-for="(f, i) in row" :key="i">
+            <template v-if="f"><dt>{{ f.label }}</dt><dd>{{ f.value }}</dd></template>
+          </div>
+        </dl>
+      </div>
     </div>
   </section>
 </template>
@@ -105,9 +113,6 @@ const personalLeft = computed(() => [...personalFields.value.slice(4, 8), ...per
   display: flex;
   flex-direction: column;
   gap: 20px;
-}
-.indent {
-  padding-inline-start: 19px;
 }
 .toggle {
   display: inline-flex;
@@ -177,39 +182,36 @@ const personalLeft = computed(() => [...personalFields.value.slice(4, 8), ...per
   color: var(--c-primary-dark);
 }
 
-.split {
-  display: flex;
-}
-/* Each group takes width in proportion to its column count, so the fields span the full row. */
-.split > .cols-2 {
-  flex: 2;
-}
-.split > .cols-4 {
-  flex: 4;
-}
-.split > .grid + .grid {
-  margin-inline-start: 15px;
-  padding-inline-start: 15px;
-  border-inline-start: 1px solid var(--c-divider);
-}
 hr {
   border: 0;
   border-top: 1px solid var(--c-divider);
-  margin: 22px 0;
+  margin: 20px 0;
 }
-.grid {
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.row8 {
   display: grid;
-  gap: 20px 16px;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  column-gap: 16px;
+}
+.row8 > div {
   min-width: 0;
 }
-.cols-2 {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+/* The divider sits in the gap between columns 4 and 5 (the exact middle), so it never
+   shifts the fields and they stay on the same guides as rows without a divider. */
+.halves {
+  position: relative;
 }
-.cols-4 {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-}
-.cols-7 {
-  grid-template-columns: repeat(7, minmax(0, 1fr));
+.halves::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  border-left: 1px solid var(--c-divider);
 }
 dt {
   font-size: 14px;
