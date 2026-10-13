@@ -51,10 +51,13 @@ const recent = computed(() =>
   peopleState.recent
     .map((r) => ({ person: findPerson(r.idNumber), at: r.at }))
     .filter((r): r is { person: Person; at: number } => !!r.person)
-    .slice(0, 5),
+    .slice(0, 4),
 )
 const favorites = computed(() =>
-  peopleState.favorites.map(findPerson).filter((p): p is Person => !!p),
+  peopleState.favorites
+    .map(findPerson)
+    .filter((p): p is Person => !!p)
+    .slice(0, 4),
 )
 
 // Draft-dodgers widget: what needs my attention first.
@@ -126,57 +129,66 @@ onMounted(() => searchInput.value?.focus())
       </form>
       <p v-if="notFound" class="not-found">לא נמצא מלש״ב התואם ל״{{ query }}״. בדקו את המספר ונסו שוב.</p>
       <p v-else class="hint">לדוגמה: 209842881 או ״בר כהן״</p>
+
+      <div class="shelves">
+        <div class="shelf">
+          <h2>נצפו לאחרונה</h2>
+          <div class="people">
+            <div
+              v-for="r in recent"
+              :key="r.person.idNumber"
+              class="person"
+              role="button"
+              tabindex="0"
+              @click="open(r.person)"
+              @keydown.enter="open(r.person)"
+            >
+              <span class="avatar">{{ r.person.fullName[0] }}</span>
+              <span class="who">
+                <b>{{ r.person.fullName }}</b>
+                <small>{{ r.person.idNumber }} · {{ timeAgo(r.at) }}</small>
+              </span>
+              <button
+                class="star"
+                :class="{ on: isFavorite(r.person.idNumber) }"
+                :aria-label="isFavorite(r.person.idNumber) ? 'הסרה ממועדפים' : 'הוספה למועדפים'"
+                @click.stop="toggleFavorite(r.person.idNumber)"
+              >
+                <svg viewBox="0 0 24 24" width="16" height="16"><path d="m12 3.5 2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9L12 3.5Z" /></svg>
+              </button>
+            </div>
+            <p v-if="!recent.length" class="shelf-empty">עוד לא נצפו מלש״בים</p>
+          </div>
+        </div>
+
+        <div class="shelf">
+          <h2>מועדפים <span class="count">{{ favorites.length }}</span></h2>
+          <div class="people">
+            <div
+              v-for="p in favorites"
+              :key="p.idNumber"
+              class="person"
+              role="button"
+              tabindex="0"
+              @click="open(p)"
+              @keydown.enter="open(p)"
+            >
+              <span class="avatar fav">{{ p.fullName[0] }}</span>
+              <span class="who">
+                <b>{{ p.fullName }}</b>
+                <small>{{ p.idNumber }} · {{ p.status }}</small>
+              </span>
+              <button class="star on" aria-label="הסרה ממועדפים" @click.stop="toggleFavorite(p.idNumber)">
+                <svg viewBox="0 0 24 24" width="16" height="16"><path d="m12 3.5 2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9L12 3.5Z" /></svg>
+              </button>
+            </div>
+            <p v-if="!favorites.length" class="shelf-empty">לחצו על הכוכב ליד מלש״ב כדי להוסיף למועדפים</p>
+          </div>
+        </div>
+      </div>
     </section>
 
     <div class="grid">
-      <section class="card panel">
-        <header>
-          <h2>נצפו לאחרונה</h2>
-        </header>
-        <ul class="people">
-          <li v-for="r in recent" :key="r.person.idNumber" @click="open(r.person)">
-            <span class="avatar">{{ r.person.fullName[0] }}</span>
-            <span class="who">
-              <b>{{ r.person.fullName }}</b>
-              <small>ת.ז {{ r.person.idNumber }} · {{ r.person.office }}</small>
-            </span>
-            <span class="when">{{ timeAgo(r.at) }}</span>
-            <button
-              class="star"
-              :class="{ on: isFavorite(r.person.idNumber) }"
-              :aria-label="isFavorite(r.person.idNumber) ? 'הסרה ממועדפים' : 'הוספה למועדפים'"
-              @click.stop="toggleFavorite(r.person.idNumber)"
-            >
-              <svg viewBox="0 0 24 24" width="18" height="18"><path d="m12 3.5 2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9L12 3.5Z" /></svg>
-            </button>
-          </li>
-          <li v-if="!recent.length" class="empty">עוד לא נצפו מלש״בים</li>
-        </ul>
-      </section>
-
-      <section class="card panel">
-        <header>
-          <h2>מועדפים</h2>
-          <span class="count">{{ favorites.length }}</span>
-        </header>
-        <ul class="people">
-          <li v-for="p in favorites" :key="p.idNumber" @click="open(p)">
-            <span class="avatar fav">{{ p.fullName[0] }}</span>
-            <span class="who">
-              <b>{{ p.fullName }}</b>
-              <small>ת.ז {{ p.idNumber }} · פרופיל {{ p.profile }}</small>
-            </span>
-            <span class="tag">{{ p.status }}</span>
-            <button class="star on" aria-label="הסרה ממועדפים" @click.stop="toggleFavorite(p.idNumber)">
-              <svg viewBox="0 0 24 24" width="18" height="18"><path d="m12 3.5 2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9L12 3.5Z" /></svg>
-            </button>
-          </li>
-          <li v-if="!favorites.length" class="empty">
-            לחצו על הכוכב ליד מלש״ב כדי להוסיף אותו למועדפים
-          </li>
-        </ul>
-      </section>
-
       <section class="card panel">
         <header>
           <h2>משתמטים וצו 12</h2>
@@ -248,7 +260,7 @@ onMounted(() => searchInput.value?.focus())
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 26px 20px 22px;
+  padding: 24px 32px 26px;
   margin-bottom: 20px;
   border-radius: 16px;
   background:
@@ -347,11 +359,72 @@ h1 {
   color: var(--c-danger);
 }
 
+/* Recently viewed + favorites live inside the search hero. */
+.shelves {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 28px;
+  width: min(1100px, 100%);
+  margin-top: 22px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(13, 45, 143, 0.1);
+  text-align: start;
+}
+.shelf h2 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--c-muted-2);
+}
+.shelf .people {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.person {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(16px) saturate(1.4);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 4px 14px rgba(13, 45, 143, 0.06);
+  cursor: pointer;
+  transition: background 0.15s, box-shadow 0.15s, transform 0.15s;
+}
+.person:hover,
+.person:focus-visible {
+  outline: none;
+  background: #fff;
+  box-shadow: 0 8px 20px rgba(13, 45, 143, 0.12);
+  transform: translateY(-1px);
+}
+.person .who b {
+  font-size: 14px;
+}
+.person .avatar {
+  width: 30px;
+  height: 30px;
+  font-size: 13px;
+}
+.shelf-empty {
+  grid-column: 1 / -1;
+  padding: 14px 0;
+  font-size: 13px;
+  color: var(--c-muted);
+}
+
 .grid {
   flex: 1;
   min-height: 0;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 20px;
 }
 .panel {
@@ -406,7 +479,6 @@ h3 {
   text-decoration: underline;
 }
 
-ul.people,
 ul.tasks,
 ul.directives {
   list-style: none;
@@ -415,7 +487,6 @@ ul.directives {
   display: flex;
   flex-direction: column;
 }
-.people li,
 .tasks li,
 .directives li {
   display: flex;
@@ -426,12 +497,10 @@ ul.directives {
   cursor: pointer;
   transition: background 0.12s;
 }
-.people li:hover,
 .tasks li:hover,
 .directives li:hover {
   background: #f5f7ff;
 }
-.people li + li,
 .tasks li + li,
 .directives li + li {
   border-top: 1px solid #f0f2f7;
@@ -516,8 +585,8 @@ li.empty:hover {
 
 .mini-kpis {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
 }
 .mini-kpis div {
   display: flex;
