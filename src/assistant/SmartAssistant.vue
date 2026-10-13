@@ -25,7 +25,20 @@ let typer: ReturnType<typeof setInterval> | undefined
 
 const delay = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
+// Chips hide while the user scrolls up to read, and come back near the bottom.
+// Two thresholds so the chips appearing/disappearing doesn't flip the state back.
+const nearBottom = ref(true)
+
+function onStreamScroll() {
+  const el = stream.value
+  if (!el) return
+  const gap = el.scrollHeight - el.scrollTop - el.clientHeight
+  if (gap > 140) nearBottom.value = false
+  else if (gap < 40) nearBottom.value = true
+}
+
 function scrollDown() {
+  nearBottom.value = true
   nextTick(() => {
     if (stream.value) stream.value.scrollTop = stream.value.scrollHeight
   })
@@ -55,7 +68,7 @@ watch(composer, (el) => {
   if (!el) return
   composerObserver = new ResizeObserver(() => {
     stream.value?.style.setProperty('--composer-h', `${el.offsetHeight}px`)
-    scrollDown()
+    if (nearBottom.value) scrollDown()
   })
   composerObserver.observe(el)
 })
@@ -111,8 +124,12 @@ onBeforeUnmount(() => {
 
 <template>
   <button v-if="!open" class="launcher" @click="open = true">
+    <span class="halo" aria-hidden="true" />
     <span class="mark small"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M12 2.5l1.9 5.6 5.6 1.9-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.9L12 2.5Zm6.5 11 .9 2.6 2.6.9-2.6.9-.9 2.6-.9-2.6-2.6-.9 2.6-.9.9-2.6Z" /></svg></span>
-    שאל/י את העוזר החכם
+    <span class="launcher-text">
+      <b>העוזר החכם</b>
+      <small>סיכום ושאלות על {{ malshab.fullName.split(' ')[0] }}</small>
+    </span>
   </button>
 
   <Transition name="drawer">
@@ -131,7 +148,7 @@ onBeforeUnmount(() => {
         </button>
       </header>
 
-      <div ref="stream" class="stream" role="log" aria-live="polite">
+      <div ref="stream" class="stream" role="log" aria-live="polite" @scroll.passive="onStreamScroll">
         <template v-for="m in msgs" :key="m.id">
           <div v-if="m.role === 'user'" class="user-msg">{{ m.text }}</div>
           <div v-else class="bot-msg"><RichText :text="m.text" /></div>
@@ -142,9 +159,11 @@ onBeforeUnmount(() => {
       </div>
 
       <div ref="composer" class="composer">
-        <div v-if="!busy" class="chips" role="group" aria-label="שאלות נפוצות">
+        <Transition name="chips">
+        <div v-if="!busy && nearBottom" class="chips" role="group" aria-label="שאלות נפוצות">
           <button v-for="q in QUICK_QUESTIONS" :key="q" class="chip" @click="useChip(q)">{{ q }}</button>
         </div>
+        </Transition>
         <form class="field" @submit.prevent="send">
           <input
             ref="input"
@@ -189,23 +208,71 @@ onBeforeUnmount(() => {
   z-index: 30;
   display: flex;
   align-items: center;
-  gap: 10px;
-  height: 48px;
-  padding: 0 10px 0 20px;
-  padding-inline: 10px 20px;
-  border-radius: 24px;
-  background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(24px) saturate(1.5);
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  box-shadow: 0 8px 32px rgba(13, 45, 143, 0.18);
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--c-brand);
+  gap: 12px;
+  height: 60px;
+  padding-inline: 10px 24px;
+  border-radius: 30px;
+  background: linear-gradient(315deg, #0d2d8f 0%, #0046fe 60%, #4d7dff 100%);
+  box-shadow: 0 12px 32px -6px rgba(0, 70, 254, 0.55);
+  color: #fff;
+  text-align: start;
   transition: box-shadow 0.2s, transform 0.2s;
+  animation: launcher-in 0.5s 0.3s ease-out both;
 }
 .launcher:hover {
-  box-shadow: 0 0 24px rgba(0, 70, 254, 0.3);
-  transform: translateY(-1px);
+  box-shadow: 0 16px 40px -6px rgba(0, 70, 254, 0.7);
+  transform: translateY(-2px);
+}
+.launcher .mark.small {
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.2);
+}
+.launcher .mark.small svg {
+  width: 20px;
+  height: 20px;
+}
+.launcher-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+.launcher-text b {
+  font-size: 16px;
+  font-weight: 700;
+}
+.launcher-text small {
+  font-size: 12px;
+  opacity: 0.85;
+}
+/* A soft pulse so the assistant is noticed on the profile page. */
+.halo {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 0 0 0 0 rgba(0, 70, 254, 0.45);
+  animation: halo 2.4s 1s ease-out 3;
+  pointer-events: none;
+}
+@keyframes halo {
+  to {
+    box-shadow: 0 0 0 16px rgba(0, 70, 254, 0);
+  }
+}
+@keyframes launcher-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.96);
+  }
+}
+.chips-enter-active,
+.chips-leave-active {
+  transition: opacity 0.2s, transform 0.2s;
+}
+.chips-enter-from,
+.chips-leave-to {
+  opacity: 0;
+  transform: translateY(8px);
 }
 
 .drawer {

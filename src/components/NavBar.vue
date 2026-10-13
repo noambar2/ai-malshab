@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import AppIcon from './AppIcon.vue'
 import { role, roleLabels, type Role } from '@/stores/role'
+import { searchPeople } from '@/data/people'
 
 const route = useRoute()
 const router = useRouter()
@@ -19,8 +21,13 @@ function isActive(link: (typeof links)[number]) {
   return [link.to, ...(link.also ?? [])].some((p) => route.path === p || route.path.startsWith(p + '/'))
 }
 
+const navQuery = ref('')
+
+// A match opens the profile; anything else falls back to the home page's full search.
 function onSearch() {
-  router.push('/malshab')
+  const hit = searchPeople(navQuery.value)[0]
+  router.push(hit ? '/malshab' : '/home')
+  navQuery.value = ''
 }
 
 function print() {
@@ -30,7 +37,7 @@ function print() {
 
 <template>
   <header class="navbar">
-    <RouterLink to="/dodgers" class="logo">מלש״ביה</RouterLink>
+    <RouterLink to="/home" class="logo">מלש״ביה</RouterLink>
     <nav class="links">
       <RouterLink
         v-for="link in links"
@@ -51,7 +58,7 @@ function print() {
       </div>
       <form class="search nav-search" @submit.prevent="onSearch">
         <AppIcon name="search" :size="18" />
-        <input type="text" placeholder="חיפוש מלש״ב" />
+        <input v-model="navQuery" type="text" placeholder="חיפוש מלש״ב (ת.ז / שם)" />
       </form>
       <button v-if="route.path === '/malshab'" class="btn btn-soft print" @click="print">
         <AppIcon name="print" :size="16" />

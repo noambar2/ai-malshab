@@ -33,7 +33,10 @@
 
 /* The whole UI is designed at 1280px but shown denser so more fits on screen at once. */
 html {
-  zoom: 0.85;
+  --zoom: 0.85;
+  /* Viewport units are scaled by zoom too; this is the real full screen height in page units. */
+  --screen-h: calc(100dvh / var(--zoom));
+  zoom: var(--zoom);
 }
 
 html,

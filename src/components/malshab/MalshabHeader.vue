@@ -1,5 +1,9 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { malshab } from '@/data/mock'
+import { isFavorite, toggleFavorite } from '@/stores/people'
+
+const fav = computed(() => isFavorite(malshab.idNumber))
 
 const s = malshab.summary
 </script>
@@ -7,7 +11,20 @@ const s = malshab.summary
 <template>
   <section class="header">
     <div class="identity">
-      <h1>{{ malshab.fullName }}</h1>
+      <div class="name-row">
+        <h1>{{ malshab.fullName }}</h1>
+        <button
+          class="fav"
+          :class="{ on: fav }"
+          :aria-pressed="fav"
+          @click="toggleFavorite(malshab.idNumber)"
+        >
+          <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+            <path d="m12 3.5 2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9L12 3.5Z" />
+          </svg>
+          {{ fav ? 'במועדפים' : 'הוספה למועדפים' }}
+        </button>
+      </div>
       <div class="ids">
         <span><span class="k">מ.א</span> {{ malshab.personalNumber }}</span>
         <span class="sep" />
@@ -59,6 +76,41 @@ const s = malshab.summary
 h1 {
   font-size: 24px;
   font-weight: 700;
+}
+.name-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.fav {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 12px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid #c9d6ff;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--c-brand);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+  transition: background 0.15s, border-color 0.15s;
+}
+.fav:hover {
+  background: #fff;
+}
+.fav.on {
+  background: #fff8e1;
+  border-color: #ffd66b;
+  color: #9a6b00;
+}
+.fav.on svg {
+  fill: #ffc21a;
+  stroke: #ffc21a;
 }
 .ids {
   display: flex;

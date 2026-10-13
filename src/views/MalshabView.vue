@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { reactive, type Component } from 'vue'
+import { onMounted, reactive, type Component } from 'vue'
 import AccordionSection from '@/components/AccordionSection.vue'
 import AppIcon from '@/components/AppIcon.vue'
 import MalshabHeader from '@/components/malshab/MalshabHeader.vue'
 import MalshabDetails from '@/components/malshab/MalshabDetails.vue'
 import SmartAssistant from '@/assistant/SmartAssistant.vue'
+import { markViewed } from '@/stores/people'
 import SummonsSection from '@/components/malshab/sections/SummonsSection.vue'
 import DraftDataSection from '@/components/malshab/sections/DraftDataSection.vue'
 import MaaSection from '@/components/malshab/sections/MaaSection.vue'
@@ -54,6 +55,8 @@ const sections: SectionDef[] = [
 ]
 
 const open = reactive<Record<string, boolean>>({ summons: true })
+
+onMounted(() => markViewed())
 
 function setAll(value: boolean) {
   for (const s of sections) open[s.key] = value

@@ -1,7 +1,7 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import DialerView from '@/views/DialerView.vue'
 import MalshabView from '@/views/MalshabView.vue'
-import PlaceholderView from '@/views/PlaceholderView.vue'
+import HomeView from '@/views/HomeView.vue'
 import DodgersView from '@/views/DodgersView.vue'
 import TaskView from '@/views/TaskView.vue'
 import DirectivesView from '@/views/DirectivesView.vue'
@@ -12,8 +12,8 @@ import DirectiveDetailView from '@/views/DirectiveDetailView.vue'
 export default createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
   routes: [
-    { path: '/', redirect: '/dodgers' },
-    { path: '/home', name: 'home', component: PlaceholderView, meta: { title: 'דף הבית' } },
+    { path: '/', redirect: '/home' },
+    { path: '/home', name: 'home', component: HomeView },
     { path: '/malshab', name: 'malshab', component: MalshabView },
     { path: '/dodgers', name: 'dodgers', component: DodgersView },
     { path: '/dodgers/task/:id', name: 'task', component: TaskView },
