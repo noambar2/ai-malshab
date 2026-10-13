@@ -35,6 +35,18 @@ function refresh() {
   query.value = ''
   sortKey.value = null
 }
+
+// Tables have different column counts, so the first column and the status column get the
+// same fixed width in every table and the middle columns share the rest evenly. This keeps
+// the start, the end and the status pills on the same vertical guides across tables.
+const FIRST = 16
+const STATUS = 14
+// Long free-text columns get a bit more of the middle share.
+const weight = (key: string) => (key === 'reason' ? 1.8 : 1)
+const middleTotal = computed(() =>
+  props.table.columns.slice(1).reduce((sum, c) => sum + weight(c.key), 0),
+)
+const middleWidth = (key: string) => `${((100 - FIRST - STATUS) * weight(key)) / middleTotal.value}%`
 </script>
 
 <template>
@@ -61,7 +73,12 @@ function refresh() {
       </div>
     </div>
     <div v-if="open" class="table-wrap">
-      <table class="table">
+      <table class="table anchored">
+        <colgroup>
+          <col class="anchor-first" />
+          <col v-for="c in table.columns.slice(1)" :key="c.key" :style="{ width: middleWidth(c.key) }" />
+          <col class="anchor-status" />
+        </colgroup>
         <thead>
           <tr>
             <th v-for="c in table.columns" :key="c.key">
@@ -122,6 +139,20 @@ function refresh() {
 }
 .search {
   width: 238px;
+}
+.anchored {
+  table-layout: fixed;
+}
+.anchor-first {
+  width: 16%;
+}
+.anchor-status {
+  width: 14%;
+}
+.anchored td {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .table td {
   font-size: 16px;
