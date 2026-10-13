@@ -8,7 +8,7 @@ defineOptions({ inheritAttrs: false })
 type ColKey = keyof Allocation
 
 const columns: { key: ColKey; label: string; width?: number }[] = [
-  { key: 'index', label: 'פ.', width: 100 },
+  { key: 'index', label: 'פ.' },
   { key: 'startDate', label: 'תאריך תחילה', width: 173 },
   { key: 'endDate', label: 'תאריך סיום', width: 173 },
   { key: 'jobNumber', label: 'משרה לא.' },

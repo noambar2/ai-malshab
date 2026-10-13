@@ -149,7 +149,24 @@ textarea {
   padding: 0 12px;
   text-align: center;
 }
+/* Shared column anchors: the first column and the last (status/action) column have the same
+   width in every table, and the middle columns split the rest by their content. Tables with a
+   different number of columns still start and end on the same vertical guides. */
+:is(.table, .dv-table) th:first-child {
+  width: 16%;
+}
+:is(.table, .dv-table) th:last-child {
+  width: 14%;
+}
+/* A leading checkbox column is narrow; the anchor moves to the column after it. */
+.table th.check-col {
+  width: 48px;
+}
+.table th.check-col + th {
+  width: 16%;
+}
 .table td {
+  white-space: nowrap;
   height: 40px;
   padding: 0 12px;
   text-align: center;

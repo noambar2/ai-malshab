@@ -300,3 +300,16 @@ select.dv-input.placeholder {
   margin-inline-start: auto;
   color: var(--c-muted);
 }
+
+/* The "יתר המיוצבים" table ends in a free-text notes column rather than a status,
+   so it gets its own split instead of the global first/last anchors. */
+.dv-table.rest th:nth-child(1) {
+  width: 30%;
+}
+.dv-table.rest th:nth-child(2),
+.dv-table.rest th:nth-child(3) {
+  width: 15%;
+}
+.dv-table.rest th:last-child {
+  width: 40%;
+}
