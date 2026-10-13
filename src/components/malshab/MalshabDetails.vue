@@ -65,7 +65,7 @@ const process = malshab.process
           :class="{ done: i < process.current, current: i === process.current }"
         >
           <span class="dot">
-            <AppIcon v-if="i < process.current" name="check" :size="12" />
+            <AppIcon v-if="i < process.current" name="check" :size="9" />
           </span>
           <span class="label">{{ step.label }}</span>
           <span v-if="step.date" class="date">{{ step.date }}</span>
@@ -158,7 +158,7 @@ dd.link {
 .stepper {
   list-style: none;
   padding: 0 20px;
-  margin-top: 24px;
+  margin-top: 16px;
   display: grid;
   grid-template-columns: repeat(7, 1fr);
 }
@@ -168,15 +168,15 @@ dd.link {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 10px;
+  gap: 6px;
 }
 .stepper li:not(:last-child)::after {
   content: '';
   position: absolute;
-  top: 7px;
-  inset-inline-start: calc(50% + 30px);
-  width: calc(100% - 60px);
-  height: 3px;
+  top: 5px;
+  inset-inline-start: calc(50% + 20px);
+  width: calc(100% - 40px);
+  height: 2px;
   border-radius: 2px;
   background: var(--c-step-idle);
 }
@@ -184,8 +184,8 @@ dd.link {
   background: var(--c-primary);
 }
 .dot {
-  width: 16px;
-  height: 16px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   background: var(--c-step-idle);
   display: flex;
@@ -198,13 +198,13 @@ dd.link {
   background: var(--c-primary);
 }
 .label {
-  max-width: 120px;
-  font-size: 16px;
+  max-width: 110px;
+  font-size: 13px;
   font-weight: 600;
   line-height: 1.3;
 }
 .date {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--c-text-2);
 }
 </style>
