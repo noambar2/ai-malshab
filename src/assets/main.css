@@ -31,6 +31,11 @@
   margin: 0;
 }
 
+/* The whole UI is designed at 1280px but shown denser so more fits on screen at once. */
+html {
+  zoom: 0.85;
+}
+
 html,
 body {
   background: var(--c-page);
@@ -137,12 +142,12 @@ textarea {
   color: var(--c-muted-2);
   font-size: 14px;
   font-weight: 400;
-  height: 38px;
+  height: 34px;
   padding: 0 12px;
   text-align: center;
 }
 .table td {
-  height: 46px;
+  height: 40px;
   padding: 0 12px;
   text-align: center;
   font-weight: 500;

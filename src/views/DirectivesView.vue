@@ -1,13 +1,13 @@
 <script setup lang="ts">
 // Directives main page. Figma ("עמוד ראשי") only gives the frame — the "דירקטיבות עתידיות" title with
 // "דירקטיבה חדשה" / "שכפול דירקטיבת עבר" buttons, an empty card, and a "דירקטיבות עבר" title.
-// The tables, search and filters inside are filled in here in the same visual language.
+// The cards, search and filters inside are filled in here in the same visual language.
 import '@/components/directives/directives.css'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import AppIcon from '@/components/AppIcon.vue'
 import DvIcon from '@/components/directives/DvIcon.vue'
-import DirectivesTable from '@/components/directives/DirectivesTable.vue'
+import DirectiveCards from '@/components/directives/DirectiveCards.vue'
 import DuplicateModal from '@/components/directives/DuplicateModal.vue'
 import { directivesState, directiveStatus, isPast, stations, type Directive } from '@/data/directives'
 
@@ -87,7 +87,7 @@ function duplicate(id: string) {
           </label>
         </div>
       </div>
-      <DirectivesTable
+      <DirectiveCards
         :rows="future"
         editable
         :empty="query || station ? 'לא נמצאו דירקטיבות עתידיות התואמות לחיפוש' : 'אין דירקטיבות עתידיות. לחצו על ״דירקטיבה חדשה״ כדי ליצור אחת.'"
@@ -99,7 +99,7 @@ function duplicate(id: string) {
       <span class="count">{{ past.length }} דירקטיבות</span>
     </div>
     <section class="dv-card list-card">
-      <DirectivesTable :rows="past" empty="לא נמצאו דירקטיבות עבר" />
+      <DirectiveCards :rows="past" past empty="לא נמצאו דירקטיבות עבר" />
     </section>
 
     <DuplicateModal v-if="dupOpen" @close="dupOpen = false" @pick="duplicate" />

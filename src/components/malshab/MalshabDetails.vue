@@ -78,13 +78,13 @@ const process = malshab.process
 <style scoped>
 .details {
   background: var(--c-surface);
-  padding: 30px 30px 40px;
+  padding: 24px 30px 28px;
 }
 h3 {
   font-size: 14px;
   font-weight: 500;
   color: var(--c-muted);
-  margin-bottom: 18px;
+  margin-bottom: 12px;
 }
 .groups {
   display: flex;
@@ -106,7 +106,7 @@ h3 {
 }
 .grid {
   display: grid;
-  gap: 18px 24px;
+  gap: 12px 24px;
 }
 .cols-1 {
   grid-template-columns: 1fr;
@@ -141,10 +141,10 @@ dd.link {
   color: var(--c-primary);
 }
 .address {
-  margin-top: 40px;
+  margin-top: 24px;
 }
 .process {
-  margin-top: 40px;
+  margin-top: 24px;
 }
 .process-head {
   display: flex;
@@ -158,7 +158,7 @@ dd.link {
 .stepper {
   list-style: none;
   padding: 0 20px;
-  margin-top: 40px;
+  margin-top: 24px;
   display: grid;
   grid-template-columns: repeat(7, 1fr);
 }

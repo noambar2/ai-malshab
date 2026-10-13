@@ -28,7 +28,7 @@ const open = defineModel<boolean>('open', { default: false })
   display: flex;
   align-items: center;
   width: 100%;
-  height: 60px;
+  height: 52px;
   padding: 0 30px;
   text-align: start;
 }
@@ -61,6 +61,6 @@ h2 {
   color: var(--c-text);
 }
 .body {
-  padding: 0 30px 40px;
+  padding: 0 30px 28px;
 }
 </style>
