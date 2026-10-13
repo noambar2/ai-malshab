@@ -3,9 +3,12 @@ import { reactive } from 'vue'
 
 export type CallStatus = 'answered' | 'missed'
 
+// A call decision: the מש״ק recommends, the רמ״ד approves.
+export type CallDecision = 'approved' | 'rejected' | 'pending'
+
 export interface DialerRow {
   id: string
-  callStatus: CallStatus
+  personalNumber: string
   idNumber: string
   fullName: string
   gender: 'זכר' | 'נקבה'
@@ -15,25 +18,60 @@ export interface DialerRow {
   stageGroup: 'before12' | 'after12' | 'draftDodgers'
   track: string
   office: string
+  /** The מש״ק's recommendation (edited in the מש״ק view). */
+  recommendation: CallDecision
+  /** The רמ״ד's approval (edited in the רמ״ד view). */
+  approval: CallDecision
 }
 
 export const lastUpdated = '10:17'
 export const editLockTime = '16:00'
 
-export const dialerRows: DialerRow[] = [
-  { id: '1', callStatus: 'missed', idNumber: '12345678', fullName: 'יקיר הדר', gender: 'זכר', age: 17.7, birthDate: '23.05.2005', stage: '1 לפני הכרזה', stageGroup: 'before12', track: 'גיוס רגיל', office: 'טבריה' },
-  { id: '2', callStatus: 'answered', idNumber: '12345678', fullName: 'שלום מלכה', gender: 'זכר', age: 17.8, birthDate: '05.05.2005', stage: '1 - לפני הכרזה', stageGroup: 'before12', track: 'גיוס רגיל', office: 'מחווה אלון' },
-  { id: '3', callStatus: 'missed', idNumber: '12345678', fullName: 'בר כהן', gender: 'נקבה', age: 18.7, birthDate: '20.08.2005', stage: '2 - אחרי הכרזה', stageGroup: 'after12', track: 'בחו״ל ללא אישור', office: 'תל השומר' },
-  { id: '4', callStatus: 'answered', idNumber: '12345678', fullName: 'דניאל לוי', gender: 'נקבה', age: 17.7, birthDate: '18.03.2005', stage: '1 - לפני הכרזה', stageGroup: 'before12', track: 'גיוס רגיל', office: 'תל השומר' },
-  { id: '5', callStatus: 'missed', idNumber: '12345678', fullName: 'שירן פרץ', gender: 'זכר', age: 19.4, birthDate: '29.11.2005', stage: '2 - אחרי הכרזה', stageGroup: 'after12', track: 'גיוס רגיל', office: 'באר שבע' },
-  { id: '6', callStatus: 'missed', idNumber: '12345678', fullName: 'אברהם כהן', gender: 'זכר', age: 20.8, birthDate: '02.01.2005', stage: '3 - משתמטים', stageGroup: 'draftDodgers', track: 'גיוס רגיל', office: 'תל השומר' },
-  { id: '7', callStatus: 'missed', idNumber: '12345678', fullName: 'דני דניאלי', gender: 'זכר', age: 17.7, birthDate: '15.09.2005', stage: '2 - אחרי הכרזה', stageGroup: 'after12', track: 'גיוס רגיל', office: 'תל השומר' },
-  { id: '8', callStatus: 'missed', idNumber: '12345678', fullName: 'דני דניאלי', gender: 'זכר', age: 17.7, birthDate: '10.12.2005', stage: '1 - לפני הכרזה', stageGroup: 'before12', track: 'גיוס רגיל', office: 'תל השומר' },
-  { id: '9', callStatus: 'missed', idNumber: '12345678', fullName: 'דני דניאלי', gender: 'זכר', age: 17.8, birthDate: '10.12.2005', stage: '1 - לפני הכרזה', stageGroup: 'before12', track: 'גיוס רגיל', office: 'ירושלים' },
-  { id: '10', callStatus: 'missed', idNumber: '12345678', fullName: 'דני דניאלי', gender: 'זכר', age: 17.4, birthDate: '10.12.2005', stage: '1 - לפני הכרזה', stageGroup: 'before12', track: 'גיוס רגיל', office: 'ירושלים' },
-  { id: '11', callStatus: 'missed', idNumber: '12345678', fullName: 'דני דניאלי', gender: 'זכר', age: 17.4, birthDate: '10.12.2005', stage: '2 - אחרי הכרזה', stageGroup: 'after12', track: 'גיוס רגיל', office: 'טבריה' },
-  { id: '12', callStatus: 'answered', idNumber: '12345678', fullName: 'נועה אברהם', gender: 'נקבה', age: 18.1, birthDate: '14.02.2005', stage: '3 - משתמטים', stageGroup: 'draftDodgers', track: 'גיוס רגיל', office: 'חיפה' },
+// Live state of the dialer page; reactive so edits survive navigating away and back.
+export const dialerState = reactive({
+  lastUpdated,
+  editLockTime,
+  editClosed: false,
+})
+
+type Seed = [string, string, DialerRow['gender'], number, string, DialerRow['stageGroup'], string, string, CallDecision, CallDecision]
+const stageLabels: Record<DialerRow['stageGroup'], string> = {
+  before12: '1 - לפני הכרזה',
+  after12: '2 - אחרי הכרזה',
+  draftDodgers: '3 - משתמטים',
+}
+const seeds: Seed[] = [
+  ['12345678', 'יקיר הדר', 'זכר', 17.7, '23.05.2005', 'before12', 'גיוס רגיל', 'טבריה', 'rejected', 'pending'],
+  ['22345671', 'שלום מלכה', 'זכר', 17.8, '05.05.2005', 'after12', 'גיוס רגיל', 'מחווה אלון', 'approved', 'approved'],
+  ['32345672', 'בר כהן', 'נקבה', 18.7, '20.08.2005', 'before12', 'בחו״ל ללא אישור', 'תל השומר', 'rejected', 'rejected'],
+  ['42345673', 'דניאל לוי', 'נקבה', 17.7, '18.03.2005', 'after12', 'גיוס רגיל', 'תל השומר', 'approved', 'approved'],
+  ['52345674', 'שירן פרץ', 'זכר', 19.4, '29.11.2005', 'draftDodgers', 'גיוס רגיל', 'באר שבע', 'rejected', 'approved'],
+  ['62345675', 'אברהם כהן', 'זכר', 20.8, '02.01.2005', 'before12', 'גיוס רגיל', 'תל השומר', 'approved', 'pending'],
+  ['72345676', 'דני דניאלי', 'זכר', 17.7, '15.09.2005', 'before12', 'גיוס רגיל', 'תל השומר', 'pending', 'pending'],
+  ['82345677', 'יוסי אדרי', 'זכר', 17.7, '10.12.2005', 'draftDodgers', 'גיוס רגיל', 'תל השומר', 'pending', 'pending'],
+  ['92345678', 'מאיה גבאי', 'נקבה', 17.8, '11.12.2005', 'before12', 'גיוס רגיל', 'טבריה', 'approved', 'pending'],
+  ['10234567', 'עומר שטרן', 'זכר', 17.4, '04.07.2005', 'before12', 'גיוס רגיל', 'ירושלים', 'rejected', 'pending'],
+  ['11234567', 'נועה אברהם', 'נקבה', 17.4, '14.02.2005', 'before12', 'גיוס רגיל', 'ירושלים', 'rejected', 'pending'],
+  ['12234567', 'איתי ברק', 'זכר', 17.5, '27.10.2005', 'after12', 'גיוס רגיל', 'תל השומר', 'approved', 'pending'],
 ]
+
+export const dialerRows: DialerRow[] = reactive(
+  seeds.map(([personalNumber, fullName, gender, age, birthDate, stageGroup, track, office, recommendation, approval], i) => ({
+    id: String(i + 1),
+    personalNumber,
+    idNumber: String(209842881 + i * 7919).slice(0, 9),
+    fullName,
+    gender,
+    age,
+    birthDate,
+    stage: stageLabels[stageGroup],
+    stageGroup,
+    track,
+    office,
+    recommendation,
+    approval,
+  })),
+)
 
 export const malshab = {
   fullName: 'נתנאל בן ציון',

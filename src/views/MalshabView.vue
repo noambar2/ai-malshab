@@ -4,6 +4,7 @@ import AccordionSection from '@/components/AccordionSection.vue'
 import AppIcon from '@/components/AppIcon.vue'
 import MalshabHeader from '@/components/malshab/MalshabHeader.vue'
 import MalshabDetails from '@/components/malshab/MalshabDetails.vue'
+import SmartAssistant from '@/assistant/SmartAssistant.vue'
 import SummonsSection from '@/components/malshab/sections/SummonsSection.vue'
 import DraftDataSection from '@/components/malshab/sections/DraftDataSection.vue'
 import MaaSection from '@/components/malshab/sections/MaaSection.vue'
@@ -112,6 +113,8 @@ function setAll(value: boolean) {
       </AccordionSection>
     </div>
   </main>
+
+  <SmartAssistant />
 </template>
 
 <style scoped>

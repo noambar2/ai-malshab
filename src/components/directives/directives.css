@@ -1,0 +1,302 @@
+/* Shared, non-scoped styles for the directives area. Every class is prefixed `dv-`
+   so it can't collide with other pages. Imported by the directives views. */
+
+.dv-page {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 30px 60px 40px;
+}
+.dv-title-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 26px;
+}
+.dv-title {
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: -0.48px;
+  color: var(--c-primary-dark);
+}
+.dv-meta {
+  display: flex;
+  align-items: center;
+  margin-inline-start: auto;
+  font-size: 14px;
+  color: var(--c-muted);
+}
+.dv-meta span + span {
+  border-inline-start: 1px solid var(--c-border);
+  margin-inline-start: 20px;
+  padding-inline-start: 20px;
+}
+
+.dv-card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 30px;
+}
+
+/* Section heading: bold title + grey hint */
+.dv-section-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.dv-section-head h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--c-text);
+}
+.dv-section-head small {
+  font-size: 14px;
+  color: var(--c-muted);
+}
+
+/* Form fields */
+.dv-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+.dv-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  color: #6d6e8d;
+  white-space: nowrap;
+}
+.dv-label .req::after {
+  content: ' *';
+}
+.dv-input {
+  width: 100%;
+  height: 42px;
+  padding: 0 12px;
+  background: #fff;
+  border: 1px solid #e2e8f8;
+  border-radius: 2px;
+  font-size: 16px;
+  color: #171c23;
+  outline: none;
+  transition: border-color 0.12s;
+}
+.dv-input::placeholder {
+  color: #a3a8bb;
+}
+.dv-input:focus,
+.dv-input:focus-within {
+  border-color: var(--c-primary);
+}
+.dv-input[readonly],
+.dv-input.readonly {
+  background: #f3f4f7;
+  border-color: #e2e8f8;
+  cursor: default;
+}
+.dv-input.invalid {
+  border-color: var(--c-danger);
+}
+.dv-input[type='number'] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+.dv-input[type='number']::-webkit-inner-spin-button,
+.dv-input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+}
+
+/* Native <select> styled like the design's dropdowns */
+select.dv-input {
+  appearance: none;
+  padding-inline-start: 12px;
+  padding-inline-end: 12px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24'%3E%3Cpath fill='%23333c5d' d='M6.4 8.6 12 14.2l5.6-5.6 1.4 1.4-7 7-7-7 1.4-1.4Z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: left 12px center;
+  cursor: pointer;
+}
+select.dv-input.placeholder {
+  color: #a3a8bb;
+}
+
+/* Dashed "add" buttons */
+.dv-add {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  height: 36px;
+  padding: 0 20px 0 15px;
+  border: 1px dashed var(--c-primary);
+  border-radius: 8px;
+  background: var(--c-primary-soft);
+  color: var(--c-primary);
+  font-size: 12px;
+  font-weight: 500;
+}
+.dv-add:hover {
+  background: #dce5ff;
+}
+.dv-add.wide {
+  width: 100%;
+  height: 56px;
+}
+
+/* Round red trash button */
+.dv-trash {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 56, 60, 0.14);
+  color: #ff383c;
+}
+.dv-trash:hover {
+  background: rgba(255, 56, 60, 0.24);
+}
+.dv-btn-danger {
+  background: rgba(255, 56, 60, 0.14);
+  color: #ff383c;
+}
+.dv-btn-danger:hover {
+  background: rgba(255, 56, 60, 0.24);
+}
+
+.dv-link {
+  font-size: 12px;
+  color: var(--c-primary);
+  text-decoration: underline;
+}
+
+/* Stats row (תוכניות / צפי הגעה / ...) */
+.dv-stats {
+  display: flex;
+  align-items: stretch;
+}
+.dv-stat {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  padding: 0 20px;
+  font-size: 14px;
+  white-space: nowrap;
+}
+.dv-stat + .dv-stat {
+  border-inline-start: 1px solid var(--c-border);
+}
+.dv-stat b {
+  font-size: 16px;
+  font-weight: 700;
+}
+.dv-stat .pct {
+  font-size: 12px;
+  font-weight: 400;
+  margin-inline-end: 6px;
+}
+.dv-stat .code {
+  font-size: 14px;
+  font-weight: 400;
+  margin-inline-start: 6px;
+  color: var(--c-text);
+}
+.dv-stat .warn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--c-danger);
+}
+
+/* Chips (read-only display of multi-select values) */
+.dv-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.dv-chip {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 12px;
+  border: 1px solid #e2e8f8;
+  border-radius: 2px;
+  font-size: 14px;
+  color: #171c23;
+  background: #fff;
+}
+
+/* Simple table used in summary sections */
+.dv-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.dv-table th {
+  height: 38px;
+  padding: 0 12px;
+  font-weight: 400;
+  color: var(--c-muted);
+  text-align: start;
+  border-bottom: 1px solid var(--c-divider);
+}
+.dv-table td {
+  padding: 12px;
+  text-align: start;
+  border-bottom: 1px solid var(--c-divider);
+  vertical-align: middle;
+}
+.dv-table tr:last-child td {
+  border-bottom: 0;
+}
+.dv-table .muted {
+  color: var(--c-muted);
+  margin-inline-start: 6px;
+}
+
+/* Modal shell (matches AddSummonsModal) */
+.dv-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(7, 25, 56, 0.35);
+  backdrop-filter: blur(3px);
+}
+.dv-modal {
+  width: 970px;
+  max-width: calc(100vw - 40px);
+  max-height: calc(100vh - 40px);
+  overflow: auto;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: var(--shadow-popup);
+}
+.dv-modal-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 64px;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--c-divider);
+}
+.dv-modal-head h2 {
+  font-size: 16px;
+  font-weight: 600;
+}
+.dv-modal-head small {
+  font-size: 14px;
+  color: var(--c-muted);
+}
+.dv-modal-head .close {
+  margin-inline-start: auto;
+  color: var(--c-muted);
+}

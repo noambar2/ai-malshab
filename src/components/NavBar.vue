@@ -1,16 +1,23 @@
 <script setup lang="ts">
 import { useRoute, useRouter } from 'vue-router'
 import AppIcon from './AppIcon.vue'
+import { role, roleLabels, type Role } from '@/stores/role'
 
 const route = useRoute()
 const router = useRouter()
 
-const links = [
+const links: { to: string; label: string; also?: string[] }[] = [
   { to: '/home', label: 'דף הבית' },
   { to: '/malshab', label: 'פרטי מלש״ב' },
-  { to: '/dialer', label: 'משתמטים' },
+  { to: '/dodgers', label: 'משתמטים', also: ['/dialer'] },
   { to: '/directives', label: 'דירקטיבות' },
 ]
+
+const roles = Object.keys(roleLabels) as Role[]
+
+function isActive(link: (typeof links)[number]) {
+  return [link.to, ...(link.also ?? [])].some((p) => route.path === p || route.path.startsWith(p + '/'))
+}
 
 function onSearch() {
   router.push('/malshab')
@@ -23,19 +30,25 @@ function print() {
 
 <template>
   <header class="navbar">
-    <RouterLink to="/dialer" class="logo">מלש״ביה</RouterLink>
+    <RouterLink to="/dodgers" class="logo">מלש״ביה</RouterLink>
     <nav class="links">
       <RouterLink
         v-for="link in links"
         :key="link.to"
         :to="link.to"
         class="link"
-        :class="{ active: route.path === link.to }"
+        :class="{ active: isActive(link) }"
       >
         {{ link.label }}
       </RouterLink>
     </nav>
     <div class="actions">
+      <div class="role-switch" title="המוקאפ ללא התחברות - בחרו תפקיד כדי לראות את התצוגה שלו">
+        <span>תצוגה כ:</span>
+        <button v-for="r in roles" :key="r" :class="{ active: role === r }" @click="role = r">
+          {{ roleLabels[r] }}
+        </button>
+      </div>
       <form class="search nav-search" @submit.prevent="onSearch">
         <AppIcon name="search" :size="18" />
         <input type="text" placeholder="חיפוש מלש״ב" />
@@ -94,6 +107,32 @@ function print() {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+.role-switch {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 32px;
+  padding: 0 4px 0 10px;
+  border: 1px dashed #b9c6ea;
+  border-radius: 16px;
+  font-size: 12px;
+  color: var(--c-muted);
+}
+.role-switch span {
+  margin-inline-end: 4px;
+}
+.role-switch button {
+  height: 24px;
+  padding: 0 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--c-muted-2);
+}
+.role-switch button.active {
+  background: var(--c-primary);
+  color: #fff;
 }
 .nav-search {
   width: 240px;
