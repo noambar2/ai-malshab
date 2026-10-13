@@ -673,7 +673,7 @@ watch(role, () => (selected.value = new Set()))
 .dialer-table th,
 .dialer-table td {
   text-align: start;
-  padding: 0 20px;
+  padding: 0 12px;
   white-space: nowrap;
 }
 .dialer-table td {
