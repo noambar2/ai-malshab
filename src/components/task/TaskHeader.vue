@@ -91,13 +91,20 @@ h1 {
   letter-spacing: -0.48px;
   white-space: nowrap;
 }
+.identity {
+  flex-shrink: 0;
+}
 .stats {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  row-gap: 8px;
+  min-width: 0;
   padding: 8px 0;
 }
 .stats > div {
   min-width: 50px;
-  padding: 0 20px;
+  padding: 0 16px;
 }
 .stats > div + div {
   border-inline-start: 1px solid #b9c6ea;

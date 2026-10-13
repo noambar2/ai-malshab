@@ -37,7 +37,7 @@ const personalLeft = computed(() => [...personalFields.value.slice(4, 8), ...per
           :class="{ done: i < current, current: i === current }"
         >
           <span class="dot">
-            <AppIcon v-if="i < current" name="check" :size="12" />
+            <AppIcon v-if="i < current" name="check" :size="9" />
           </span>
           <span class="label">{{ step.label }}</span>
           <span v-if="step.date && i < current" class="date">{{ step.date }}</span>
@@ -136,15 +136,15 @@ const personalLeft = computed(() => [...personalFields.value.slice(4, 8), ...per
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 10px;
+  gap: 6px;
 }
 .stepper li:not(:last-child)::after {
   content: '';
   position: absolute;
-  top: 6.5px;
-  inset-inline-start: calc(50% + 32px);
-  width: calc(100% - 64px);
-  height: 3px;
+  top: 5px;
+  inset-inline-start: calc(50% + 20px);
+  width: calc(100% - 40px);
+  height: 2px;
   border-radius: 2px;
   background: var(--c-step-idle);
 }
@@ -152,8 +152,8 @@ const personalLeft = computed(() => [...personalFields.value.slice(4, 8), ...per
   background: var(--c-primary);
 }
 .dot {
-  width: 16px;
-  height: 16px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   background: var(--c-step-idle);
   display: flex;
@@ -167,12 +167,13 @@ const personalLeft = computed(() => [...personalFields.value.slice(4, 8), ...per
 }
 .label {
   white-space: pre-line;
-  font-size: 16px;
-  font-weight: 700;
-  line-height: 1.35;
+  max-width: 110px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.3;
 }
 .date {
-  font-size: 14px;
+  font-size: 11px;
   color: var(--c-primary-dark);
 }
 
