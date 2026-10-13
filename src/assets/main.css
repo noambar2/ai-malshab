@@ -1,35 +1,163 @@
-@import './base.css';
+:root {
+  --c-text: #333c5d;
+  --c-text-2: #5a5a5a;
+  --c-muted: #848a9e;
+  --c-muted-2: #5a607f;
+  --c-primary: #0046fe;
+  --c-primary-dark: #071938;
+  --c-brand: #0d2d8f;
+  --c-primary-soft: #ebf0ff;
+  --c-header-bg: #e8eefc;
+  --c-page: #f5f6fa;
+  --c-surface: #ffffff;
+  --c-table-head: #f5f6fa;
+  --c-border: #d9e1ec;
+  --c-border-2: #d7dbec;
+  --c-divider: #eaeaea;
+  --c-step-idle: #e1ebf5;
+  --c-danger: #f12b43;
+  --c-success: #06a561;
+  --c-row-selected: #ebf0ff;
 
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  font-weight: normal;
+  --radius-card: 10px;
+  --radius-pill: 60px;
+  --shadow-popup: 2px 2px 5px rgba(0, 0, 0, 0.15);
 }
 
-a,
-.green {
-  text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-  padding: 3px;
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
 }
 
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
-  }
+html,
+body {
+  background: var(--c-page);
+  color: var(--c-text);
+  font-family: 'Noto Sans Hebrew', system-ui, sans-serif;
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
 }
 
-@media (min-width: 1024px) {
-  body {
-    display: flex;
-    place-items: center;
-  }
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
 
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
-  }
+input,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 20px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: background 0.15s, opacity 0.15s;
+}
+.btn-primary {
+  background: var(--c-primary);
+  color: #fff;
+}
+.btn-primary:hover {
+  background: #0038cc;
+}
+.btn-soft {
+  background: var(--c-primary-soft);
+  color: var(--c-primary);
+}
+.btn-soft:hover {
+  background: #dce5ff;
+}
+.btn:disabled {
+  background: #eff1f4;
+  color: var(--c-muted);
+  cursor: not-allowed;
+}
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--c-primary-soft);
+  color: var(--c-primary);
+}
+
+/* Search pill */
+.search {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 16px;
+  background: #f5f8fb;
+  color: var(--c-muted);
+}
+.search input {
+  flex: 1;
+  border: 0;
+  background: transparent;
+  outline: none;
+  font-size: 14px;
+  min-width: 0;
+}
+.search input::placeholder {
+  color: var(--c-muted);
+}
+
+/* Tables */
+.table-wrap {
+  border: 1px solid var(--c-border-2);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 16px;
+}
+.table th {
+  background: var(--c-table-head);
+  color: var(--c-muted-2);
+  font-size: 14px;
+  font-weight: 400;
+  height: 38px;
+  padding: 0 12px;
+  text-align: center;
+}
+.table td {
+  height: 46px;
+  padding: 0 12px;
+  text-align: center;
+  font-weight: 500;
+}
+.table tbody tr {
+  transition: background 0.1s;
+}
+.table.clickable tbody tr {
+  cursor: pointer;
+}
+.table.clickable tbody tr:hover {
+  background: #f9f9fe;
+}
+
+.card {
+  background: var(--c-surface);
+  border-radius: var(--radius-card);
 }
