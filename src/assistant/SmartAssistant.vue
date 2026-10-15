@@ -210,7 +210,7 @@ onBeforeUnmount(() => {
 
 .launcher {
   position: fixed;
-  left: 30px;
+  right: 30px;
   bottom: 30px;
   z-index: 30;
   display: flex;
@@ -285,7 +285,7 @@ onBeforeUnmount(() => {
 .drawer {
   position: fixed;
   top: 56px;
-  left: 0;
+  right: 0;
   bottom: 0;
   z-index: 40;
   display: flex;
@@ -293,7 +293,7 @@ onBeforeUnmount(() => {
   width: 440px;
   max-width: 100vw;
   background: #fff;
-  box-shadow: 8px 0 40px rgba(13, 45, 143, 0.14);
+  box-shadow: -8px 0 40px rgba(13, 45, 143, 0.14);
 }
 .drawer-enter-active,
 .drawer-leave-active {
@@ -301,7 +301,7 @@ onBeforeUnmount(() => {
 }
 .drawer-enter-from,
 .drawer-leave-to {
-  transform: translateX(-24px);
+  transform: translateX(24px);
   opacity: 0;
 }
 
