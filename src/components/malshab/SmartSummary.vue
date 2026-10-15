@@ -67,16 +67,6 @@ onMounted(() => setTimeout(() => (ready.value = true), 700))
   border: 1px solid #dbe4ff;
   box-shadow: 0 6px 24px -12px rgba(13, 45, 143, 0.25);
 }
-/* Thin gradient edge on the start side, echoing the assistant's mark. */
-.smart::before {
-  content: '';
-  position: absolute;
-  inset-block: 14px;
-  inset-inline-start: -1px;
-  width: 3px;
-  border-radius: 3px;
-  background: linear-gradient(180deg, #4d7dff, #0046fe 60%, #0d2d8f);
-}
 .head {
   display: flex;
   align-items: center;
