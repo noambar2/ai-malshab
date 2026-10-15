@@ -112,9 +112,16 @@ function duplicate() {
       <button type="button" class="dv-link" @click="tabsOpen = !tabsOpen">
         {{ tabsOpen ? 'הסתרת סדר לשוניות תחנה' : 'הצגת סדר לשוניות תחנה' }}
       </button>
-      <ol v-if="tabsOpen" class="tabs">
-        <li v-for="(t, i) in d.tabOrder" :key="t"><span>{{ i + 1 }}</span>{{ t }}</li>
-      </ol>
+      <div v-if="tabsOpen" class="tabs-box">
+        <h3 class="tabs-title">סדר לשוניות תחנה</h3>
+        <!-- Same layout as the tab-order popup: three columns, read top to bottom. -->
+        <ol class="tabs" :style="{ gridTemplateRows: `repeat(${Math.ceil(d.tabOrder.length / 3)}, auto)` }">
+          <li v-for="(t, i) in d.tabOrder" :key="t">
+            <span class="num">{{ i + 1 }}</span>
+            <span class="pill">{{ t }}</span>
+          </li>
+        </ol>
+      </div>
     </section>
 
     <h2 class="section-title">סלים ויעדים</h2>
@@ -222,33 +229,56 @@ dd {
   font-size: 16px;
   font-weight: 500;
 }
+.tabs-box {
+  align-self: stretch;
+  margin-top: 14px;
+  padding: 18px 20px;
+  border: 1px solid #eef1f8;
+  border-radius: 12px;
+}
+.tabs-title {
+  margin-bottom: 14px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--c-text);
+}
 .tabs {
   list-style: none;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px 20px;
   padding: 0;
+  margin: 0;
 }
 .tabs li {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 6px;
-  height: 30px;
-  padding: 0 12px 0 4px;
-  border: 1px solid #e2e8f8;
-  border-radius: 15px;
-  font-size: 13px;
+  gap: 10px;
 }
-.tabs li span {
-  display: inline-flex;
+.tabs .num {
+  flex-shrink: 0;
+  display: flex;
   align-items: center;
   justify-content: center;
-  width: 22px;
-  height: 22px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   background: #f5f6fa;
+  font-size: 14px;
   color: var(--c-muted);
-  font-size: 11px;
+}
+.tabs .pill {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  height: 34px;
+  padding: 0 18px;
+  border: 1px solid #e2e8f8;
+  border-radius: 18px;
+  background: #fff;
+  font-size: 15px;
+  font-weight: 500;
 }
 .section-title {
   margin: 36px 0 16px;
