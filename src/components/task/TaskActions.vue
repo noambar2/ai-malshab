@@ -22,6 +22,7 @@ const tipVisible = ref(false)
 
 // "הצעה חכמה": the assistant types a drafted comment into the box, which stays editable.
 const writing = ref(false)
+const textarea = ref<HTMLTextAreaElement>()
 let typer: ReturnType<typeof setInterval> | undefined
 
 function smartSuggest() {
@@ -35,6 +36,12 @@ function smartSuggest() {
     comment.value = text.slice(0, i)
     if (i >= text.length) stopTyping()
   }, 16)
+}
+
+function clearComment() {
+  stopTyping()
+  comment.value = ''
+  textarea.value?.focus()
 }
 
 function stopTyping() {
@@ -73,6 +80,7 @@ function submit(action: TaskAction) {
   <div class="actions">
     <label class="comment" :class="{ invalid: error, filled: comment }">
       <textarea
+        ref="textarea"
         v-model="comment"
         :maxlength="MAX"
         :placeholder="mode === 'review' ? 'הוספת הערה / המלצה חדשה...' : 'הוספת התייחסות חדשה...'"
@@ -95,6 +103,15 @@ function submit(action: TaskAction) {
             />
           </svg>
           {{ writing ? 'כותב…' : comment ? 'הצעה חכמה חדשה' : 'הצעה חכמה' }}
+        </button>
+        <button v-if="comment && !writing" type="button" class="clear" @click.prevent="clearComment">
+          <svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true">
+            <path
+              fill="currentColor"
+              d="M6.4 5.3 12 10.9l5.6-5.6 1.1 1.1-5.6 5.6 5.6 5.6-1.1 1.1-5.6-5.6-5.6 5.6-1.1-1.1 5.6-5.6-5.6-5.6 1.1-1.1Z"
+            />
+          </svg>
+          ניקוי
         </button>
         <span class="counter">{{ comment.length }}/{{ MAX }}</span>
       </span>
@@ -217,9 +234,28 @@ textarea::placeholder {
     transform: scale(0.85);
   }
 }
+.clear {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--c-muted-2);
+  transition: background 0.15s, color 0.15s;
+}
+.clear:hover {
+  background: #e9ecf5;
+  color: var(--c-text);
+}
+/* Small and quiet, pinned to the left end of the field. Physical margin on purpose:
+   the counter is direction: ltr, which would flip a logical margin to the wrong side. */
 .counter {
-  margin-inline-start: auto;
-  font-size: 14px;
+  margin-right: auto;
+  font-size: 11px;
+  opacity: 0.6;
   color: var(--c-muted-2);
   text-align: end;
   direction: ltr;
