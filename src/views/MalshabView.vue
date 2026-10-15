@@ -123,6 +123,9 @@ function setAll(value: boolean) {
 <style scoped>
 .data {
   padding: 30px;
+  /* Room for the floating assistant button (60px tall, 30px off the bottom) plus the
+     normal page padding, so the last section isn't hidden behind it. */
+  padding-bottom: calc(30px + 60px + 30px);
 }
 .data-head {
   display: flex;
