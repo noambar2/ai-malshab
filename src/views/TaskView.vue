@@ -12,6 +12,7 @@ import ProcessFooter from '@/components/task/ProcessFooter.vue'
 import { findTask, isMyTask, pullTask } from '@/data/dodgers'
 import { currentUser, getProcess, nextStage, nowStamp, printoutTables, type Tone } from '@/data/tasks'
 import { role } from '@/stores/role'
+import { suggestComment } from '@/assistant/taskSuggest'
 
 const route = useRoute()
 const router = useRouter()
@@ -20,6 +21,11 @@ const id = computed(() => String(route.params.id ?? ''))
 const task = computed(() => findTask(id.value))
 const mine = computed(() => isMyTask(id.value))
 const process = computed(() => getProcess(id.value))
+
+function suggest(dodgeType?: string) {
+  if (!task.value) return ''
+  return suggestComment({ task: task.value, role: role.value, history: process.value.history, dodgeType })
+}
 const me = computed(() => currentUser[role.value])
 
 // A השתמטות file adds the dodging-declaration process on top of the צו 12 one.
@@ -126,7 +132,12 @@ const footerProps = computed(() => ({
       <BigSection v-model:open="open.tzav" title="תהליך הכרזה צו 12">
         <ProcessHistory :entries="isDodging ? process.history.slice(0, 2) : process.history" />
         <template v-if="!isDodging">
-          <TaskActions v-if="canAct" :mode="role === 'pakad' ? 'declare' : 'review'" @submit="onSubmit" />
+          <TaskActions
+            v-if="canAct"
+            :mode="role === 'pakad' ? 'declare' : 'review'"
+            :suggest="suggest"
+            @submit="onSubmit"
+          />
           <ProcessFooter v-else v-bind="footerProps" @pull="pull" />
         </template>
       </BigSection>
@@ -137,6 +148,7 @@ const footerProps = computed(() => ({
           v-if="canAct"
           :mode="role === 'pakad' ? 'declare' : 'review'"
           :needs-dodge-type="role === 'pakad'"
+          :suggest="suggest"
           @submit="onSubmit"
         />
         <ProcessFooter v-else v-bind="footerProps" @pull="pull" />

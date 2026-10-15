@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { dodgeTypes } from '@/data/tasks'
 
 export type TaskAction = 'forward' | 'return' | 'declare'
@@ -9,6 +9,8 @@ const props = defineProps<{
   mode: 'review' | 'declare'
   // The פוקד must pick a dodge type before declaring השתמטות.
   needsDodgeType?: boolean
+  // Drafts a comment for "הצעה חכמה"; gets the dodge type picked so far.
+  suggest?: (dodgeType?: string) => string
 }>()
 const emit = defineEmits<{ submit: [action: TaskAction, comment: string, dodgeType?: string] }>()
 
@@ -17,6 +19,31 @@ const comment = ref('')
 const dodgeType = ref<string>('')
 const error = ref('')
 const tipVisible = ref(false)
+
+// "הצעה חכמה": the assistant types a drafted comment into the box, which stays editable.
+const writing = ref(false)
+let typer: ReturnType<typeof setInterval> | undefined
+
+function smartSuggest() {
+  if (!props.suggest || writing.value) return
+  const text = props.suggest(dodgeType.value || undefined).slice(0, MAX)
+  comment.value = ''
+  writing.value = true
+  let i = 0
+  typer = setInterval(() => {
+    i = Math.min(i + 3, text.length)
+    comment.value = text.slice(0, i)
+    if (i >= text.length) stopTyping()
+  }, 16)
+}
+
+function stopTyping() {
+  if (typer) clearInterval(typer)
+  typer = undefined
+  writing.value = false
+}
+
+onBeforeUnmount(stopTyping)
 
 const declareBlocked = computed(() => !!props.needsDodgeType && !dodgeType.value)
 
@@ -50,8 +77,27 @@ function submit(action: TaskAction) {
         :maxlength="MAX"
         :placeholder="mode === 'review' ? 'הוספת הערה / המלצה חדשה...' : 'הוספת התייחסות חדשה...'"
         rows="2"
+        :readonly="writing"
       />
-      <span class="counter">{{ comment.length }}/{{ MAX }}</span>
+      <span class="field-foot">
+        <button
+          v-if="suggest"
+          type="button"
+          class="smart"
+          :class="{ writing }"
+          :disabled="writing"
+          @click="smartSuggest"
+        >
+          <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+            <path
+              fill="currentColor"
+              d="M12 2.5l1.9 5.6 5.6 1.9-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.9L12 2.5Zm6.5 11 .9 2.6 2.6.9-2.6.9-.9 2.6-.9-2.6-2.6-.9 2.6-.9.9-2.6Z"
+            />
+          </svg>
+          {{ writing ? 'כותב…' : comment ? 'הצעה חכמה חדשה' : 'הצעה חכמה' }}
+        </button>
+        <span class="counter">{{ comment.length }}/{{ MAX }}</span>
+      </span>
     </label>
     <p v-if="error" class="error" role="alert">{{ error }}</p>
 
@@ -124,13 +170,55 @@ textarea {
   outline: none;
   resize: none;
   font-size: 14px;
+  line-height: 1.6;
   color: var(--c-primary-dark);
+  /* Grow with the text, so a full suggestion is visible without scrolling. */
+  field-sizing: content;
+  min-height: 44px;
 }
 textarea::placeholder {
   color: var(--c-primary-dark);
   opacity: 0.5;
 }
+.field-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 6px;
+}
+.smart {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 12px;
+  border-radius: 14px;
+  background: linear-gradient(315deg, #0d2d8f 0%, #0046fe 55%, #4d7dff 100%);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: 0 6px 14px -6px rgba(0, 70, 254, 0.6);
+  transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+}
+.smart:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px -6px rgba(0, 70, 254, 0.7);
+}
+.smart:disabled {
+  cursor: default;
+}
+.smart.writing svg {
+  animation: twinkle 0.8s ease-in-out infinite;
+}
+@keyframes twinkle {
+  50% {
+    opacity: 0.4;
+    transform: scale(0.85);
+  }
+}
 .counter {
+  margin-inline-start: auto;
   font-size: 14px;
   color: var(--c-muted-2);
   text-align: end;
