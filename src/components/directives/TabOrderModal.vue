@@ -41,18 +41,24 @@ function move(i: number, delta: number) {
         </button>
       </header>
       <ol class="grid" :style="{ gridTemplateRows: `repeat(${rows}, auto)` }">
+        <!-- Slots are keyed by position, so the numbers stay put and only the pills move. -->
         <li
           v-for="(t, i) in tabs"
-          :key="t"
-          :class="{ dragging: dragging === i }"
-          draggable="true"
-          @dragstart="onDragStart(i, $event)"
+          :key="i"
           @dragenter.prevent="onDragEnter(i)"
           @dragover.prevent
-          @dragend="dragging = null"
         >
           <span class="num">{{ i + 1 }}</span>
-          <span class="pill" tabindex="0" @keydown.up.prevent="move(i, -1)" @keydown.down.prevent="move(i, 1)">
+          <span
+            class="pill"
+            :class="{ dragging: dragging === i }"
+            tabindex="0"
+            draggable="true"
+            @dragstart="onDragStart(i, $event)"
+            @dragend="dragging = null"
+            @keydown.up.prevent="move(i, -1)"
+            @keydown.down.prevent="move(i, 1)"
+          >
             {{ t }}
             <DvIcon name="drag" :size="18" class="handle" />
           </span>
@@ -110,7 +116,7 @@ li {
 .handle {
   color: #a3a8bb;
 }
-li.dragging .pill {
+.pill.dragging {
   border: 1px dashed var(--c-primary);
   background: var(--c-primary-soft);
   color: var(--c-primary);
