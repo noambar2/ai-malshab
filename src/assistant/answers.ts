@@ -34,6 +34,41 @@ export const QUICK_QUESTIONS = [
   'איך יוצרים איתו קשר?',
 ]
 
+export interface SummaryFlag {
+  tone: 'red' | 'amber' | 'blue'
+  text: string
+}
+
+// The "smart summary" card at the top of the profile: a short written read of the file,
+// plus the few things that need attention right now.
+export function smartSummary(): { text: string; flags: SummaryFlag[]; recommendation: string } {
+  const open = openSummons().length
+  const stage = process.steps[process.current]!.label
+  const trigger = process.steps[0]!
+  const missing = maaZoomScores.find((f) => f.icon === 'error')
+  const appeal = maaComputerScores.find((f) => f.icon === 'warning')
+  const accepted = goals.filter((g) => g.status === 'התקבל/שובץ').length
+  const inSorting = goals.filter((g) => g.status === 'בתהליך מיון').length
+
+  const text = [
+    `**${malshab.fullName}**, בן ${field(malshab.personal, 'גיל')} מ${field(malshab.personal, 'יישוב / סוציואקונומי').split(' /')[0]}, משויך ל${field(malshab.draft, 'לשכה')}. `,
+    `נתוני האיכות שלו טובים — פרופיל **${s.profile}** ודפ״ר **${s.dapar}**, בטווח **${s.track}** עם תאריך גיוס ${s.draftDate}. `,
+    `הוא נמצא בתהליך צו 12 בשלב **${stage}**, לאחר ${trigger.label.replace('אי ', 'אי־')} (${trigger.date}). `,
+    `כרגע יש לו **${open} זימונים פתוחים**, ${accepted} יעדים שהתקבל אליהם ו־${inSorting} יעדים בתהליך מיון. `,
+    `במא״ה **לא סיים תהליכים**${missing ? ` — חסרה השלמה של רכיב ${missing.label}` : ''}${appeal ? ` ויש ערעור פתוח על ציון ${appeal.label}` : ''}.`,
+  ].join('')
+
+  const flags: SummaryFlag[] = [
+    { tone: 'red', text: trigger.label },
+    { tone: 'amber', text: 'מא״ה לא הושלם' },
+    { tone: 'blue', text: `${open} זימונים פתוחים` },
+  ]
+
+  const recommendation = `לוודא הגעה לזימון הפתוח הקרוב ולתאם השלמת מא״ה לפני ${process.steps[process.current + 1]?.label ?? 'השלב הבא'}.`
+
+  return { text, flags, recommendation }
+}
+
 export function greeting(): string[] {
   const open = openSummons().length
   return [

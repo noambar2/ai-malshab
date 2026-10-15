@@ -2,6 +2,7 @@
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import RichText from './RichText.vue'
 import { QUICK_QUESTIONS, answer, greeting } from './answers'
+import { assistantOpen } from './state'
 import { malshab } from '@/data/mock'
 
 interface Msg {
@@ -10,7 +11,7 @@ interface Msg {
   text: string
 }
 
-const open = ref(false)
+const open = assistantOpen
 const msgs = ref<Msg[]>([])
 const typing = ref(false)
 const busy = ref(false)

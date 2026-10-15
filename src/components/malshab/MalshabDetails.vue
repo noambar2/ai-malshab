@@ -1,53 +1,54 @@
 <script setup lang="ts">
 import AppIcon from '@/components/AppIcon.vue'
+import SmartSummary from './SmartSummary.vue'
 import { malshab } from '@/data/mock'
 
 const process = malshab.process
+
+// The fields sit on one 6-column grid (4 + 2, with a divider between them) so every row
+// lines up; the smart summary takes the space beside them.
+type Cell = { label: string; value: string; info?: boolean; link?: boolean } | null
+const half = (list: Cell[], from: number, n: number) =>
+  Array.from({ length: n }, (_, i) => list[from + i] ?? null)
+
+const bands = [
+  {
+    titles: ['פרטים אישיים', 'מוצא'],
+    rows: [0, 1].map((r) => [...half(malshab.personal, r * 4, 4), ...half(malshab.origin, r * 2, 2)]),
+  },
+  {
+    titles: ['כתובת', 'פרטי גיוס'],
+    rows: [
+      [...half(malshab.address, 0, 4), ...half(malshab.draft, 0, 2)],
+      [...half(malshab.address, 4, 4), null, null],
+    ],
+  },
+]
 </script>
 
 <template>
   <section class="details">
-    <div class="groups">
-      <div class="group personal">
-        <h3>פרטים אישיים</h3>
-        <dl class="grid cols-4">
-          <div v-for="f in malshab.personal" :key="f.label">
-            <dt>{{ f.label }}</dt>
-            <dd>
-              {{ f.value }}
-              <AppIcon v-if="f.info" name="info" :size="12" class="info" />
-            </dd>
+    <div class="top">
+      <div class="fields">
+        <div v-for="band in bands" :key="band.titles[0]" class="band">
+          <div class="row6 titles">
+            <h3>{{ band.titles[0] }}</h3>
+            <h3>{{ band.titles[1] }}</h3>
           </div>
-        </dl>
-      </div>
-      <div class="group">
-        <h3>מוצא</h3>
-        <dl class="grid cols-2">
-          <div v-for="f in malshab.origin" :key="f.label">
-            <dt>{{ f.label }}</dt>
-            <dd>{{ f.value }}</dd>
-          </div>
-        </dl>
-      </div>
-      <div class="group">
-        <h3>פרטי גיוס</h3>
-        <dl class="grid cols-1">
-          <div v-for="f in malshab.draft" :key="f.label">
-            <dt>{{ f.label }}</dt>
-            <dd class="link">{{ f.value }}</dd>
-          </div>
-        </dl>
-      </div>
-    </div>
-
-    <div class="group address">
-      <h3>כתובת</h3>
-      <dl class="grid cols-6">
-        <div v-for="f in malshab.address" :key="f.label">
-          <dt>{{ f.label }}</dt>
-          <dd>{{ f.value }}</dd>
+          <dl v-for="(row, r) in band.rows" :key="r" class="row6">
+            <div v-for="(f, i) in row" :key="i">
+              <template v-if="f">
+                <dt>{{ f.label }}</dt>
+                <dd :class="{ link: f.link }">
+                  {{ f.value }}
+                  <AppIcon v-if="f.info" name="info" :size="12" class="info" />
+                </dd>
+              </template>
+            </div>
+          </dl>
         </div>
-      </dl>
+      </div>
+      <SmartSummary class="summary" />
     </div>
 
     <div class="process">
@@ -86,39 +87,45 @@ h3 {
   color: var(--c-muted);
   margin-bottom: 12px;
 }
-.groups {
+.top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 400px;
+  gap: 32px;
+  align-items: stretch;
+}
+.fields {
   display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
-.group.personal {
-  flex: 1.4;
+.row6 {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  column-gap: 20px;
 }
-.groups .group {
-  padding-inline-end: 40px;
+.row6 + .row6 {
+  margin-top: 12px;
 }
-.groups .group + .group {
-  flex: 1;
-  padding-inline-start: 40px;
+.row6 > * {
+  min-width: 0;
+}
+/* Divider between the 4-column and the 2-column halves, on the same guide in every row. */
+.row6 > :nth-child(5) {
+  padding-inline-start: 20px;
   border-inline-start: 1px solid var(--c-divider);
 }
-.groups .group:last-child {
-  flex: 0.6;
-  padding-inline-end: 0;
+.titles h3 {
+  margin: 0;
 }
-.grid {
-  display: grid;
-  gap: 12px 24px;
+.titles > :nth-child(1) {
+  grid-column: span 4;
 }
-.cols-1 {
-  grid-template-columns: 1fr;
+.titles > :nth-child(2) {
+  grid-column: span 2;
 }
-.cols-2 {
-  grid-template-columns: repeat(2, 1fr);
-}
-.cols-4 {
-  grid-template-columns: repeat(4, 1fr);
-}
-.cols-6 {
-  grid-template-columns: repeat(6, minmax(0, 130px));
+.titles > :nth-child(2) {
+  padding-inline-start: 20px;
+  border-inline-start: 1px solid var(--c-divider);
 }
 dt {
   font-size: 12px;
@@ -139,9 +146,6 @@ dd.link {
 }
 .info {
   color: var(--c-primary);
-}
-.address {
-  margin-top: 24px;
 }
 .process {
   margin-top: 24px;
