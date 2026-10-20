@@ -54,7 +54,7 @@ const tabsOpen = ref(false)
     </section>
 
     <!-- Collapsed by default; when open, the tabs are dragged right here. -->
-    <section>
+    <section class="tabs-section">
       <button type="button" class="dv-section-head toggle" :aria-expanded="tabsOpen" @click="tabsOpen = !tabsOpen">
         <h3>סדר לשוניות תחנה</h3>
         <AppIcon :name="tabsOpen ? 'chevron-up' : 'chevron-down'" :size="20" class="chev" />
@@ -122,7 +122,7 @@ const tabsOpen = ref(false)
 .step {
   display: flex;
   flex-direction: column;
-  gap: 50px;
+  gap: 40px;
   min-height: 734px;
 }
 .grid4 {
@@ -137,6 +137,10 @@ const tabsOpen = ref(false)
   align-items: start;
 }
 /* The section title doubles as the open/close control. */
+/* Belongs with the station choice above it, so it sits closer to it. */
+.tabs-section {
+  margin-top: -14px;
+}
 .toggle {
   width: 100%;
   padding: 0;
@@ -147,6 +151,9 @@ const tabsOpen = ref(false)
   align-self: center;
   margin-inline-start: -4px;
   color: var(--c-text);
+}
+.toggle[aria-expanded='false'] {
+  margin-bottom: 0;
 }
 .toggle:hover h3 {
   color: var(--c-primary);
