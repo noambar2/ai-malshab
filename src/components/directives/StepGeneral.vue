@@ -57,8 +57,8 @@ const tabsOpen = ref(false)
     <section>
       <button type="button" class="dv-section-head toggle" :aria-expanded="tabsOpen" @click="tabsOpen = !tabsOpen">
         <h3>סדר לשוניות תחנה</h3>
-        <small>הסדר שבו יוצגו הלשוניות בתחנה - גררו לשינוי</small>
         <AppIcon :name="tabsOpen ? 'chevron-up' : 'chevron-down'" :size="20" class="chev" />
+        <small v-if="tabsOpen">הסדר שבו יוצגו הלשוניות בתחנה - גררו לשינוי</small>
       </button>
       <TabOrderGrid v-if="tabsOpen" :tabs="d.tabOrder" />
     </section>
@@ -144,7 +144,7 @@ const tabsOpen = ref(false)
 }
 .toggle .chev {
   align-self: center;
-  margin-inline-start: auto;
+  margin-inline-start: -4px;
   color: var(--c-text);
 }
 .toggle:hover h3 {
