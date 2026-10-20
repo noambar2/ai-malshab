@@ -260,10 +260,10 @@ function remove(i: number) {
   display: flex;
   align-items: baseline;
   min-width: 0;
-  font-size: 24px;
+  /* Same size as the basket name in the basket step. */
+  font-size: 20px;
   font-weight: 500;
   color: var(--c-primary-dark);
-  letter-spacing: -0.48px;
 }
 /* One line: a long name is cut off with "…" (full name on hover) instead of wrapping word by word. */
 .title .nm {
@@ -277,7 +277,6 @@ function remove(i: number) {
   font-size: 14px;
   font-weight: 400;
   color: var(--c-muted);
-  letter-spacing: 0;
 }
 .note {
   display: flex;
