@@ -11,7 +11,8 @@ import { fmtRange, type Directive } from '@/data/directives'
 const props = defineProps<{ d: Directive; editable?: boolean }>()
 const emit = defineEmits<{ editRest: [] }>()
 
-const restOpen = reactive<Record<string, boolean>>({})
+// Like a basket's targets: the first one starts open so its placement targets are visible.
+const restOpen = reactive<Record<string, boolean>>(Object.fromEntries(props.d.rest.map((t, i) => [t.id, i === 0])))
 const openMap = reactive<Record<string, boolean>>(
   Object.fromEntries(props.d.baskets.map((b, i) => [b.id, i === 0])),
 )
@@ -96,10 +97,14 @@ const openMap = reactive<Record<string, boolean>>(
   font-size: 16px;
   font-weight: 700;
 }
+/* Same light-blue ground as an open basket, so each target card's edges show. */
 .rest-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
+  padding: 20px;
+  border-radius: 8px;
+  background: #e2eafd;
 }
 .none {
   font-size: 14px;
