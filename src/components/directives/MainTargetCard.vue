@@ -30,8 +30,8 @@ function remove(i: number) {
   <section class="mt" :class="{ open, editable }">
     <button type="button" class="head" :aria-expanded="open" @click="open = !open">
       <div class="title">
-        <h3>
-          {{ info?.name ?? 'יעד לא נבחר' }}
+        <h3 :title="info?.name">
+          <span class="nm">{{ info?.name ?? 'יעד לא נבחר' }}</span>
           <small>{{ target.targetCode }}</small>
         </h3>
         <p class="note" :title="target.notes">
@@ -176,12 +176,22 @@ function remove(i: number) {
   min-width: 0;
 }
 .title h3 {
+  display: flex;
+  align-items: baseline;
+  min-width: 0;
   font-size: 24px;
   font-weight: 500;
   color: var(--c-primary-dark);
   letter-spacing: -0.48px;
 }
+/* One line: a long name is cut off with "…" (full name on hover) instead of wrapping word by word. */
+.title .nm {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
 .title small {
+  flex-shrink: 0;
   margin-inline-start: 8px;
   font-size: 14px;
   font-weight: 400;

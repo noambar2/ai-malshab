@@ -39,11 +39,8 @@ function remove(i: number) {
 
   <div class="list">
     <template v-for="(t, i) in d.rest" :key="t.id">
-      <RestTargetEditor v-if="editing.includes(t.id)" :target="t" :index="i" @save="close(t.id)" @remove="remove(i)" />
-      <div v-else class="saved">
-        <span class="badge">יעד מס׳ {{ i + 1 }}</span>
-        <MainTargetCard :target="t" :open="false" @update:open="open(t.id)" />
-      </div>
+      <RestTargetEditor v-if="editing.includes(t.id)" :target="t" @save="close(t.id)" @remove="remove(i)" />
+      <MainTargetCard v-else :target="t" :open="false" @update:open="open(t.id)" />
     </template>
 
     <p v-if="!d.rest.length" class="none">לא הוגדרו מיוצבים נוספים. הוסיפו יעד ראשי אם יש מיוצבים שאינם משויכים לאף סל.</p>
@@ -59,25 +56,7 @@ function remove(i: number) {
 .list {
   display: flex;
   flex-direction: column;
-  gap: 30px;
-}
-.saved {
-  position: relative;
-}
-.saved .badge {
-  position: absolute;
-  top: -12px;
-  inset-inline-start: 20px;
-  z-index: 1;
-  height: 24px;
-  padding: 0 10px;
-  display: inline-flex;
-  align-items: center;
-  border-radius: 12px;
-  background: var(--c-primary);
-  color: #fff;
-  font-size: 14px;
-  font-weight: 700;
+  gap: 12px;
 }
 .none {
   margin: 0;

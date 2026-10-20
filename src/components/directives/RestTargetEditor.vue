@@ -16,7 +16,7 @@ import {
   type MainTarget,
 } from '@/data/directives'
 
-const props = defineProps<{ target: MainTarget; index: number }>()
+const props = defineProps<{ target: MainTarget }>()
 const emit = defineEmits<{ save: []; remove: [] }>()
 
 const showErrors = ref(false)
@@ -42,8 +42,6 @@ const missing = (v: unknown) => showErrors.value && (typeof v === 'string' ? !v.
 
 <template>
   <div class="dv-card editor">
-    <span class="badge">יעד מס׳ {{ index + 1 }}</span>
-
     <div class="main-row">
       <div class="dv-field">
         <span class="dv-label"><span class="req">יעד</span></span>
@@ -155,21 +153,6 @@ const missing = (v: unknown) => showErrors.value && (typeof v === 'string' ? !v.
 <style scoped>
 .editor {
   position: relative;
-  padding-top: 26px;
-}
-.badge {
-  position: absolute;
-  top: -12px;
-  inset-inline-start: 20px;
-  height: 24px;
-  padding: 0 10px;
-  display: inline-flex;
-  align-items: center;
-  border-radius: 12px;
-  background: var(--c-primary);
-  color: #fff;
-  font-size: 14px;
-  font-weight: 700;
 }
 /* Figma: the target field is wider, followed by four equal fields. */
 .main-row {
