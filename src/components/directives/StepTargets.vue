@@ -4,6 +4,7 @@ import { computed, reactive, ref } from 'vue'
 import BasketStats from './BasketStats.vue'
 import MainTargetCard from './MainTargetCard.vue'
 import MetaLine from './MetaLine.vue'
+import NoteLine from './NoteLine.vue'
 import type { Directive } from '@/data/directives'
 
 const props = defineProps<{ d: Directive; showErrors?: boolean; initialBasket?: string }>()
@@ -36,8 +37,9 @@ const missing = (id: string) => {
 
   <template v-if="active">
     <div class="banner">
-      <div>
+      <div class="banner-name">
         <h2>{{ active.name }}</h2>
+        <NoteLine v-if="active.notes" :text="active.notes" />
         <p>
           לעריכת הסל והיעדים יש
           <button type="button" class="back-link" @click="emit('editBaskets')">לחזור אחורה לשלב הקודם</button>
@@ -109,14 +111,24 @@ const missing = (id: string) => {
   border-radius: 8px;
   background: #e2eafd;
 }
+/* Same text sizes as a basket in the basket step, in the banner's brand blue. */
+.banner-name {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  min-width: 0;
+}
 .banner h2 {
-  font-size: 24px;
-  font-weight: 700;
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--c-brand);
+}
+.banner :deep(.note-line) {
   color: var(--c-brand);
 }
 .banner p {
-  margin-top: 6px;
-  font-size: 16px;
+  font-size: 13px;
   color: var(--c-brand);
 }
 .back-link {
