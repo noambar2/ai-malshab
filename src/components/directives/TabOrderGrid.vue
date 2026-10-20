@@ -1,11 +1,10 @@
 <script setup lang="ts">
-// "סדר לשוניות תחנה" popup — drag the pills to reorder the station tabs. Edits the array in place.
+// "סדר לשוניות תחנה" grid, shown inline on the first wizard step — drag the pills (or use the
+// arrow keys) to reorder the station tabs. Edits the array in place.
 import { computed, ref } from 'vue'
-import AppIcon from '@/components/AppIcon.vue'
 import DvIcon from './DvIcon.vue'
 
 const props = defineProps<{ tabs: string[] }>()
-const emit = defineEmits<{ close: [] }>()
 
 const dragging = ref<number | null>(null)
 const rows = computed(() => Math.ceil(props.tabs.length / 3))
@@ -31,15 +30,6 @@ function move(i: number, delta: number) {
 </script>
 
 <template>
-  <div class="dv-overlay" @click.self="emit('close')">
-    <div class="dv-modal" role="dialog" aria-modal="true" aria-label="סדר לשוניות תחנה">
-      <header class="dv-modal-head">
-        <h2>סדר לשוניות תחנה</h2>
-        <small>ניתן לגרור לשינוי הסדר</small>
-        <button class="close" aria-label="סגירה" @click="emit('close')">
-          <AppIcon name="close" :size="20" />
-        </button>
-      </header>
       <ol class="grid" :style="{ gridTemplateRows: `repeat(${rows}, auto)` }">
         <!-- Slots are keyed by position, so the numbers stay put and only the pills move. -->
         <li
@@ -64,8 +54,6 @@ function move(i: number, delta: number) {
           </span>
         </li>
       </ol>
-    </div>
-  </div>
 </template>
 
 <style scoped>
@@ -75,7 +63,8 @@ function move(i: number, delta: number) {
   grid-auto-flow: column;
   grid-template-columns: repeat(3, 1fr);
   gap: 10px 20px;
-  padding: 20px;
+  margin: 0;
+  padding: 0;
 }
 li {
   display: flex;

@@ -6,7 +6,8 @@ import MultiSelect from './MultiSelect.vue'
 import DateInput from './DateInput.vue'
 import AnchorDatesEditor from './AnchorDatesEditor.vue'
 import GuidelinesEditor from './GuidelinesEditor.vue'
-import TabOrderModal from './TabOrderModal.vue'
+import AppIcon from '@/components/AppIcon.vue'
+import TabOrderGrid from './TabOrderGrid.vue'
 import {
   cohortOptions,
   districts,
@@ -50,7 +51,16 @@ const tabsOpen = ref(false)
           <DateInput v-model="d.date" :invalid="showErrors && !d.date" />
         </div>
       </div>
-      <button type="button" class="dv-link tabs-link" @click="tabsOpen = true">לחצו לשינוי סדר לשוניות תחנה</button>
+    </section>
+
+    <!-- Collapsed by default; when open, the tabs are dragged right here. -->
+    <section>
+      <button type="button" class="dv-section-head toggle" :aria-expanded="tabsOpen" @click="tabsOpen = !tabsOpen">
+        <h3>סדר לשוניות תחנה</h3>
+        <small>הסדר שבו יוצגו הלשוניות בתחנה - גררו לשינוי</small>
+        <AppIcon :name="tabsOpen ? 'chevron-up' : 'chevron-down'" :size="20" class="chev" />
+      </button>
+      <TabOrderGrid v-if="tabsOpen" :tabs="d.tabOrder" />
     </section>
 
     <section>
@@ -106,7 +116,6 @@ const tabsOpen = ref(false)
     </section>
   </div>
 
-  <TabOrderModal v-if="tabsOpen" :tabs="d.tabOrder" @close="tabsOpen = false" />
 </template>
 
 <style scoped>
@@ -127,7 +136,18 @@ const tabsOpen = ref(false)
   gap: 20px;
   align-items: start;
 }
-.tabs-link {
-  margin-top: 20px;
+/* The section title doubles as the open/close control. */
+.toggle {
+  width: 100%;
+  text-align: start;
+  cursor: pointer;
+}
+.toggle .chev {
+  align-self: center;
+  margin-inline-start: auto;
+  color: var(--c-text);
+}
+.toggle:hover h3 {
+  color: var(--c-primary);
 }
 </style>
