@@ -177,7 +177,8 @@ h4 small {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  margin-inline-start: 8px;
+  /* Pushed to the far (left) end of the row, away from the message. */
+  margin-inline-start: auto;
   padding: 0;
   font-size: 13px;
   font-weight: 600;
