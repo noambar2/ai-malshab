@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // A basket's main target as an expandable card. In the wizard ("יעדים לשיבוץ") the body edits
 // the targets recruits can be placed into; on the summary/detail pages it's a read-only table.
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import AppIcon from '@/components/AppIcon.vue'
 import DvIcon from './DvIcon.vue'
 import SearchSelect from './SearchSelect.vue'
@@ -23,9 +23,30 @@ const professionOf = (code: string) => {
   return t ? `${t.professionCode} - ${t.profession}` : ''
 }
 
+// In the wizard the placement targets have a view mode (read-only table) and an edit mode
+// (fields), like a basket. Incomplete targets start in edit mode.
+const subsValid = computed(() => props.target.subTargets.every((s) => !!s.targetCode && hasNum(s.quantity)))
+const editing = ref(!!props.editable && !subsValid.value)
+const localErrors = ref(false)
+const errors = computed(() => !!props.showErrors || localErrors.value)
+
+function startEdit() {
+  editing.value = true
+  open.value = true
+}
+function saveClose() {
+  localErrors.value = true
+  if (!subsValid.value) return
+  editing.value = false
+  localErrors.value = false
+}
 function add() {
   props.target.subTargets.push(newSubTarget())
+  editing.value = true
   open.value = true
+}
+function toggle() {
+  if (!props.summaryOnly) open.value = !open.value
 }
 function remove(i: number) {
   props.target.subTargets.splice(i, 1)
@@ -34,13 +55,14 @@ function remove(i: number) {
 
 <template>
   <section class="mt" :class="{ open, editable, compact: summaryOnly }">
-    <component
-      :is="summaryOnly ? 'div' : 'button'"
-      :type="summaryOnly ? undefined : 'button'"
+    <div
       class="head"
       :class="{ static: summaryOnly }"
+      :role="summaryOnly ? undefined : 'button'"
+      :tabindex="summaryOnly ? undefined : 0"
       :aria-expanded="summaryOnly ? undefined : open"
-      @click="!summaryOnly && (open = !open)"
+      @click="toggle"
+      @keydown.enter.self="toggle"
     >
       <div class="title">
         <h3 :title="info?.name">
@@ -75,12 +97,22 @@ function remove(i: number) {
           <b v-else class="warn"><DvIcon name="warning" :size="15" />0</b>
         </div>
       </div>
+      <button
+        v-if="editable && !editing && target.subTargets.length"
+        type="button"
+        class="edit-ico"
+        title="עריכת היעדים לשיבוץ"
+        aria-label="עריכת היעדים לשיבוץ"
+        @click.stop="startEdit"
+      >
+        <DvIcon name="edit" :size="17" />
+      </button>
       <AppIcon v-if="!summaryOnly" :name="open ? 'chevron-up' : 'chevron-down'" :size="22" class="chev" />
-    </component>
+    </div>
 
     <div v-if="open && !summaryOnly" class="body">
-      <!-- Editable (wizard) -->
-      <template v-if="editable">
+      <!-- Edit mode (wizard) -->
+      <template v-if="editable && editing">
         <div class="dv-section-head">
           <h3>בחירת יעדים לשיבוץ</h3>
           <small>היעדים אליהם ניתן לשבץ את המתגייסים מהיום הנוכחי, בהתאם ליעד שאיתו הגיעו אל יום הגיוס.</small>
@@ -96,7 +128,7 @@ function remove(i: number) {
                 v-model="s.targetCode"
                 :options="targetOptions"
                 placeholder="התחילו להקליד שם או מזהה יעד..."
-                :invalid="showErrors && !s.targetCode"
+                :invalid="errors && !s.targetCode"
               />
             </div>
             <div class="dv-field">
@@ -111,7 +143,7 @@ function remove(i: number) {
                 min="0"
                 class="dv-input"
                 placeholder="0"
-                :class="{ invalid: showErrors && !hasNum(s.quantity) }"
+                :class="{ invalid: errors && !hasNum(s.quantity) }"
               />
             </label>
             <label class="dv-field">
@@ -128,13 +160,20 @@ function remove(i: number) {
             </label>
           </div>
         </div>
-        <button type="button" class="dv-add" @click="add">
-          <AppIcon name="plus" :size="16" />
-          הוספת יעד לשיבוץ
-        </button>
+        <p v-if="localErrors && !subsValid" class="err">יש לבחור יעד ולמלא "כמה ניתן לשבץ" בכל יעד לשיבוץ</p>
+        <div class="edit-actions">
+          <button type="button" class="dv-add" @click="add">
+            <AppIcon name="plus" :size="16" />
+            הוספת יעד לשיבוץ
+          </button>
+          <button type="button" class="btn btn-primary save" @click="saveClose">
+            <AppIcon name="check" :size="14" />
+            שמירה וסגירה
+          </button>
+        </div>
       </template>
 
-      <!-- Read-only (summary / detail) -->
+      <!-- View mode: read-only table (also the summary / detail pages) -->
       <template v-else>
         <table v-if="target.subTargets.length" class="dv-table">
           <thead>
@@ -161,10 +200,16 @@ function remove(i: number) {
             </tr>
           </tbody>
         </table>
-        <p v-else class="empty">
-          <DvIcon name="warning" :size="15" />
-          לא הוגדרו יעדים לשיבוץ עבור יעד זה
-        </p>
+        <div v-else class="empty-row">
+          <p class="empty">
+            <DvIcon name="warning" :size="15" />
+            לא הוגדרו יעדים לשיבוץ עבור יעד זה
+          </p>
+          <button v-if="editable" type="button" class="dv-add" @click="add">
+            <AppIcon name="plus" :size="16" />
+            הוספת יעד לשיבוץ
+          </button>
+        </div>
       </template>
     </div>
   </section>
@@ -184,8 +229,49 @@ function remove(i: number) {
   padding: 16px 30px;
   text-align: start;
 }
+.head {
+  cursor: pointer;
+}
 .head.static {
   cursor: default;
+}
+.head:focus-visible {
+  outline: 2px solid var(--c-primary);
+  outline-offset: -2px;
+  border-radius: 8px;
+}
+.edit-ico {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  color: var(--c-primary);
+}
+.edit-ico:hover {
+  background: var(--c-primary-soft);
+}
+.edit-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.edit-actions .save {
+  height: 32px;
+}
+.empty-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.err {
+  margin: 0 0 10px;
+  font-size: 13px;
+  color: var(--c-danger);
 }
 .title {
   flex: 1;
