@@ -5,10 +5,10 @@ import { computed, ref } from 'vue'
 import AppIcon from '@/components/AppIcon.vue'
 import DvIcon from './DvIcon.vue'
 import SearchSelect from './SearchSelect.vue'
+import SubTargetsEditor from './SubTargetsEditor.vue'
 import {
   findTarget,
   hasNum,
-  newSubTarget,
   placementTypes,
   restTargetValid,
   targetCatalog,
@@ -30,12 +30,6 @@ const professionOf = (code: string) => {
 function save() {
   showErrors.value = true
   if (restTargetValid(props.target)) emit('save')
-}
-function addSub() {
-  props.target.subTargets.push(newSubTarget())
-}
-function removeSub(i: number) {
-  props.target.subTargets.splice(i, 1)
 }
 const missing = (v: unknown) => showErrors.value && (typeof v === 'string' ? !v.trim() : !hasNum(v as number | null))
 </script>
@@ -86,54 +80,7 @@ const missing = (v: unknown) => showErrors.value && (typeof v === 'string' ? !v.
       <small>היעדים אליהם ניתן לשבץ את המתגייסים מהיום הנוכחי, בהתאם ליעד שאיתו הגיעו אל יום הגיוס.</small>
     </div>
 
-    <div v-for="(s, i) in target.subTargets" :key="s.id" class="sub">
-      <button type="button" class="dv-trash" aria-label="מחיקת יעד לשיבוץ" @click="removeSub(i)">
-        <DvIcon name="trash" :size="18" />
-      </button>
-      <div class="sub-grid">
-        <div class="dv-field">
-          <span class="dv-label"><span class="req">יעד</span></span>
-          <SearchSelect
-            v-model="s.targetCode"
-            :options="targetOptions"
-            placeholder="התחילו להקליד שם או מזהה יעד..."
-            :invalid="showErrors && !s.targetCode"
-          />
-        </div>
-        <div class="dv-field">
-          <span class="dv-label">מקצוע</span>
-          <span class="dv-input readonly calc ellipsis">{{ professionOf(s.targetCode) }}</span>
-        </div>
-        <label class="dv-field">
-          <span class="dv-label"><span class="req">כמה ניתן לשבץ?</span></span>
-          <input
-            v-model.number="s.quantity"
-            type="number"
-            min="0"
-            class="dv-input"
-            placeholder="0"
-            :class="{ invalid: missing(s.quantity) }"
-          />
-        </label>
-        <label class="dv-field">
-          <span class="dv-label"><span class="req">איכות</span></span>
-          <input v-model="s.quality" class="dv-input" :class="{ invalid: missing(s.quality) }" placeholder="טקסט חופשי" />
-        </label>
-        <label class="dv-field">
-          <span class="dv-label"><span class="req">כשירות</span></span>
-          <input v-model="s.qualification" class="dv-input" :class="{ invalid: missing(s.qualification) }" placeholder="טקסט חופשי" />
-        </label>
-        <label class="dv-field">
-          <span class="dv-label"><span class="req">הערות</span></span>
-          <input v-model="s.notes" class="dv-input" :class="{ invalid: missing(s.notes) }" placeholder="טקסט חופשי" />
-        </label>
-      </div>
-    </div>
-
-    <button type="button" class="dv-add add-sub" @click="addSub">
-      <AppIcon name="plus" :size="16" />
-      הוספת יעד לשיבוץ
-    </button>
+    <SubTargetsEditor :sub-targets="target.subTargets" strict :show-errors="showErrors" />
 
     <p v-if="showErrors && !restTargetValid(target)" class="err">יש למלא את כל שדות החובה המסומנים לפני השמירה</p>
 
@@ -176,26 +123,6 @@ const missing = (v: unknown) => showErrors.value && (typeof v === 'string' ? !v.
 }
 .subs-head {
   margin-top: 24px;
-}
-.sub {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  margin-bottom: 14px;
-}
-.sub .dv-trash {
-  flex-shrink: 0;
-  margin-top: 21px;
-}
-.sub-grid {
-  flex: 1;
-  min-width: 0;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-}
-.add-sub {
-  align-self: flex-start;
 }
 .err {
   margin-top: 16px;

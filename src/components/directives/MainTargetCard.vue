@@ -4,8 +4,8 @@
 import { computed, ref } from 'vue'
 import AppIcon from '@/components/AppIcon.vue'
 import DvIcon from './DvIcon.vue'
-import SearchSelect from './SearchSelect.vue'
-import { findTarget, hasNum, newSubTarget, targetCatalog, targetLabel, type MainTarget } from '@/data/directives'
+import SubTargetsEditor from './SubTargetsEditor.vue'
+import { findTarget, hasNum, newSubTarget, type MainTarget } from '@/data/directives'
 
 const props = defineProps<{
   target: MainTarget
@@ -21,11 +21,6 @@ const emit = defineEmits<{ edit: [] }>()
 const open = defineModel<boolean>('open', { default: false })
 
 const info = computed(() => findTarget(props.target.targetCode))
-const targetOptions = targetCatalog.map((t) => ({ value: t.code, label: targetLabel(t) }))
-const professionOf = (code: string) => {
-  const t = findTarget(code)
-  return t ? `${t.professionCode} - ${t.profession}` : ''
-}
 
 // In the wizard the placement targets have a view mode (read-only table) and an edit mode
 // (fields), like a basket. Incomplete targets start in edit mode.
@@ -53,9 +48,6 @@ function add() {
 }
 function toggle() {
   if (!props.summaryOnly) open.value = !open.value
-}
-function remove(i: number) {
-  props.target.subTargets.splice(i, 1)
 }
 </script>
 
@@ -106,55 +98,9 @@ function remove(i: number) {
           <h3>בחירת יעדים לשיבוץ</h3>
           <small>היעדים אליהם ניתן לשבץ את המתגייסים מהיום הנוכחי, בהתאם ליעד שאיתו הגיעו אל יום הגיוס.</small>
         </div>
-        <div v-for="(s, i) in target.subTargets" :key="s.id" class="sub">
-          <button type="button" class="dv-trash" aria-label="מחיקת יעד לשיבוץ" @click="remove(i)">
-            <DvIcon name="trash" :size="18" />
-          </button>
-          <div class="sub-grid">
-            <div class="dv-field">
-              <span class="dv-label"><span class="req">יעד</span></span>
-              <SearchSelect
-                v-model="s.targetCode"
-                :options="targetOptions"
-                placeholder="התחילו להקליד שם או מזהה יעד..."
-                :invalid="errors && !s.targetCode"
-              />
-            </div>
-            <div class="dv-field">
-              <span class="dv-label">מקצוע</span>
-              <span class="dv-input readonly ro">{{ professionOf(s.targetCode) || 0 }}</span>
-            </div>
-            <label class="dv-field">
-              <span class="dv-label"><span class="req">כמה ניתן לשבץ?</span></span>
-              <input
-                v-model.number="s.quantity"
-                type="number"
-                min="0"
-                class="dv-input"
-                placeholder="0"
-                :class="{ invalid: errors && !hasNum(s.quantity) }"
-              />
-            </label>
-            <label class="dv-field">
-              <span class="dv-label">איכות</span>
-              <input v-model="s.quality" class="dv-input" placeholder="טקסט חופשי" />
-            </label>
-            <label class="dv-field">
-              <span class="dv-label">כשירות</span>
-              <input v-model="s.qualification" class="dv-input" placeholder="טקסט חופשי" />
-            </label>
-            <label class="dv-field">
-              <span class="dv-label">הערות</span>
-              <input v-model="s.notes" class="dv-input" placeholder="טקסט חופשי" />
-            </label>
-          </div>
-        </div>
+        <SubTargetsEditor :sub-targets="target.subTargets" :show-errors="errors" />
         <p v-if="localErrors && !subsValid" class="err">יש לבחור יעד ולמלא "כמה ניתן לשבץ" בכל יעד לשיבוץ</p>
         <div class="edit-actions">
-          <button type="button" class="dv-add" @click="add">
-            <AppIcon name="plus" :size="16" />
-            הוספת יעד לשיבוץ
-          </button>
           <button type="button" class="btn btn-primary save" @click="saveClose">
             <AppIcon name="check" :size="14" />
             שמירה וסגירה
@@ -235,9 +181,8 @@ function remove(i: number) {
 }
 .edit-actions {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 20px;
 }
 .edit-actions .save {
   height: 32px;
@@ -309,26 +254,6 @@ function remove(i: number) {
   margin: 0 30px;
   padding: 24px 0 30px;
   border-top: 1px solid var(--c-divider);
-}
-.sub {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding-bottom: 14px;
-  margin-bottom: 14px;
-  border-bottom: 1px solid var(--c-divider);
-}
-.sub-grid {
-  flex: 1;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-}
-.ro {
-  display: flex;
-  align-items: center;
-  overflow: hidden;
-  white-space: nowrap;
 }
 .notes {
   max-width: 220px;
