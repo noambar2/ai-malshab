@@ -1,87 +1,123 @@
 <script setup lang="ts">
-// Top progress bar of the create-directive wizard. Visited steps are clickable.
+// Top progress of the create-directive wizard: "שלב 2 מתוך 4" over four bar segments, each
+// with its step name underneath. Done steps show a check; steps already reached are clickable.
 import AppIcon from '@/components/AppIcon.vue'
 
-defineProps<{ steps: string[]; current: number; reached: number }>()
+const props = defineProps<{ steps: string[]; current: number; reached: number }>()
 const emit = defineEmits<{ go: [index: number] }>()
+
+function go(i: number) {
+  if (i <= props.reached && i !== props.current) emit('go', i)
+}
 </script>
 
 <template>
-  <div class="stepper-band">
-    <ol class="stepper">
-      <template v-for="(s, i) in steps" :key="s">
-        <li v-if="i > 0" class="line" :class="{ done: i <= current }" aria-hidden="true" />
-        <li :class="{ done: i < current, current: i === current, reachable: i <= reached && i !== current }">
-          <button type="button" class="step" :disabled="i > reached || i === current" @click="emit('go', i)">
-            <span class="dot"><AppIcon v-if="i < current" name="check" :size="11" /></span>
-            <span class="label">{{ s }}</span>
+  <nav class="stepper-band" aria-label="שלבי יצירת הדירקטיבה">
+    <div class="inner">
+      <p class="count">שלב {{ current + 1 }} מתוך {{ steps.length }}</p>
+      <ol class="steps">
+        <li
+          v-for="(s, i) in steps"
+          :key="s"
+          :class="{ done: i < current, current: i === current, reachable: i <= reached && i !== current }"
+        >
+          <button
+            type="button"
+            class="step"
+            :disabled="i > reached || i === current"
+            :aria-current="i === current ? 'step' : undefined"
+            @click="go(i)"
+          >
+            <span class="bar" aria-hidden="true" />
+            <span class="label">
+              <AppIcon v-if="i < current" name="check" :size="14" class="check" />
+              {{ s }}
+            </span>
           </button>
         </li>
-      </template>
-    </ol>
-  </div>
+      </ol>
+    </div>
+  </nav>
 </template>
 
 <style scoped>
 .stepper-band {
   background: #fff;
-  padding: 40px 20px 20px;
+  border-bottom: 1px solid var(--c-divider);
 }
-.stepper {
-  list-style: none;
-  display: flex;
-  align-items: flex-start;
-  max-width: 1260px;
+.inner {
+  max-width: 1300px;
   margin: 0 auto;
+  padding: 10px 60px 12px;
+}
+.count {
+  margin: 0 0 6px;
+  font-size: 12px;
+  color: var(--c-muted);
+}
+.steps {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  margin: 0;
   padding: 0;
-}
-.line {
-  flex: 1;
-  height: 4px;
-  margin: 6px -10px 0;
-  border-radius: 2px;
-  background: var(--c-step-idle);
-}
-.line.done {
-  background: var(--c-primary);
 }
 .step {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  width: 105px;
+  align-items: stretch;
+  gap: 6px;
+  width: 100%;
+  text-align: start;
   cursor: default;
 }
 .reachable .step {
   cursor: pointer;
 }
-.reachable .step:hover .label {
-  color: var(--c-primary);
-}
 .step:disabled {
   color: inherit;
 }
-.dot {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
+.bar {
+  height: 4px;
+  border-radius: 2px;
   background: var(--c-step-idle);
-  color: #fff;
+  transition: background 0.15s;
 }
-.done .dot,
-.current .dot {
+.done .bar,
+.current .bar {
   background: var(--c-primary);
 }
+.reachable .step:hover .bar {
+  background: #3d6fff;
+}
 .label {
-  min-height: 40px;
-  font-size: 16px;
-  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--c-muted-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.check {
+  flex-shrink: 0;
+  color: var(--c-primary);
+}
+.done .label {
   color: var(--c-text);
-  text-align: center;
-  line-height: 1.35;
+}
+.current .label {
+  font-weight: 700;
+  color: var(--c-primary);
+}
+.reachable .step:hover .label {
+  color: var(--c-primary);
+}
+.step:not(:disabled):focus-visible {
+  outline: 2px solid var(--c-primary);
+  outline-offset: 3px;
+  border-radius: 2px;
 }
 </style>
