@@ -93,6 +93,19 @@ const info = computed(() => findTarget(props.target.targetCode))
 .tr + .tr {
   border-top: 1px solid var(--c-divider);
 }
+/* The open target and its placement targets read as one tinted block. */
+.tr.open {
+  background: #f4f7ff;
+}
+.tr.open .row:hover {
+  background: transparent;
+}
+.tr.open .subs .dv-table th {
+  border-bottom-color: #dfe6f8;
+}
+.tr.open .subs .dv-table td {
+  border-bottom-color: #e6ecfa;
+}
 /* Same grid as the basket header; the hierarchy shows in the label, indented one step in. */
 .row {
   cursor: pointer;
