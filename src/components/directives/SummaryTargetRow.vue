@@ -93,12 +93,10 @@ const info = computed(() => findTarget(props.target.targetCode))
 .tr + .tr {
   border-top: 1px solid var(--c-divider);
 }
-/* The open target and its placement targets read as one tinted block. */
-.tr.open {
+/* Only the open target's contents (its placement targets) are tinted; the row stays white. */
+.tr.open .subs {
   background: #f4f7ff;
-}
-.tr.open .row:hover {
-  background: transparent;
+  padding-top: 4px;
 }
 .tr.open .subs .dv-table th {
   border-bottom-color: #dfe6f8;
