@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// Wizard step 2b — "יעדים לשיבוץ": per basket (tabs), choose where each main target's recruits can be placed.
+// Wizard step 3 — "יעדים לשיבוץ": per basket (tabs), choose where each main target's recruits can be placed.
 import { computed, reactive, ref } from 'vue'
 import BasketStats from './BasketStats.vue'
 import MainTargetCard from './MainTargetCard.vue'
@@ -20,6 +20,11 @@ const missing = (id: string) => {
 </script>
 
 <template>
+  <div class="dv-title-row">
+    <h1 class="dv-title">יעדים לשיבוץ</h1>
+    <MetaLine :d="d" />
+  </div>
+
   <nav class="tabs" aria-label="סלים">
     <button
       v-for="b in d.baskets"
@@ -44,10 +49,6 @@ const missing = (id: string) => {
         </p>
       </div>
       <BasketStats :basket="active" tone="blue" />
-    </div>
-
-    <div class="meta-row">
-      <MetaLine :d="d" />
     </div>
 
     <div class="cards">
@@ -118,10 +119,6 @@ const missing = (id: string) => {
   font-size: inherit;
   color: inherit;
   text-decoration: underline;
-}
-.meta-row {
-  display: flex;
-  margin: 22px 0 18px;
 }
 .cards {
   display: flex;

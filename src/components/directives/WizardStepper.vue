@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// Top progress of the create-directive wizard: "שלב 2 מתוך 4" over four bar segments, each
+// Top progress of the create-directive wizard: "שלב 2 מתוך 5" over one bar segment per step, each
 // with its step name underneath. Done steps show a check; steps already reached are clickable.
 import AppIcon from '@/components/AppIcon.vue'
 
@@ -15,7 +15,7 @@ function go(i: number) {
   <nav class="stepper-band" aria-label="שלבי יצירת הדירקטיבה">
     <div class="inner">
       <p class="count">שלב {{ current + 1 }} מתוך {{ steps.length }}</p>
-      <ol class="steps">
+      <ol class="steps" :style="{ gridTemplateColumns: `repeat(${steps.length}, minmax(0, 1fr))` }">
         <li
           v-for="(s, i) in steps"
           :key="s"
@@ -62,7 +62,6 @@ function go(i: number) {
 .steps {
   list-style: none;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 6px;
   margin: 0;
   padding: 0;

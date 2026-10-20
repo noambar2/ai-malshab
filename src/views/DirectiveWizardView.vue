@@ -27,10 +27,10 @@ const route = useRoute()
 const router = useRouter()
 
 type Stage = 'general' | 'baskets' | 'targets' | 'rest' | 'summary'
-const STEPS = ['הגדרות כלליות', 'סלים', 'יתר מיוצבים', 'סיכום']
-const stageOfStep: Stage[] = ['general', 'baskets', 'rest', 'summary']
+// One step per stage: defining the baskets and placing targets into them are separate steps.
 const order: Stage[] = ['general', 'baskets', 'targets', 'rest', 'summary']
-const stepOf = (s: Stage) => (s === 'general' ? 0 : s === 'baskets' || s === 'targets' ? 1 : s === 'rest' ? 2 : 3)
+const STEPS = ['הגדרות כלליות', 'הגדרת סלים', 'יעדים לשיבוץ', 'יתר מיוצבים', 'סיכום']
+const stepOf = (s: Stage) => order.indexOf(s)
 
 const editId = typeof route.query.edit === 'string' ? route.query.edit : ''
 const fromId = typeof route.query.from === 'string' ? route.query.from : ''
@@ -52,7 +52,7 @@ const d = reactive<Directive>(initial())
 const isEdit = !!editId && !!getDirective(editId)
 
 const stage = ref<Stage>('general')
-const reachedIdx = ref(isEdit || fromId ? 3 : 0)
+const reachedIdx = ref(isEdit || fromId ? order.length - 1 : 0)
 const step = computed(() => stepOf(stage.value))
 const showErrors = ref(false)
 const editingBaskets = ref<string[]>([])
@@ -129,7 +129,7 @@ function back() {
   else stage.value = order[i - 1] ?? 'general'
 }
 function goStep(i: number) {
-  const target = stageOfStep[i]
+  const target = order[i]
   if (!target || i > reachedIdx.value) return
   if (i > step.value && !validate(stage.value)) return
   stage.value = target
@@ -216,10 +216,10 @@ function saveDraft() {
   height: 72px;
   padding: 0 60px;
   /* Frosted glass: the page shows through, blurred, as it scrolls under the bar. */
-  background: rgba(255, 255, 255, 0.28);
-  -webkit-backdrop-filter: blur(8px) saturate(1.3);
-  backdrop-filter: blur(8px) saturate(1.3);
-  border-top: 1px solid rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.72);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  box-shadow: 0 -1px 0 #eceef5, 0 -6px 16px rgba(7, 25, 56, 0.06);
 }
 .draft {
   font-size: 13px;
