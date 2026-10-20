@@ -131,10 +131,55 @@ export interface SubTarget {
   id: string
   targetCode: string
   quantity: number | null
-  quality: string
-  qualification: string
+  // Who can be placed here: all conditions must hold (e.g. דפ״ר ≥ 50 and פרופיל = 97).
+  conditions: Condition[]
   notes: string
 }
+
+/** One placement condition on a recruit field: field, operator and value. */
+export interface Condition {
+  id: string
+  field: string
+  op: ConditionOp | ''
+  value: string
+}
+
+export type ConditionOp = 'eq' | 'ne' | 'gt' | 'gte' | 'lt' | 'lte'
+
+export interface ConditionField {
+  key: string
+  label: string
+  // Numbers can be compared; a list of options can only be equal / not equal.
+  options?: string[]
+}
+
+export const conditionFields: ConditionField[] = [
+  { key: 'dapar', label: 'דפ״ר' },
+  { key: 'profile', label: 'פרופיל', options: ['21', '24', '45', '64', '72', '82', '97'] },
+  { key: 'kaba', label: 'קב״א' },
+  { key: 'tzadach', label: 'צד״כ' },
+  { key: 'attention', label: 'קשב מתמשך' },
+  { key: 'english', label: 'רמת אנגלית' },
+  { key: 'gender', label: 'מגדר', options: ['זכר', 'נקבה'] },
+  { key: 'education', label: 'השכלה', options: ['12 שנות לימוד', 'בגרות מלאה', 'הנדסאי', 'תואר ראשון'] },
+]
+
+// Long labels for choosing; short ones for reading a condition back in a table.
+export const conditionOps: { key: ConditionOp; label: string; short: string }[] = [
+  { key: 'eq', label: 'שווה ל', short: 'שווה' },
+  { key: 'ne', label: 'שונה מ', short: 'שונה מ' },
+  { key: 'gt', label: 'גדול מ', short: 'מעל' },
+  { key: 'gte', label: 'גדול או שווה ל', short: 'לפחות' },
+  { key: 'lt', label: 'קטן מ', short: 'מתחת ל' },
+  { key: 'lte', label: 'קטן או שווה ל', short: 'עד' },
+]
+
+export const findField = (key: string) => conditionFields.find((f) => f.key === key)
+export const opsFor = (field: string) =>
+  findField(field)?.options ? conditionOps.filter((o) => o.key === 'eq' || o.key === 'ne') : conditionOps
+export const conditionComplete = (c: Condition) => !!c.field && !!c.op && !!c.value.trim()
+export const conditionText = (c: Condition) =>
+  `${findField(c.field)?.label ?? c.field} ${conditionOps.find((o) => o.key === c.op)?.short ?? ''} ${c.value}`
 
 export interface MainTarget {
   id: string
@@ -222,7 +267,7 @@ export function restTargetValid(t: MainTarget) {
     !!t.placementType &&
     !!t.evacTarget.trim() &&
     t.subTargets.every(
-      (s) => !!s.targetCode && hasNum(s.quantity) && !!s.quality.trim() && !!s.qualification.trim() && !!s.notes.trim(),
+      (s) => !!s.targetCode && hasNum(s.quantity) && s.conditions.every(conditionComplete) && !!s.notes.trim(),
     )
   )
 }
@@ -254,10 +299,11 @@ export const newSubTarget = (): SubTarget => ({
   id: uid('s'),
   targetCode: '',
   quantity: null,
-  quality: '',
-  qualification: '',
+  conditions: [],
   notes: '',
 })
+
+export const newCondition = (): Condition => ({ id: uid('c'), field: '', op: '', value: '' })
 
 export const newMainTarget = (): MainTarget => ({
   id: uid('t'),
@@ -305,14 +351,14 @@ export const cloneDirective = (d: Directive): Directive => JSON.parse(JSON.strin
 
 // ---------- Seed ----------
 
-const sub = (targetCode: string, quantity: number, quality: string, qualification: string, notes: string): SubTarget => ({
+const sub = (targetCode: string, quantity: number, conditions: Condition[], notes: string): SubTarget => ({
   id: uid('s'),
   targetCode,
   quantity,
-  quality,
-  qualification,
+  conditions,
   notes,
 })
+const cond = (field: string, op: ConditionOp, value: string): Condition => ({ id: uid('c'), field, op, value })
 
 const main = (targetCode: string, evacTarget: string, notes: string, subs: SubTarget[], placementType = 'שוחררים'): MainTarget => ({
   id: uid('t'),
@@ -347,24 +393,24 @@ function seed(): Directive[] {
   const dental = () =>
     basket('בה״ד 20 הסל הראשון שלי', 154, 80, 80, [
       main('12345678', 'יעד פינוי', 'הערות יעד ראשי, הערה ארוכה רק התחלה ובטולטיפ הערה מלאה של היעד הראשי.', [
-        sub('3301744', 5, 'קב״א 49 ומטה', 'דוגמא לכשירות', 'ללא התש'),
-        sub('3302190', 5, 'קשב מתמשך 2 ומעלה', 'דוגמא לכשירות', 'כאן יש ממש הרבה טקסט בהערות מלא מה להעיר'),
-        sub('2384395', 5, 'קב״א 49 ומטה', 'דוגמא לכשירות', 'ללא התש'),
-        sub('4410288', 5, 'קב״א 49 ומטה', 'דוגמא לכשירות', 'ללא התש'),
+        sub('3301744', 5, [cond('kaba', 'lte', '49')], 'ללא התש'),
+        sub('3302190', 5, [cond('attention', 'gte', '2')], 'כאן יש ממש הרבה טקסט בהערות מלא מה להעיר'),
+        sub('2384395', 5, [cond('kaba', 'lte', '49')], 'ללא התש'),
+        sub('4410288', 5, [cond('kaba', 'lte', '49')], 'ללא התש'),
       ]),
       main('12345690', 'יעד פינוי', 'יעד משני למרפאות הצפון.', [
-        sub('3301744', 3, 'קב״א 49 ומטה', 'דוגמא לכשירות', ''),
-        sub('4410288', 6, 'דפ״ר 50 ומעלה', 'קורס חובשים', 'ירידה במאסף קרה״ד'),
+        sub('3301744', 3, [cond('kaba', 'lte', '49')], ''),
+        sub('4410288', 6, [cond('dapar', 'gte', '50'), cond('profile', 'eq', '97')], 'ירידה במאסף קרה״ד'),
       ]),
     ], 'סל מועדף למרפאות השיניים. לתאם עם קצין הרפואה לפני השיבוץ.')
 
   const restRows = () => [
     main('9950204', 'יעד פינוי', 'עדיפות להנג״א, לא לשכוח למלא טופס 16 א׳', [
-      sub('8840011', 4, 'דפ״ר 50 ומעלה', 'ראיון קצין מיון', 'עדיפות לבוגרי מכינה'),
-      sub('5512140', 3, 'קב״א 49 ומטה', 'דוגמא לכשירות', 'ללא התש'),
+      sub('8840011', 4, [cond('dapar', 'gte', '50'), cond('profile', 'eq', '97')], 'עדיפות לבוגרי מכינה'),
+      sub('5512140', 3, [cond('kaba', 'lte', '49')], 'ללא התש'),
     ]),
-    main('8840033', 'יעד פינוי', 'עדיפות להנג״א', [sub('5512006', 6, 'קב״א 49 ומטה', 'דוגמא לכשירות', 'ללא התש')]),
-    main('5512006', 'שוחרר', '', [sub('8840011', 2, 'דפ״ר 40 ומעלה', 'דוגמא לכשירות', 'ירידה במאסף')]),
+    main('8840033', 'יעד פינוי', 'עדיפות להנג״א', [sub('5512006', 6, [cond('kaba', 'lte', '49')], 'ללא התש')]),
+    main('5512006', 'שוחרר', '', [sub('8840011', 2, [cond('dapar', 'gte', '40')], 'ירידה במאסף')]),
   ]
 
   // Only some seeded directives carry guidelines; the rest start with none.
@@ -407,12 +453,12 @@ function seed(): Directive[] {
       baskets: [
         dental(),
         basket('אדמיניסטרציה, משאבי אנוש ותפעול שוטף', 120, 75, 85, [
-          main('8840011', 'מנהלה', 'עדיפות לבעלי ניסיון קודם.', [sub('8840033', 4, 'קב״א 45 ומעלה', 'ללא', '')]),
+          main('8840011', 'מנהלה', 'עדיפות לבעלי ניסיון קודם.', [sub('8840033', 4, [cond('kaba', 'gte', '45')], '')]),
           main('5512140', 'כוח אדם', '', []),
         ]),
         basket('משרות פיתוח תוכנה וארכיטקטורת ענן', 60, 90, 70, [
-          main('6620031', 'ממר״ם', 'מיון ממוחשב בלבד.', [sub('2384395', 5, 'קשב מתמשך 2 ומעלה', 'מבחן תכנות', 'ירידה במאסף קרה״ד')]),
-          main('6620077', 'ממר״ם', '', [sub('2384395', 2, 'קשב מתמשך 2 ומעלה', 'מבחן תכנות', '')]),
+          main('6620031', 'ממר״ם', 'מיון ממוחשב בלבד.', [sub('2384395', 5, [cond('attention', 'gte', '2')], 'ירידה במאסף קרה״ד')]),
+          main('6620077', 'ממר״ם', '', [sub('2384395', 2, [cond('attention', 'gte', '2')], '')]),
         ]),
       ],
       rest: restRows(),
@@ -436,11 +482,11 @@ function seed(): Directive[] {
       tabOrder: [...defaultTabOrder],
       baskets: [
         basket('ניהול מוצר, אסטרטגיה וניתוח נתונים', 80, 85, 75, [
-          main('7730412', 'יעד פינוי', 'לשבץ רק בעלי תואר ראשון.', [sub('7730590', 4, 'דפ״ר 60 ומעלה', 'תואר ראשון', '')]),
+          main('7730412', 'יעד פינוי', 'לשבץ רק בעלי תואר ראשון.', [sub('7730590', 4, [cond('dapar', 'gte', '60'), cond('education', 'eq', 'תואר ראשון')], '')]),
           main('7730590', 'יעד פינוי', '', []),
         ]),
         basket('מכירות שטח, פיתוח עסקי וניהול לקוחות', 45, 70, 80, [
-          main('3301744', 'שירות', '', [sub('3302190', 3, 'קב״א 49 ומטה', 'דוגמא לכשירות', '')]),
+          main('3301744', 'שירות', '', [sub('3302190', 3, [cond('kaba', 'lte', '49')], '')]),
         ]),
       ],
       rest: restRows().slice(0, 2),
@@ -497,9 +543,9 @@ function seed(): Directive[] {
       tabOrder: [...defaultTabOrder],
       baskets: [
         basket('קרבי', 210, 85, 90, [
-          main('4410288', 'יעד פינוי', 'חובשים לגדודים.', [sub('4410288', 10, 'דפ״ר 50 ומעלה', 'קורס חובשים', '')]),
+          main('4410288', 'יעד פינוי', 'חובשים לגדודים.', [sub('4410288', 10, [cond('dapar', 'gte', '50'), cond('profile', 'eq', '97')], '')]),
         ]),
-        basket('משאבי אנוש', 70, 80, 80, [main('8840011', '', '', [sub('5512140', 4, 'קב״א 45 ומעלה', '', '')])]),
+        basket('משאבי אנוש', 70, 80, 80, [main('8840011', '', '', [sub('5512140', 4, [cond('kaba', 'gte', '45')], '')])]),
       ],
       rest: restRows().slice(1),
       draft: false,
@@ -517,7 +563,7 @@ function seed(): Directive[] {
       cohorts: ['ינואר 2024'],
       anchors: [],
       tabOrder: [...defaultTabOrder],
-      baskets: [basket('בה״ד 20', 130, 80, 80, [main('12345678', 'יעד פינוי', '', [sub('3301744', 5, 'קב״א 49 ומטה', '', '')])])],
+      baskets: [basket('בה״ד 20', 130, 80, 80, [main('12345678', 'יעד פינוי', '', [sub('3301744', 5, [cond('kaba', 'lte', '49')], '')])])],
       rest: [],
       draft: false,
       createdBy: 'אבירן שלמה',

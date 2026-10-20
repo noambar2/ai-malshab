@@ -4,6 +4,7 @@
 import { computed } from 'vue'
 import AppIcon from '@/components/AppIcon.vue'
 import DvIcon from './DvIcon.vue'
+import ConditionChips from './ConditionChips.vue'
 import NoteLine from './NoteLine.vue'
 import { findTarget, type MainTarget } from '@/data/directives'
 
@@ -58,8 +59,7 @@ const info = computed(() => findTarget(props.target.targetCode))
             <th>יעד לשיבוץ</th>
             <th>מקצוע</th>
             <th>ניתן לשבץ</th>
-            <th>איכות</th>
-            <th>כשירות</th>
+            <th>תנאים</th>
             <th>הערות</th>
           </tr>
         </thead>
@@ -71,8 +71,7 @@ const info = computed(() => findTarget(props.target.targetCode))
               <span class="code">{{ findTarget(s.targetCode)?.professionCode }}</span>
             </td>
             <td>{{ s.quantity ?? '-' }}</td>
-            <td>{{ s.quality || '-' }}</td>
-            <td>{{ s.qualification || '-' }}</td>
+            <td><ConditionChips :conditions="s.conditions" /></td>
             <td>{{ s.notes || '-' }}</td>
           </tr>
         </tbody>

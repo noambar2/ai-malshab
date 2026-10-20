@@ -4,6 +4,7 @@
 import { computed, ref } from 'vue'
 import AppIcon from '@/components/AppIcon.vue'
 import DvIcon from './DvIcon.vue'
+import ConditionChips from './ConditionChips.vue'
 import SubTargetsEditor from './SubTargetsEditor.vue'
 import { findTarget, hasNum, newSubTarget, type MainTarget } from '@/data/directives'
 
@@ -116,8 +117,7 @@ function toggle() {
               <th>יעדים לשיבוץ</th>
               <th>מקצוע</th>
               <th>ניתן לשבץ</th>
-              <th>איכות</th>
-              <th>כשירות</th>
+              <th>תנאים</th>
               <th>הערות</th>
             </tr>
           </thead>
@@ -129,8 +129,7 @@ function toggle() {
                 <span class="muted">{{ findTarget(s.targetCode)?.professionCode }}</span>
               </td>
               <td>{{ s.quantity ?? '-' }}</td>
-              <td>{{ s.quality || '-' }}</td>
-              <td>{{ s.qualification || '-' }}</td>
+              <td><ConditionChips :conditions="s.conditions" /></td>
               <td class="notes">{{ s.notes || '-' }}</td>
             </tr>
           </tbody>

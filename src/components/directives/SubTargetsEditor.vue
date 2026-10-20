@@ -5,11 +5,13 @@ import { ref } from 'vue'
 import AppIcon from '@/components/AppIcon.vue'
 import DvIcon from './DvIcon.vue'
 import SearchSelect from './SearchSelect.vue'
-import { findTarget, hasNum, newSubTarget, targetCatalog, targetLabel, type SubTarget } from '@/data/directives'
+import ConditionsEditor from './ConditionsEditor.vue'
+import ConditionChips from './ConditionChips.vue'
+import { conditionComplete, findTarget, hasNum, newSubTarget, targetCatalog, targetLabel, type SubTarget } from '@/data/directives'
 
 const props = defineProps<{
   subTargets: SubTarget[]
-  // "יתר מיוצבים": איכות, כשירות and הערות are required too.
+  // "יתר מיוצבים": הערות is required too.
   strict?: boolean
   showErrors?: boolean
 }>()
@@ -23,7 +25,8 @@ const professionOf = (code: string) => {
 const valid = (s: SubTarget) =>
   !!s.targetCode &&
   hasNum(s.quantity) &&
-  (!props.strict || (!!s.quality.trim() && !!s.qualification.trim() && !!s.notes.trim()))
+  s.conditions.every(conditionComplete) &&
+  (!props.strict || !!s.notes.trim())
 
 // Incomplete rows start open for editing; rows whose ✓ was pressed while incomplete show errors.
 const editing = ref<string[]>(props.subTargets.filter((s) => !valid(s)).map((s) => s.id))
@@ -60,8 +63,7 @@ function remove(i: number) {
         <th>יעד לשיבוץ</th>
         <th>מקצוע</th>
         <th>ניתן לשבץ</th>
-        <th>איכות</th>
-        <th>כשירות</th>
+        <th>תנאים</th>
         <th>הערות</th>
         <th class="acts-col"><span class="sr-only">פעולות</span></th>
       </tr>
@@ -69,7 +71,7 @@ function remove(i: number) {
     <tbody>
       <template v-for="(s, i) in subTargets" :key="s.id">
         <tr v-if="editing.includes(s.id)" class="editing">
-          <td colspan="7">
+          <td colspan="6">
             <div class="form">
               <div class="grid">
                 <div class="dv-field">
@@ -96,19 +98,10 @@ function remove(i: number) {
                     :class="{ invalid: missing(s, s.quantity) }"
                   />
                 </label>
-                <label class="dv-field">
-                  <span class="dv-label"><span :class="{ req: strict }">איכות</span></span>
-                  <input v-model="s.quality" class="dv-input" :class="{ invalid: strict && missing(s, s.quality) }" placeholder="טקסט חופשי" />
-                </label>
-                <label class="dv-field">
-                  <span class="dv-label"><span :class="{ req: strict }">כשירות</span></span>
-                  <input
-                    v-model="s.qualification"
-                    class="dv-input"
-                    :class="{ invalid: strict && missing(s, s.qualification) }"
-                    placeholder="טקסט חופשי"
-                  />
-                </label>
+                <div class="dv-field conds-field">
+                  <span class="dv-label">תנאים לשיבוץ</span>
+                  <ConditionsEditor :conditions="s.conditions" :show-errors="err(s)" />
+                </div>
                 <label class="dv-field">
                   <span class="dv-label"><span :class="{ req: strict }">הערות</span></span>
                   <input v-model="s.notes" class="dv-input" :class="{ invalid: strict && missing(s, s.notes) }" placeholder="טקסט חופשי" />
@@ -132,8 +125,7 @@ function remove(i: number) {
             <span class="muted">{{ findTarget(s.targetCode)?.professionCode }}</span>
           </td>
           <td>{{ s.quantity ?? '-' }}</td>
-          <td>{{ s.quality || '-' }}</td>
-          <td>{{ s.qualification || '-' }}</td>
+          <td><ConditionChips :conditions="s.conditions" /></td>
           <td class="notes">{{ s.notes || '-' }}</td>
           <td class="acts">
             <button type="button" class="ico" aria-label="עריכת יעד לשיבוץ" title="עריכה" @click="edit(s)">
@@ -216,6 +208,10 @@ function remove(i: number) {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px 10px;
+}
+/* Conditions take the first two columns of the second row, הערות the third. */
+.conds-field {
+  grid-column: span 2;
 }
 .form-acts {
   display: flex;
