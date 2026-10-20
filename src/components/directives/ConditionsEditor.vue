@@ -70,6 +70,8 @@ function remove(i: number) {
   align-items: center;
   gap: 8px;
   width: 100%;
+  /* Even across a whole row, a condition stays a compact pill. */
+  max-width: 640px;
 }
 /* "וגם" between conditions, as a small label in front of each pill. */
 .join {

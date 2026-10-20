@@ -98,14 +98,14 @@ function remove(i: number) {
                     :class="{ invalid: missing(s, s.quantity) }"
                   />
                 </label>
-                <div class="dv-field conds-field">
-                  <span class="dv-label">תנאים לשיבוץ</span>
-                  <ConditionsEditor :conditions="s.conditions" :show-errors="err(s)" />
-                </div>
                 <label class="dv-field">
                   <span class="dv-label"><span :class="{ req: strict }">הערות</span></span>
                   <input v-model="s.notes" class="dv-input" :class="{ invalid: strict && missing(s, s.notes) }" placeholder="טקסט חופשי" />
                 </label>
+                <div class="dv-field conds-field">
+                  <span class="dv-label">תנאים לשיבוץ</span>
+                  <ConditionsEditor :conditions="s.conditions" :show-errors="err(s)" />
+                </div>
               </div>
               <div class="form-acts">
                 <button type="button" class="ico ok" aria-label="שמירת יעד לשיבוץ" title="שמירה" @click="save(s)">
@@ -206,12 +206,13 @@ function remove(i: number) {
   flex: 1;
   min-width: 0;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  /* Row 1: יעד, מקצוע, a narrow כמה ניתן לשבץ, הערות. Row 2: the conditions alone. */
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) 120px minmax(0, 1fr);
   gap: 8px 10px;
 }
-/* Conditions take the first two columns of the second row, הערות the third. */
+/* The conditions take the whole second row. */
 .conds-field {
-  grid-column: span 2;
+  grid-column: 1 / -1;
 }
 .form-acts {
   display: flex;
