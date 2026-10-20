@@ -20,11 +20,6 @@ const missing = (id: string) => {
 </script>
 
 <template>
-  <div class="dv-title-row">
-    <h1 class="dv-title">יעדים לשיבוץ</h1>
-    <MetaLine :d="d" />
-  </div>
-
   <nav class="tabs" aria-label="סלים">
     <button
       v-for="b in d.baskets"
@@ -51,6 +46,12 @@ const missing = (id: string) => {
       <BasketStats :basket="active" tone="blue" />
     </div>
 
+    <!-- Figma: the step title sits between the basket banner and its target cards. -->
+    <div class="dv-title-row targets-title">
+      <h1 class="dv-title">יעדים לשיבוץ</h1>
+      <MetaLine :d="d" />
+    </div>
+
     <div class="cards">
       <MainTargetCard
         v-for="t in active.targets"
@@ -65,10 +66,13 @@ const missing = (id: string) => {
 </template>
 
 <style scoped>
+.targets-title {
+  margin-top: 24px;
+}
 .tabs {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 10px;
   margin-bottom: 20px;
 }
