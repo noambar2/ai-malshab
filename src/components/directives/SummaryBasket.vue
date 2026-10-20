@@ -4,6 +4,7 @@ import { reactive } from 'vue'
 import AppIcon from '@/components/AppIcon.vue'
 import BasketStats from './BasketStats.vue'
 import MainTargetCard from './MainTargetCard.vue'
+import NoteLine from './NoteLine.vue'
 import type { Basket } from '@/data/directives'
 
 const props = defineProps<{ basket: Basket }>()
@@ -16,12 +17,14 @@ const openMap = reactive<Record<string, boolean>>(
 <template>
   <section class="sb" :class="{ open }">
     <button type="button" class="head" :aria-expanded="open" @click="open = !open">
-      <h2>{{ basket.name }}</h2>
+      <div class="name">
+        <h2>{{ basket.name }}</h2>
+        <NoteLine v-if="basket.notes" :text="basket.notes" :inverse="open" @click.stop />
+      </div>
       <BasketStats :basket="basket" :tone="open ? 'inverse' : 'plain'" />
       <AppIcon :name="open ? 'chevron-up' : 'chevron-down'" :size="22" class="chev" />
     </button>
     <div v-if="open" class="body">
-      <p v-if="basket.notes" class="bnote"><svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20Zm0 1.6a8.4 8.4 0 1 0 0 16.8 8.4 8.4 0 0 0 0-16.8ZM11.2 10.5h1.6V17h-1.6v-6.5Zm.8-3.3a1 1 0 1 1 0 2 1 1 0 0 1 0-2Z"/></svg><span><b>הערה לסל:</b> {{ basket.notes }}</span></p>
       <MainTargetCard v-for="t in basket.targets" :key="t.id" v-model:open="openMap[t.id]" :target="t" />
       <p v-if="!basket.targets.length" class="empty">לא הוגדרו יעדים לסל זה</p>
     </div>
@@ -50,34 +53,26 @@ const openMap = reactive<Record<string, boolean>>(
   background: #2f6eff;
   color: #fff;
 }
-.head h2 {
+.name {
   flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+.head h2 {
   font-size: 24px;
   font-weight: 700;
   color: var(--c-primary-dark);
 }
-.open .head h2,
-.open .bnote {
-  display: flex;
-  align-items: flex-start;
-  gap: 6px;
-  margin: 0;
-  font-size: 14px;
-  color: var(--c-text);
-}
-.bnote svg {
+.chev {
   flex-shrink: 0;
-  margin-top: 4px;
-  color: var(--c-primary);
-}
-.bnote b {
-  font-weight: 600;
-}
-.chev {
-  color: #fff;
-}
-.chev {
   color: var(--c-text);
+}
+.open .head h2,
+.open .chev {
+  color: #fff;
 }
 .body {
   display: flex;
