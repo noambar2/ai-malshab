@@ -13,9 +13,9 @@ function onField(c: Condition) {
   const opts = findField(c.field)?.options
   if (opts && !opts.includes(c.value)) c.value = ''
 }
-// The operator's sign next to its name, e.g. "גדול מ (>)". It's isolated as left-to-right so
-// the right-to-left text doesn't mirror ">" into "<".
-const sign = (s: string) => `(\u2066${s}\u2069)`
+// The operator's sign next to its name, e.g. "גדול מ (>)". It's left to the right-to-left text
+// direction, so it reads the way Hebrew is written ("דפ״ר > 60" reads right to left as greater than).
+const sign = (s: string) => `(${s})`
 
 function add() {
   props.conditions.push(newCondition())
