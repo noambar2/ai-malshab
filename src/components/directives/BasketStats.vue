@@ -15,11 +15,11 @@ const s = computed(() => basketStats(props.basket))
     </div>
     <div class="dv-stat">
       <span>צפי הגעה</span>
-      <span><b>{{ s.arrival }}</b>&nbsp;&nbsp;<span class="pct">{{ basket.arrivalPct ?? 0 }}%</span></span>
+      <span class="val"><b>{{ s.arrival }}</b><span class="pct">{{ basket.arrivalPct ?? 0 }}%</span></span>
     </div>
     <div class="dv-stat">
       <span>צפי פינוי</span>
-      <span><b>{{ s.evac }}</b>&nbsp;&nbsp;<span class="pct">{{ basket.evacPct ?? 0 }}%</span></span>
+      <span class="val"><b>{{ s.evac }}</b><span class="pct">{{ basket.evacPct ?? 0 }}%</span></span>
     </div>
     <div class="dv-stat">
       <span>סך מיוצבים</span>
@@ -43,10 +43,26 @@ const s = computed(() => basketStats(props.basket))
 .plain {
   color: var(--c-text);
 }
+/* Value on the start side, its percentage at the far side of the cell (Figma). */
+.val {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  align-self: stretch;
+}
+.bs .dv-stat .pct {
+  margin: 0;
+}
+/* Blue banner: labels and percentages in the dark brand blue, values bold. */
 .blue {
-  color: var(--c-primary);
+  color: var(--c-brand);
 }
 .blue b {
+  color: var(--c-brand);
+}
+.blue .pct {
+  font-size: 14px;
   color: var(--c-brand);
 }
 .blue .dv-stat + .dv-stat {
