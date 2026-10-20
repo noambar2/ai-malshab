@@ -151,18 +151,12 @@ export interface Basket {
   plans: number | null
   arrivalPct: number | null
   evacPct: number | null
+  /** Free-text note on the whole basket. */
+  notes: string
   targets: MainTarget[]
 }
 
 /** "יתר המיוצבים" — stabilized recruits outside the baskets, per target. */
-export interface RestRow {
-  id: string
-  targetCode: string
-  count: number | null
-  interviewed: string
-  notes: string
-}
-
 /** A general note / guideline on the directive: a short title and free text. */
 export interface Guideline {
   id: string
@@ -183,7 +177,8 @@ export interface Directive {
   anchors: AnchorDate[]
   tabOrder: string[]
   baskets: Basket[]
-  rest: RestRow[]
+  /** יתר מיוצבים — main targets outside the baskets, with their placement targets. */
+  rest: MainTarget[]
   /** הערות והנחיות — set on the first wizard step, shown again on the summary. */
   guidelines: Guideline[]
   draft: boolean
@@ -218,6 +213,18 @@ export function basketStats(b: Basket) {
   const evac = Math.round((arrival * (Number(b.evacPct) || 0)) / 100)
   const stabilized = b.targets.reduce((s, t) => s + (findTarget(t.targetCode)?.stabilized ?? 0), 0)
   return { plans, arrival, evac, stabilized, targets: b.targets.length }
+}
+
+/** A "יתר מיוצבים" target is complete when it and all its placement targets have the required fields. */
+export function restTargetValid(t: MainTarget) {
+  return (
+    !!t.targetCode &&
+    !!t.placementType &&
+    !!t.evacTarget.trim() &&
+    t.subTargets.every(
+      (s) => !!s.targetCode && hasNum(s.quantity) && !!s.quality.trim() && !!s.qualification.trim() && !!s.notes.trim(),
+    )
+  )
 }
 
 export function directiveTotals(d: Directive) {
@@ -267,15 +274,8 @@ export const newBasket = (): Basket => ({
   plans: null,
   arrivalPct: null,
   evacPct: null,
-  targets: [newMainTarget()],
-})
-
-export const newRestRow = (): RestRow => ({
-  id: uid('r'),
-  targetCode: '',
-  count: null,
-  interviewed: '',
   notes: '',
+  targets: [newMainTarget()],
 })
 
 export const newAnchor = (): AnchorDate => ({ id: uid('a'), title: '', from: '', to: '' })
@@ -323,21 +323,21 @@ const main = (targetCode: string, evacTarget: string, notes: string, subs: SubTa
   subTargets: subs,
 })
 
-const basket = (name: string, plans: number, arrivalPct: number, evacPct: number, targets: MainTarget[]): Basket => ({
+const basket = (
+  name: string,
+  plans: number,
+  arrivalPct: number,
+  evacPct: number,
+  targets: MainTarget[],
+  notes = '',
+): Basket => ({
   id: uid('b'),
   name,
   plans,
   arrivalPct,
   evacPct,
-  targets,
-})
-
-const rest = (targetCode: string, count: number, interviewed: string, notes: string): RestRow => ({
-  id: uid('r'),
-  targetCode,
-  count,
-  interviewed,
   notes,
+  targets,
 })
 
 const lorem =
@@ -356,13 +356,15 @@ function seed(): Directive[] {
         sub('3301744', 3, 'קב״א 49 ומטה', 'דוגמא לכשירות', ''),
         sub('4410288', 6, 'דפ״ר 50 ומעלה', 'קורס חובשים', 'ירידה במאסף קרה״ד'),
       ]),
-    ])
+    ], 'סל מועדף למרפאות השיניים. לתאם עם קצין הרפואה לפני השיבוץ.')
 
   const restRows = () => [
-    rest('9950204', 20, '8/20', 'עדיפות להנג״א, לא לשכול למלא טופס 16 א׳'),
-    rest('8840033', 20, '8/20', 'עדיפות להנג״א, לא לשכול למלא טופס 16 א׳'),
-    rest('5512006', 20, '8/20', 'עדיפות להנג״א'),
-    rest('5512140', 20, '8/20', 'עדיפות להנג״א, לא לשכול למלא טופס 16 א׳'),
+    main('9950204', 'יעד פינוי', 'עדיפות להנג״א, לא לשכוח למלא טופס 16 א׳', [
+      sub('8840011', 4, 'דפ״ר 50 ומעלה', 'ראיון קצין מיון', 'עדיפות לבוגרי מכינה'),
+      sub('5512140', 3, 'קב״א 49 ומטה', 'דוגמא לכשירות', 'ללא התש'),
+    ]),
+    main('8840033', 'יעד פינוי', 'עדיפות להנג״א', [sub('5512006', 6, 'קב״א 49 ומטה', 'דוגמא לכשירות', 'ללא התש')]),
+    main('5512006', 'שוחרר', '', [sub('8840011', 2, 'דפ״ר 40 ומעלה', 'דוגמא לכשירות', 'ירידה במאסף')]),
   ]
 
   // Only some seeded directives carry guidelines; the rest start with none.

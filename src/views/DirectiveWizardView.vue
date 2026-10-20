@@ -18,6 +18,7 @@ import {
   getDirective,
   hasNum,
   newBasket,
+  restTargetValid,
   saveDirective,
   type Directive,
 } from '@/data/directives'
@@ -97,7 +98,7 @@ function validBaskets() {
 }
 const validTargets = () =>
   d.baskets.every((b) => b.targets.every((t) => t.subTargets.every((s) => s.targetCode && hasNum(s.quantity))))
-const validRest = () => d.rest.every((r) => r.targetCode && hasNum(r.count))
+const validRest = () => d.rest.every(restTargetValid)
 
 function validate(s: Stage) {
   showErrors.value = true
@@ -112,7 +113,7 @@ const errorText = computed(() => {
   if (!showErrors.value) return ''
   if (stage.value === 'general' && !validGeneral()) return 'יש למלא את כל שדות החובה המסומנים'
   if (stage.value === 'targets' && !validTargets()) return 'יש לבחור יעד ולמלא "כמה ניתן לשבץ" בכל יעד לשיבוץ'
-  if (stage.value === 'rest' && !validRest()) return 'יש למלא יעד וכמות בכל שורה'
+  if (stage.value === 'rest' && !validRest()) return 'יש להשלים את שדות החובה בכל היעדים לפני המעבר לשלב הבא'
   return ''
 })
 
@@ -170,7 +171,7 @@ function saveDraft() {
         :show-errors="showErrors"
         @edit-baskets="stage = 'baskets'"
       />
-      <StepRest v-else-if="stage === 'rest'" :key="stageKey" :d="d" :show-errors="showErrors" />
+      <StepRest v-else-if="stage === 'rest'" :key="stageKey" :d="d" />
       <template v-else>
         <div class="dv-title-row">
           <h1 class="dv-title">סיכום</h1>

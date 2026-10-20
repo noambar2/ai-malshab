@@ -3,13 +3,15 @@
 // baskets (expandable), "יתר המיוצבים", guidelines and anchor dates.
 import { reactive } from 'vue'
 import SummaryBasket from './SummaryBasket.vue'
+import MainTargetCard from './MainTargetCard.vue'
 import AnchorDatesEditor from './AnchorDatesEditor.vue'
 import GuidelinesEditor from './GuidelinesEditor.vue'
-import { findTarget, fmtRange, type Directive } from '@/data/directives'
+import { fmtRange, type Directive } from '@/data/directives'
 
 const props = defineProps<{ d: Directive; editable?: boolean }>()
 const emit = defineEmits<{ editRest: [] }>()
 
+const restOpen = reactive<Record<string, boolean>>({})
 const openMap = reactive<Record<string, boolean>>(
   Object.fromEntries(props.d.baskets.map((b, i) => [b.id, i === 0])),
 )
@@ -28,24 +30,9 @@ const openMap = reactive<Record<string, boolean>>(
           <h3>יתר המיוצבים</h3>
           <button v-if="editable" type="button" class="dv-link" @click="emit('editRest')">עריכה</button>
         </div>
-        <table v-if="d.rest.length" class="dv-table rest">
-          <thead>
-            <tr>
-              <th>יעד</th>
-              <th>כמות מיוצבים</th>
-              <th>התראיינו</th>
-              <th>הערות לפי יעד</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="r in d.rest" :key="r.id">
-              <td>{{ findTarget(r.targetCode)?.name ?? '-' }} <span class="code">{{ findTarget(r.targetCode)?.professionCode }}</span></td>
-              <td>{{ r.count ?? '-' }}</td>
-              <td>{{ r.interviewed || '-' }}</td>
-              <td class="notes">{{ r.notes || '-' }}</td>
-            </tr>
-          </tbody>
-        </table>
+        <div v-if="d.rest.length" class="rest-list">
+          <MainTargetCard v-for="t in d.rest" :key="t.id" v-model:open="restOpen[t.id]" :target="t" />
+        </div>
         <p v-else class="none">לא הוגדרו מיוצבים נוספים</p>
       </section>
 
@@ -109,16 +96,10 @@ const openMap = reactive<Record<string, boolean>>(
   font-size: 16px;
   font-weight: 700;
 }
-.rest td {
-  height: 62px;
-  font-size: 16px;
-}
-.code {
-  margin-inline-start: 4px;
-}
-.notes {
-  max-width: 280px;
-  font-size: 14px;
+.rest-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 .none {
   font-size: 14px;

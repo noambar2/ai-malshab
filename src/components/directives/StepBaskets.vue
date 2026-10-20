@@ -40,6 +40,7 @@ function remove(i: number) {
         <span class="badge">סל מס׳ {{ i + 1 }}</span>
         <div class="name">
           <h2>{{ b.name }}</h2>
+          <p v-if="b.notes" class="bnote" :title="b.notes"><svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20Zm0 1.6a8.4 8.4 0 1 0 0 16.8 8.4 8.4 0 0 0 0-16.8ZM11.2 10.5h1.6V17h-1.6v-6.5Zm.8-3.3a1 1 0 1 1 0 2 1 1 0 0 1 0-2Z"/></svg><span>{{ b.notes }}</span></p>
           <button type="button" class="dv-link" @click="edit(b.id)">לחצו לצפייה ועריכה</button>
         </div>
         <BasketStats :basket="b" />
@@ -88,6 +89,20 @@ function remove(i: number) {
   flex-direction: column;
   align-items: flex-start;
   gap: 4px;
+}
+.bnote {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 2px 0 4px;
+  max-width: 420px;
+  font-size: 13px;
+  color: var(--c-muted-2);
+}
+.bnote span {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 .name h2 {
   font-size: 24px;

@@ -21,6 +21,7 @@ const openMap = reactive<Record<string, boolean>>(
       <AppIcon :name="open ? 'chevron-up' : 'chevron-down'" :size="22" class="chev" />
     </button>
     <div v-if="open" class="body">
+      <p v-if="basket.notes" class="bnote"><svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20Zm0 1.6a8.4 8.4 0 1 0 0 16.8 8.4 8.4 0 0 0 0-16.8ZM11.2 10.5h1.6V17h-1.6v-6.5Zm.8-3.3a1 1 0 1 1 0 2 1 1 0 0 1 0-2Z"/></svg><span><b>הערה לסל:</b> {{ basket.notes }}</span></p>
       <MainTargetCard v-for="t in basket.targets" :key="t.id" v-model:open="openMap[t.id]" :target="t" />
       <p v-if="!basket.targets.length" class="empty">לא הוגדרו יעדים לסל זה</p>
     </div>
@@ -56,7 +57,23 @@ const openMap = reactive<Record<string, boolean>>(
   color: var(--c-primary-dark);
 }
 .open .head h2,
-.open .chev {
+.open .bnote {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 0;
+  font-size: 14px;
+  color: var(--c-text);
+}
+.bnote svg {
+  flex-shrink: 0;
+  margin-top: 4px;
+  color: var(--c-primary);
+}
+.bnote b {
+  font-weight: 600;
+}
+.chev {
   color: #fff;
 }
 .chev {

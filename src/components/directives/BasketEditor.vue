@@ -114,6 +114,10 @@ function pct(v: number | null) {
         <span class="dv-input readonly calc">{{ stats.stabilized }}</span>
       </div>
     </div>
+    <label class="dv-field basket-notes">
+      <span class="dv-label">הערה לסל</span>
+      <input v-model="basket.notes" class="dv-input" placeholder="טקסט חופשי - הערה כללית על הסל" />
+    </label>
 
     <div class="dv-section-head targets-head">
       <h3>בחירת יעדים</h3>
@@ -207,6 +211,9 @@ function pct(v: number | null) {
   display: grid;
   grid-template-columns: 1fr repeat(4, 131px);
   gap: 10px;
+}
+.basket-notes {
+  margin-top: 10px;
 }
 .pct-pair {
   display: flex;
