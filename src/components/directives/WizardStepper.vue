@@ -41,7 +41,11 @@ function go(i: number) {
 </template>
 
 <style scoped>
+/* Stays pinned under the navbar (56px) while the step scrolls, like the navbar itself. */
 .stepper-band {
+  position: sticky;
+  top: 56px;
+  z-index: 15;
   background: #fff;
   border-bottom: 1px solid var(--c-divider);
 }
