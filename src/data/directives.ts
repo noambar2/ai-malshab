@@ -165,13 +165,13 @@ export const conditionFields: ConditionField[] = [
 ]
 
 // Long labels for choosing; short ones for reading a condition back in a table.
-export const conditionOps: { key: ConditionOp; label: string; short: string }[] = [
-  { key: 'eq', label: 'שווה ל', short: 'שווה' },
-  { key: 'ne', label: 'שונה מ', short: 'שונה מ' },
-  { key: 'gt', label: 'גדול מ', short: 'מעל' },
-  { key: 'gte', label: 'גדול או שווה ל', short: 'לפחות' },
-  { key: 'lt', label: 'קטן מ', short: 'מתחת ל' },
-  { key: 'lte', label: 'קטן או שווה ל', short: 'עד' },
+export const conditionOps: { key: ConditionOp; label: string; short: string; symbol: string }[] = [
+  { key: 'eq', label: 'שווה ל', short: 'שווה', symbol: '=' },
+  { key: 'ne', label: 'שונה מ', short: 'שונה מ', symbol: '≠' },
+  { key: 'gt', label: 'גדול מ', short: 'מעל', symbol: '>' },
+  { key: 'gte', label: 'גדול או שווה ל', short: 'לפחות', symbol: '≥' },
+  { key: 'lt', label: 'קטן מ', short: 'מתחת ל', symbol: '<' },
+  { key: 'lte', label: 'קטן או שווה ל', short: 'עד', symbol: '≤' },
 ]
 
 export const findField = (key: string) => conditionFields.find((f) => f.key === key)

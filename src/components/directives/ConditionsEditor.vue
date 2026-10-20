@@ -13,6 +13,10 @@ function onField(c: Condition) {
   const opts = findField(c.field)?.options
   if (opts && !opts.includes(c.value)) c.value = ''
 }
+// The operator's sign next to its name, e.g. "גדול מ (>)". It's isolated as left-to-right so
+// the right-to-left text doesn't mirror ">" into "<".
+const sign = (s: string) => `(\u2066${s}\u2069)`
+
 function add() {
   props.conditions.push(newCondition())
 }
@@ -32,7 +36,7 @@ function remove(i: number) {
         </select>
         <select v-model="c.op" class="seg" :class="{ ph: !c.op }" aria-label="תנאי">
           <option value="" disabled>תנאי</option>
-          <option v-for="o in opsFor(c.field)" :key="o.key" :value="o.key">{{ o.label }}</option>
+          <option v-for="o in opsFor(c.field)" :key="o.key" :value="o.key">{{ o.label }} {{ sign(o.symbol) }}</option>
         </select>
         <select
           v-if="findField(c.field)?.options"
