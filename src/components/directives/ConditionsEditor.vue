@@ -31,7 +31,7 @@ function remove(i: number) {
       <span class="join" :class="{ first: !i }">{{ i ? 'וגם' : 'אם' }}</span>
       <div class="pill" :class="{ invalid: showErrors && !conditionComplete(c) }">
         <select v-model="c.field" class="seg" :class="{ ph: !c.field }" aria-label="שדה" @change="onField(c)">
-          <option value="" disabled>שדה</option>
+          <option value="" disabled>איכות / כשירות</option>
           <option v-for="f in conditionFields" :key="f.key" :value="f.key">{{ f.label }}</option>
         </select>
         <select v-model="c.op" class="seg" :class="{ ph: !c.op }" aria-label="תנאי">
