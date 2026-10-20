@@ -96,7 +96,8 @@ const info = computed(() => findTarget(props.target.targetCode))
 /* Only the open target's contents (its placement targets) are tinted; the row stays white. */
 .tr.open .subs {
   background: #f4f7ff;
-  padding-top: 4px;
+  /* Same space above and below the contents. */
+  padding-block: 10px;
 }
 .tr.open .subs .dv-table th {
   border-bottom-color: #dfe6f8;
