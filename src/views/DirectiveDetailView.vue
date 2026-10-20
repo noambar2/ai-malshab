@@ -7,6 +7,7 @@ import { useRoute, useRouter } from 'vue-router'
 import AppIcon from '@/components/AppIcon.vue'
 import DvIcon from '@/components/directives/DvIcon.vue'
 import DirectiveSummary from '@/components/directives/DirectiveSummary.vue'
+import TabOrderGrid from '@/components/directives/TabOrderGrid.vue'
 import DirectiveStatusBadge from '@/components/directives/DirectiveStatusBadge.vue'
 import MetaLine from '@/components/directives/MetaLine.vue'
 import { directiveStatus, directiveTotals, fmtDate, getDirective, isPast } from '@/data/directives'
@@ -112,18 +113,14 @@ function duplicate() {
           </dd>
         </div>
       </dl>
-      <button type="button" class="dv-link" @click="tabsOpen = !tabsOpen">
-        {{ tabsOpen ? 'הסתרת סדר לשוניות תחנה' : 'הצגת סדר לשוניות תחנה' }}
-      </button>
-      <div v-if="tabsOpen" class="tabs-box">
-        <h3 class="tabs-title">סדר לשוניות תחנה</h3>
-        <!-- Same layout as the tab-order popup: three columns, read top to bottom. -->
-        <ol class="tabs" :style="{ gridTemplateRows: `repeat(${Math.ceil(d.tabOrder.length / 3)}, auto)` }">
-          <li v-for="(t, i) in d.tabOrder" :key="t">
-            <span class="num">{{ i + 1 }}</span>
-            <span class="pill">{{ t }}</span>
-          </li>
-        </ol>
+      <!-- Same collapsible section as on the edit screen, without dragging. -->
+      <div class="tabs-section">
+        <button type="button" class="dv-section-head toggle" :aria-expanded="tabsOpen" @click="tabsOpen = !tabsOpen">
+          <h3>סדר לשוניות תחנה</h3>
+          <AppIcon :name="tabsOpen ? 'chevron-up' : 'chevron-down'" :size="20" class="chev" />
+          <small v-if="tabsOpen">הסדר שבו יוצגו הלשוניות בתחנה</small>
+        </button>
+        <TabOrderGrid v-if="tabsOpen" :tabs="d.tabOrder" readonly />
       </div>
     </section>
 
@@ -232,56 +229,27 @@ dd {
   font-size: 16px;
   font-weight: 500;
 }
-.tabs-box {
+.tabs-section {
   align-self: stretch;
-  margin-top: 14px;
-  padding: 18px 20px;
-  border: 1px solid #eef1f8;
-  border-radius: 12px;
+  margin-top: 6px;
 }
-.tabs-title {
-  margin-bottom: 14px;
-  font-size: 15px;
-  font-weight: 600;
+/* The section title doubles as the open/close control (as on the first wizard step). */
+.toggle {
+  width: 100%;
+  padding: 0;
+  text-align: start;
+  cursor: pointer;
+}
+.toggle[aria-expanded='false'] {
+  margin-bottom: 0;
+}
+.toggle .chev {
+  align-self: center;
+  margin-inline-start: -4px;
   color: var(--c-text);
 }
-.tabs {
-  list-style: none;
-  display: grid;
-  grid-auto-flow: column;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px 20px;
-  padding: 0;
-  margin: 0;
-}
-.tabs li {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.tabs .num {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: #f5f6fa;
-  font-size: 14px;
-  color: var(--c-muted);
-}
-.tabs .pill {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  height: 34px;
-  padding: 0 18px;
-  border: 1px solid #e2e8f8;
-  border-radius: 18px;
-  background: #fff;
-  font-size: 15px;
-  font-weight: 500;
+.toggle:hover h3 {
+  color: var(--c-primary);
 }
 .section-title {
   margin: 36px 0 16px;

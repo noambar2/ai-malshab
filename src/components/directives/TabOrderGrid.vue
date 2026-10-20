@@ -4,7 +4,7 @@
 import { computed, ref } from 'vue'
 import DvIcon from './DvIcon.vue'
 
-const props = defineProps<{ tabs: string[] }>()
+const props = defineProps<{ tabs: string[]; readonly?: boolean }>()
 
 const dragging = ref<number | null>(null)
 const rows = computed(() => Math.ceil(props.tabs.length / 3))
@@ -39,7 +39,9 @@ function move(i: number, delta: number) {
           @dragover.prevent
         >
           <span class="num">{{ i + 1 }}</span>
+          <span v-if="readonly" class="pill static">{{ t }}</span>
           <span
+            v-else
             class="pill"
             :class="{ dragging: dragging === i }"
             tabindex="0"
@@ -98,6 +100,9 @@ li {
   cursor: grab;
   user-select: none;
   outline: none;
+}
+.pill.static {
+  cursor: default;
 }
 .pill:focus-visible {
   border-color: var(--c-primary);
