@@ -347,6 +347,16 @@ select.dv-input.placeholder {
   font-weight: 600;
   color: var(--c-text);
 }
+/* A value with a percentage: the number on the start side, the percentage at the far side. */
+.sum-stat dd:has(.pct) {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+.sum-stat dd .pct {
+  margin-inline-start: 0 !important;
+}
 .sum-stat dd .pct,
 .sum-stat dd .code {
   font-size: 11px;

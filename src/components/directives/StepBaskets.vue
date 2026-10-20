@@ -83,7 +83,7 @@ function remove(i: number) {
 
         <div v-if="expanded[b.id]" class="body">
           <!-- Placement targets are set in the next step, so the targets here are summary rows only.
-               They share the header's grid: יעד פינוי sits under צפי פינוי, מיוצבים under סך מיוצבים. -->
+               They share the header's grid; מקצוע spans two of its number columns. -->
           <div v-for="t in b.targets" :key="t.id" class="trow bk-grid">
             <div class="tname">
               <h4>
@@ -92,7 +92,7 @@ function remove(i: number) {
               </h4>
               <NoteLine v-if="t.notes" :text="t.notes" />
             </div>
-            <dl class="sum-stat">
+            <dl class="sum-stat wide">
               <dt>מקצוע</dt>
               <dd :data-tip="findTarget(t.targetCode) ? `${findTarget(t.targetCode)!.profession} ${findTarget(t.targetCode)!.professionCode}` : undefined">
                 {{ findTarget(t.targetCode)?.profession ?? '-' }}<span class="code">{{ findTarget(t.targetCode)?.professionCode }}</span>
@@ -190,6 +190,10 @@ function remove(i: number) {
 /* The target rows read as one list, separated by hairlines. */
 .trow {
   padding: 10px 0;
+}
+/* Profession names are long: give them two number columns. */
+.trow .sum-stat.wide {
+  grid-column: span 2;
 }
 .trow + .trow {
   border-top: 1px solid var(--c-divider);
