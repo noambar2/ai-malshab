@@ -149,13 +149,15 @@ export type ConditionOp = 'eq' | 'ne' | 'gt' | 'gte' | 'lt' | 'lte'
 export interface ConditionField {
   key: string
   label: string
-  // Numbers can be compared; a list of options can only be equal / not equal.
+  // Numbers can be compared; a list of options can only be equal / not equal, unless its
+  // options are in order (פרופיל 64 ומעלה).
   options?: string[]
+  ordered?: boolean
 }
 
 export const conditionFields: ConditionField[] = [
   { key: 'dapar', label: 'דפ״ר' },
-  { key: 'profile', label: 'פרופיל', options: ['21', '24', '45', '64', '72', '82', '97'] },
+  { key: 'profile', label: 'פרופיל', options: ['21', '24', '45', '64', '72', '82', '97'], ordered: true },
   { key: 'kaba', label: 'קב״א' },
   { key: 'tzadach', label: 'צד״כ' },
   { key: 'attention', label: 'קשב מתמשך' },
@@ -175,8 +177,10 @@ export const conditionOps: { key: ConditionOp; label: string; short: string; sym
 ]
 
 export const findField = (key: string) => conditionFields.find((f) => f.key === key)
-export const opsFor = (field: string) =>
-  findField(field)?.options ? conditionOps.filter((o) => o.key === 'eq' || o.key === 'ne') : conditionOps
+export const opsFor = (field: string) => {
+  const f = findField(field)
+  return f?.options && !f.ordered ? conditionOps.filter((o) => o.key === 'eq' || o.key === 'ne') : conditionOps
+}
 export const conditionComplete = (c: Condition) => !!c.field && !!c.op && !!c.value.trim()
 export const conditionText = (c: Condition) =>
   `${findField(c.field)?.label ?? c.field} ${conditionOps.find((o) => o.key === c.op)?.short ?? ''} ${c.value}`
