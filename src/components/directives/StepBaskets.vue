@@ -56,7 +56,7 @@ function remove(i: number) {
           @keydown.enter.self="expanded[b.id] = !expanded[b.id]"
         >
           <div class="name">
-            <h2 :title="b.name">{{ b.name }}</h2>
+            <h2>{{ b.name }}</h2>
             <NoteLine v-if="b.notes" :text="b.notes" @click.stop />
           </div>
           <BasketStats :basket="b" />

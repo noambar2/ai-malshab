@@ -25,7 +25,7 @@ const st = computed(() => basketStats(props.basket))
     >
       <span class="level">סל {{ index + 1 }}</span>
       <div class="name">
-        <h2 :title="basket.name">{{ basket.name }}</h2>
+        <h2>{{ basket.name }}</h2>
         <NoteLine v-if="basket.notes" :text="basket.notes" @click.stop />
       </div>
       <dl class="sum-stat"><dt>תוכניות</dt><dd>{{ st.plans }}</dd></dl>

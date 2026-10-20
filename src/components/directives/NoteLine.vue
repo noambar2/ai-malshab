@@ -19,6 +19,7 @@ function open() {
 <template>
   <span
     class="note-line"
+    data-no-tip
     :class="{ inverse }"
     :tabindex="0"
     @mouseenter="open"

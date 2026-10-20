@@ -30,7 +30,7 @@ const info = computed(() => findTarget(props.target.targetCode))
     >
       <span class="level">יעד ראשי</span>
       <div class="name">
-        <h4 :title="info?.name">
+        <h4>
           <span class="nm">{{ info?.name ?? 'יעד לא נבחר' }}</span>
           <small>{{ target.targetCode }}</small>
         </h4>
@@ -38,7 +38,7 @@ const info = computed(() => findTarget(props.target.targetCode))
       </div>
       <dl class="sum-stat">
         <dt>מקצוע</dt>
-        <dd :title="info?.profession">{{ info?.profession ?? '-' }}<span class="code">{{ info?.professionCode }}</span></dd>
+        <dd :data-tip="info ? `${info.profession} ${info.professionCode}` : undefined">{{ info?.profession ?? '-' }}<span class="code">{{ info?.professionCode }}</span></dd>
       </dl>
       <dl class="sum-stat"><dt>סוג שיבוץ</dt><dd>{{ target.placementType || '-' }}</dd></dl>
       <dl class="sum-stat"><dt>יעד פינוי</dt><dd>{{ target.evacTarget || '-' }}</dd></dl>

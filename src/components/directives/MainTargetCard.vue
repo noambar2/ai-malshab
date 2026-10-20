@@ -65,11 +65,11 @@ function remove(i: number) {
       @keydown.enter.self="toggle"
     >
       <div class="title">
-        <h3 :title="info?.name">
+        <h3>
           <span class="nm">{{ info?.name ?? 'יעד לא נבחר' }}</span>
           <small>{{ target.targetCode }}</small>
         </h3>
-        <p class="note" :title="target.notes">
+        <p class="note">
           <AppIcon name="info" :size="14" />
           <span>{{ target.notes || 'אין הערות ליעד הראשי' }}</span>
         </p>
