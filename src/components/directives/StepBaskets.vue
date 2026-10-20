@@ -2,7 +2,7 @@
 // Wizard step 2a — "הגדרת סלים": baskets and their main targets. Baskets being edited are
 // tracked by id in `editing`; saved baskets collapse into an accordion whose header shows the
 // basket's name, note and numbers, and whose body lists its main targets.
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
 import AppIcon from '@/components/AppIcon.vue'
 import DvIcon from './DvIcon.vue'
 import BasketEditor from './BasketEditor.vue'
@@ -16,6 +16,7 @@ const props = defineProps<{ d: Directive; error?: string }>()
 const editing = defineModel<string[]>('editing', { default: () => [] })
 
 const expanded = reactive<Record<string, boolean>>({})
+const confirmDelete = ref<string | null>(null)
 
 function add() {
   const b = newBasket()
@@ -31,6 +32,7 @@ function edit(id: string) {
 function remove(i: number) {
   const [b] = props.d.baskets.splice(i, 1)
   if (b) close(b.id)
+  confirmDelete.value = null
 }
 </script>
 
@@ -58,6 +60,21 @@ function remove(i: number) {
             <NoteLine v-if="b.notes" :text="b.notes" @click.stop />
           </div>
           <BasketStats :basket="b" />
+          <div class="head-acts" @click.stop @keydown.stop>
+            <template v-if="confirmDelete === b.id">
+              <span class="confirm-q">למחוק את הסל?</span>
+              <button type="button" class="btn dv-btn-danger sm" @click="remove(i)">מחיקה</button>
+              <button type="button" class="btn btn-soft sm" @click="confirmDelete = null">ביטול</button>
+            </template>
+            <template v-else>
+              <button type="button" class="act" title="עריכת הסל" aria-label="עריכת הסל" @click="edit(b.id)">
+                <DvIcon name="edit" :size="17" />
+              </button>
+              <button type="button" class="act del" title="מחיקת הסל" aria-label="מחיקת הסל" @click="confirmDelete = b.id">
+                <DvIcon name="trash" :size="17" />
+              </button>
+            </template>
+          </div>
           <AppIcon :name="expanded[b.id] ? 'chevron-up' : 'chevron-down'" :size="22" class="chev" />
         </div>
 
@@ -65,12 +82,6 @@ function remove(i: number) {
           <!-- Placement targets are set in the next step, so the targets here are summary rows only. -->
           <MainTargetCard v-for="t in b.targets" :key="t.id" :target="t" summary-only />
           <p v-if="!b.targets.length" class="empty">לא הוגדרו יעדים לסל זה</p>
-          <div class="actions">
-            <button type="button" class="btn btn-soft" @click="edit(b.id)">
-              <DvIcon name="edit" :size="14" />
-              עריכת הסל
-            </button>
-          </div>
         </div>
       </section>
     </template>
@@ -161,10 +172,39 @@ function remove(i: number) {
   font-size: 14px;
   color: var(--c-muted-2);
 }
-.actions {
+.head-acts {
   display: flex;
-  justify-content: flex-end;
-  margin-top: 8px;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.act {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  color: var(--c-primary);
+}
+.act:hover {
+  background: var(--c-primary-soft);
+}
+.act.del {
+  color: var(--c-muted-2);
+}
+.act.del:hover {
+  background: #ffe8eb;
+  color: var(--c-danger);
+}
+.confirm-q {
+  font-size: 13px;
+  white-space: nowrap;
+  margin-inline-end: 4px;
+}
+.btn.sm {
+  height: 28px;
+  padding: 0 12px;
 }
 .err {
   margin-top: -14px;

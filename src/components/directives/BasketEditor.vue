@@ -51,6 +51,17 @@ function pct(v: number | null) {
 <template>
   <div class="dv-card editor">
     <span class="badge">סל מס׳ {{ index + 1 }}</span>
+    <!-- Sits on the card's top edge, mirroring the badge, so it's reachable without scrolling. -->
+    <div class="edge-acts">
+      <button type="button" class="btn dv-btn-danger" @click="emit('remove')">
+        <DvIcon name="trash" :size="14" />
+        מחיקת סל
+      </button>
+      <button type="button" class="btn btn-primary" @click="save">
+        <AppIcon name="check" :size="14" />
+        שמירה וסגירה
+      </button>
+    </div>
 
     <div class="basket-row">
       <label class="dv-field">
@@ -175,16 +186,6 @@ function pct(v: number | null) {
 
     <p v-if="showErrors && !valid" class="err">יש למלא את כל שדות החובה המסומנים לפני השמירה</p>
 
-    <div class="actions">
-      <button type="button" class="btn dv-btn-danger" @click="emit('remove')">
-        <DvIcon name="trash" :size="14" />
-        מחיקת סל
-      </button>
-      <button type="button" class="btn btn-soft" @click="save">
-        <AppIcon name="check" :size="14" />
-        שמירה וסגירה
-      </button>
-    </div>
   </div>
 </template>
 
@@ -265,10 +266,19 @@ function pct(v: number | null) {
   font-size: 13px;
   color: var(--c-danger);
 }
-.actions {
+.edge-acts {
+  position: absolute;
+  top: -15px;
+  inset-inline-end: 20px;
   display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 40px;
+  gap: 8px;
+}
+.edge-acts .btn {
+  height: 30px;
+  box-shadow: 0 2px 6px rgba(7, 25, 56, 0.1);
+}
+/* The danger button is a soft tint; give it a solid base so the card edge doesn't show through. */
+.edge-acts .dv-btn-danger {
+  background-color: #ffe8eb;
 }
 </style>
