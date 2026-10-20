@@ -124,26 +124,32 @@ select.dv-input.placeholder {
 }
 
 /* Dashed "add" buttons */
+/* Add buttons: the same soft pill as "הוספת הערה" (.btn.btn-soft), no dashed frame. */
 .dv-add {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
-  height: 36px;
-  padding: 0 20px 0 15px;
-  border: 1px dashed var(--c-primary);
-  border-radius: 8px;
+  gap: 6px;
+  height: 32px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: var(--radius-pill);
   background: var(--c-primary-soft);
   color: var(--c-primary);
   font-size: 12px;
   font-weight: 500;
+  white-space: nowrap;
+  transition: background 0.15s;
 }
 .dv-add:hover {
   background: #dce5ff;
 }
+/* The full-width "הוספת סל חדש" / "הוספת יעד ראשי" keeps its size but loses the frame. */
 .dv-add.wide {
   width: 100%;
-  height: 56px;
+  height: 48px;
+  border-radius: 10px;
+  font-size: 13px;
 }
 
 /* Round red trash button */

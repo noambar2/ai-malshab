@@ -3,7 +3,7 @@
 // with its step name underneath. Done steps show a check; steps already reached are clickable.
 import AppIcon from '@/components/AppIcon.vue'
 
-const props = defineProps<{ steps: string[]; current: number; reached: number }>()
+const props = defineProps<{ steps: string[]; current: number; reached: number; context?: string }>()
 const emit = defineEmits<{ go: [index: number] }>()
 
 function go(i: number) {
@@ -14,7 +14,11 @@ function go(i: number) {
 <template>
   <nav class="stepper-band" aria-label="שלבי יצירת הדירקטיבה">
     <div class="inner">
-      <p class="count">שלב {{ current + 1 }} מתוך {{ steps.length }}</p>
+      <p class="count">
+        <span v-if="context" class="context">{{ context }}</span>
+        <span v-if="context" class="sep" aria-hidden="true">·</span>
+        שלב {{ current + 1 }} מתוך {{ steps.length }}
+      </p>
       <ol class="steps" :style="{ gridTemplateColumns: `repeat(${steps.length}, minmax(0, 1fr))` }">
         <li
           v-for="(s, i) in steps"
@@ -55,9 +59,19 @@ function go(i: number) {
   padding: 10px 60px 12px;
 }
 .count {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   margin: 0 0 6px;
   font-size: 12px;
   color: var(--c-muted);
+}
+.context {
+  font-weight: 600;
+  color: var(--c-primary);
+}
+.sep {
+  color: var(--c-border);
 }
 .steps {
   list-style: none;

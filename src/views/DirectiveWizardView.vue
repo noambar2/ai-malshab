@@ -50,6 +50,12 @@ function initial(): Directive {
 
 const d = reactive<Directive>(initial())
 const isEdit = !!editId && !!getDirective(editId)
+// Shown in the stepper bar before "שלב X מתוך 5".
+const modeLabel = isEdit
+  ? `עריכת דירקטיבה #${editId}`
+  : fromId
+    ? `דירקטיבה חדשה - שכפול של #${fromId}`
+    : 'דירקטיבה חדשה'
 
 const stage = ref<Stage>('general')
 const reachedIdx = ref(isEdit || fromId ? order.length - 1 : 0)
@@ -149,13 +155,9 @@ function saveDraft() {
 
 <template>
   <div class="wizard">
-    <WizardStepper :steps="STEPS" :current="step" :reached="reachedIdx" @go="goStep" />
+    <WizardStepper :steps="STEPS" :current="step" :reached="reachedIdx" :context="modeLabel" @go="goStep" />
 
     <main class="dv-page">
-      <p v-if="isEdit || fromId" class="mode">
-        {{ isEdit ? `עריכת דירקטיבה #${editId}` : `דירקטיבה חדשה - שכפול של דירקטיבה #${fromId}` }}
-      </p>
-
       <StepGeneral v-if="stage === 'general'" :key="stageKey" :d="d" :show-errors="showErrors" />
       <StepBaskets
         v-else-if="stage === 'baskets'"
@@ -199,11 +201,6 @@ function saveDraft() {
   min-height: calc(100vh - 56px);
   background: #f9f9fe;
   padding-bottom: 72px;
-}
-.mode {
-  margin: -10px 0 16px;
-  font-size: 13px;
-  color: var(--c-primary);
 }
 .bar {
   position: fixed;
