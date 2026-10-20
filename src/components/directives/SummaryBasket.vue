@@ -42,7 +42,7 @@ const st = computed(() => basketStats(props.basket))
         :key="t.id"
         :target="t"
         :open="openTarget === t.id"
-        :fix-label="canFix ? 'להגדרת יעדים לשיבוץ' : undefined"
+        :fix-label="canFix ? 'מעבר לשלב יעדים לשיבוץ' : undefined"
         @toggle="emit('toggleTarget', t.id)"
         @fix="emit('fix')"
       />

@@ -61,7 +61,7 @@ function toggleRest(id: string) {
             :key="t.id"
             :target="t"
             :open="openRest === t.id"
-            :fix-label="canFix ? 'לעריכה בשלב יתר מיוצבים' : undefined"
+            :fix-label="canFix ? 'מעבר לשלב יתר מיוצבים' : undefined"
             @toggle="toggleRest(t.id)"
             @fix="emit('fix', 'rest')"
           />
