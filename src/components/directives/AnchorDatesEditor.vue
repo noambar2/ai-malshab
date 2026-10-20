@@ -39,14 +39,18 @@ function remove(i: number) {
     <datalist id="dv-anchor-titles">
       <option v-for="t in anchorTitles" :key="t" :value="t" />
     </datalist>
-    <button type="button" class="dv-add" @click="add">
-      <AppIcon name="plus" :size="16" />
+    <!-- Same button as "הוספת הערה" in the guidelines section. -->
+    <button type="button" class="btn btn-soft add" @click="add">
+      <AppIcon name="plus" :size="14" />
       {{ addLabel ?? 'הוספת תאריכי עוגן' }}
     </button>
   </div>
 </template>
 
 <style scoped>
+.add {
+  align-self: flex-start;
+}
 .anchors {
   display: flex;
   flex-direction: column;
