@@ -56,7 +56,7 @@ function remove(i: number) {
 <template>
   <section class="mt" :class="{ open, editable, compact: summaryOnly }">
     <div
-      class="head"
+      class="head bk-grid"
       :class="{ static: summaryOnly }"
       :role="summaryOnly ? undefined : 'button'"
       :tabindex="summaryOnly ? undefined : 0"
@@ -74,40 +74,23 @@ function remove(i: number) {
           <span>{{ target.notes || 'אין הערות ליעד הראשי' }}</span>
         </p>
       </div>
-      <div class="dv-stats">
-        <div class="dv-stat">
-          <span>מקצוע</span>
-          <span><b>{{ info?.profession ?? '-' }}</b><span class="code">{{ info?.professionCode }}</span></span>
-        </div>
-        <div class="dv-stat">
-          <span>סוג שיבוץ</span>
-          <b>{{ target.placementType || '-' }}</b>
-        </div>
-        <div class="dv-stat">
-          <span>יעד פינוי</span>
-          <b>{{ target.evacTarget || '-' }}</b>
-        </div>
-        <div class="dv-stat">
-          <span>מיוצבים</span>
-          <b>{{ info?.stabilized ?? 0 }}</b>
-        </div>
-        <div v-if="!summaryOnly" class="dv-stat">
-          <span>יעדים לשיבוץ</span>
-          <b v-if="target.subTargets.length">{{ target.subTargets.length }}</b>
-          <b v-else class="warn"><DvIcon name="warning" :size="15" />0</b>
-        </div>
-      </div>
-      <button
-        v-if="editable && !editing && target.subTargets.length"
-        type="button"
-        class="edit-ico"
-        title="עריכת היעדים לשיבוץ"
-        aria-label="עריכת היעדים לשיבוץ"
-        @click.stop="startEdit"
-      >
-        <DvIcon name="edit" :size="17" />
-      </button>
-      <AppIcon v-if="!summaryOnly" :name="open ? 'chevron-up' : 'chevron-down'" :size="22" class="chev" />
+      <!-- Same grid as the basket step: מקצוע spans two number columns, and the placement-targets
+           count takes the column the basket uses for its edit / delete icons. -->
+      <dl class="sum-stat wide">
+        <dt>מקצוע</dt>
+        <dd :data-tip="info ? `${info.profession} ${info.professionCode}` : undefined">
+          {{ info?.profession ?? '-' }}<span class="code">{{ info?.professionCode }}</span>
+        </dd>
+      </dl>
+      <dl class="sum-stat"><dt>סוג שיבוץ</dt><dd>{{ target.placementType || '-' }}</dd></dl>
+      <dl class="sum-stat"><dt>יעד פינוי</dt><dd>{{ target.evacTarget || '-' }}</dd></dl>
+      <dl class="sum-stat"><dt>מיוצבים</dt><dd>{{ info?.stabilized ?? 0 }}</dd></dl>
+      <dl v-if="!summaryOnly" class="sum-stat">
+        <dt>יעדים לשיבוץ</dt>
+        <dd v-if="target.subTargets.length">{{ target.subTargets.length }}</dd>
+        <dd v-else class="warn"><DvIcon name="warning" :size="13" />0</dd>
+      </dl>
+      <AppIcon v-if="!summaryOnly" :name="open ? 'chevron-up' : 'chevron-down'" :size="22" class="chev sum-chev" />
     </div>
 
     <div v-if="open && !summaryOnly" class="body">
@@ -200,7 +183,13 @@ function remove(i: number) {
             </tr>
           </tbody>
         </table>
-        <div v-else class="empty-row">
+        <div v-if="editable && target.subTargets.length" class="view-actions">
+          <button type="button" class="btn btn-soft" @click="startEdit">
+            <DvIcon name="edit" :size="14" />
+            עריכת יעדים לשיבוץ
+          </button>
+        </div>
+        <div v-if="!target.subTargets.length" class="empty-row">
           <p class="empty">
             <DvIcon name="warning" :size="15" />
             לא הוגדרו יעדים לשיבוץ עבור יעד זה
@@ -220,10 +209,8 @@ function remove(i: number) {
   background: #fff;
   border-radius: 8px;
 }
+/* Layout comes from the shared .bk-grid (directives.css). */
 .head {
-  display: flex;
-  align-items: center;
-  gap: 20px;
   width: 100%;
   min-height: 86px;
   padding: 16px 30px;
@@ -240,19 +227,6 @@ function remove(i: number) {
   outline-offset: -2px;
   border-radius: 8px;
 }
-.edit-ico {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  color: var(--c-primary);
-}
-.edit-ico:hover {
-  background: var(--c-primary-soft);
-}
 .edit-actions {
   display: flex;
   align-items: center;
@@ -261,6 +235,11 @@ function remove(i: number) {
 }
 .edit-actions .save {
   height: 32px;
+}
+.view-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
 }
 .empty-row {
   display: flex;
@@ -274,8 +253,8 @@ function remove(i: number) {
   color: var(--c-danger);
 }
 .title {
-  flex: 1;
   min-width: 0;
+  padding-inline-end: 16px;
 }
 .title h3 {
   display: flex;

@@ -141,12 +141,6 @@ function remove(i: number) {
   font-size: 14px;
   font-weight: 700;
 }
-/* Header and target rows share one grid: name, five numbers, actions, chevron. */
-.bk-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) repeat(5, 108px) 80px 32px;
-  align-items: center;
-}
 .head {
   padding: 22px 30px 20px;
   cursor: pointer;
@@ -190,10 +184,6 @@ function remove(i: number) {
 /* The target rows read as one list, separated by hairlines. */
 .trow {
   padding: 10px 0;
-}
-/* Profession names are long: give them two number columns. */
-.trow .sum-stat.wide {
-  grid-column: span 2;
 }
 .trow + .trow {
   border-top: 1px solid var(--c-divider);

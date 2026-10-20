@@ -372,3 +372,22 @@ select.dv-input.placeholder {
 .sum-span {
   grid-column: 2 / -1;
 }
+
+/* Wizard basket / target rows: name, five number columns, an actions column and the chevron.
+   Shared by the basket step and the placement-targets step so their columns line up. */
+.bk-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) repeat(5, 108px) 80px 32px;
+  align-items: center;
+}
+/* Profession names are long: they take two number columns. */
+.sum-stat.wide {
+  grid-column: span 2;
+}
+/* A count of zero with its warning icon, on one line. */
+.sum-stat dd.warn {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--c-danger);
+}
