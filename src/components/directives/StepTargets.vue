@@ -117,6 +117,7 @@ const missing = (id: string) => {
 .banner h2 {
   font-size: 20px;
   font-weight: 700;
+  letter-spacing: -0.3px;
   color: var(--c-brand);
 }
 .banner :deep(.note-line) {
