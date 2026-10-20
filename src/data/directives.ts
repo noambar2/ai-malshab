@@ -163,10 +163,10 @@ export interface RestRow {
   notes: string
 }
 
-export interface DirectiveNote {
+/** A general note / guideline on the directive: a short title and free text. */
+export interface Guideline {
   id: string
-  author: string
-  authorId: string
+  title: string
   text: string
 }
 
@@ -184,7 +184,8 @@ export interface Directive {
   tabOrder: string[]
   baskets: Basket[]
   rest: RestRow[]
-  notes: DirectiveNote[]
+  /** הערות והנחיות — set on the first wizard step, shown again on the summary. */
+  guidelines: Guideline[]
   draft: boolean
   createdBy: string
   /** ISO yyyy-mm-dd */
@@ -293,7 +294,7 @@ export function emptyDirective(): Directive {
     tabOrder: [...defaultTabOrder],
     baskets: [],
     rest: [],
-    notes: [],
+    guidelines: [],
     draft: true,
     createdBy: 'ליה לנד',
     updatedAt: TODAY,
@@ -342,14 +343,6 @@ const rest = (targetCode: string, count: number, interviewed: string, notes: str
 const lorem =
   'לורם איפסום דולור סיט אמט, קונסקטורר אדיפיסינג אלית קולורס מונפרד אדנדום סילקוף, מרגשי ומרגשח. עמחליף מוסן מנת.'
 
-function seedNotes(): DirectiveNote[] {
-  return [
-    { id: uid('n'), author: 'אבירן שלמה', authorId: 's8282828', text: `${lorem} להאמית קרהשק סכעיט דז מא, מנכם למטכין.` },
-    { id: uid('n'), author: 'נועה כהן', authorId: 'n4433221', text: lorem },
-    { id: uid('n'), author: 'דוד לוי', authorId: 'd5566778', text: 'יש לוודא מול המדור שהיעדים בסל השני מאושרים לפני יום הגיוס.' },
-  ]
-}
-
 function seed(): Directive[] {
   const dental = () =>
     basket('בה״ד 20 הסל הראשון שלי', 154, 80, 80, [
@@ -372,7 +365,32 @@ function seed(): Directive[] {
     rest('5512140', 20, '8/20', 'עדיפות להנג״א, לא לשכול למלא טופס 16 א׳'),
   ]
 
-  return [
+  // Only some seeded directives carry guidelines; the rest start with none.
+  const guidelines: Record<string, Guideline[]> = {
+    '1042': [
+      {
+        id: uid('g'),
+        title: 'הנחיות ליום הגיוס',
+        text: 'הגעה לתחנה עד 07:30. יש לוודא שכל המלש״בים בסל הראשון עברו ראיון קצין מיון לפני השיבוץ.\nמלש״ב ללא אישור רפואי בתוקף לא ישובץ ביום זה.',
+      },
+      {
+        id: uid('g'),
+        title: 'דגשים לשיבוץ',
+        text: 'עדיפות לשיבוץ יעדי הנג״א. יש להשאיר 10% מהתוכניות פנויות להשלמות אחרי יום הגיוס.',
+      },
+    ],
+    '1045': [
+      {
+        id: uid('g'),
+        title: 'תיאום מול המדור',
+        text: 'לפני פרסום יש לקבל אישור מדור תכנון על מכסות הסל השני.',
+      },
+    ],
+  }
+  const withGuidelines = (list: Omit<Directive, 'guidelines'>[]): Directive[] =>
+    list.map((d) => ({ ...d, guidelines: guidelines[d.id] ?? [] }))
+
+  return withGuidelines([
     {
       id: '1042',
       district: 'מתחם 60, שרשרת חיול 0100',
@@ -396,7 +414,6 @@ function seed(): Directive[] {
         ]),
       ],
       rest: restRows(),
-      notes: seedNotes(),
       draft: false,
       createdBy: 'ליה לנד',
       updatedAt: '2025-04-02',
@@ -425,7 +442,6 @@ function seed(): Directive[] {
         ]),
       ],
       rest: restRows().slice(0, 2),
-      notes: seedNotes().slice(1),
       draft: false,
       createdBy: 'נועה כהן',
       updatedAt: '2025-03-28',
@@ -445,7 +461,6 @@ function seed(): Directive[] {
         basket('תקשוב', 40, 80, 0, [main('2384395', '', '', [])]),
       ],
       rest: [],
-      notes: [],
       draft: true,
       createdBy: 'דוד לוי',
       updatedAt: '2025-04-06',
@@ -463,7 +478,6 @@ function seed(): Directive[] {
       tabOrder: [...defaultTabOrder],
       baskets: [dental()],
       rest: restRows(),
-      notes: seedNotes(),
       draft: false,
       createdBy: 'ליה לנד',
       updatedAt: '2024-12-01',
@@ -486,7 +500,6 @@ function seed(): Directive[] {
         basket('משאבי אנוש', 70, 80, 80, [main('8840011', '', '', [sub('5512140', 4, 'קב״א 45 ומעלה', '', '')])]),
       ],
       rest: restRows().slice(1),
-      notes: seedNotes().slice(0, 1),
       draft: false,
       createdBy: 'מאיה פרץ',
       updatedAt: '2024-08-14',
@@ -504,12 +517,11 @@ function seed(): Directive[] {
       tabOrder: [...defaultTabOrder],
       baskets: [basket('בה״ד 20', 130, 80, 80, [main('12345678', 'יעד פינוי', '', [sub('3301744', 5, 'קב״א 49 ומטה', '', '')])])],
       rest: [],
-      notes: [],
       draft: false,
       createdBy: 'אבירן שלמה',
       updatedAt: '2024-03-10',
     },
-  ]
+  ])
 }
 
 // ---------- Store ----------

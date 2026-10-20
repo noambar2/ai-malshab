@@ -43,7 +43,6 @@ function initial(): Directive {
     copy.id = ''
     copy.draft = true
     copy.date = ''
-    copy.notes = []
   }
   return copy
 }

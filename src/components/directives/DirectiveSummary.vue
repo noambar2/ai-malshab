@@ -1,12 +1,11 @@
 <script setup lang="ts">
 // Body of the "דף סיכום" page, shared by the wizard's last step and the read-only detail page:
-// baskets (expandable), "יתר המיוצבים", notes thread and anchor dates.
-import { reactive, ref } from 'vue'
-import AppIcon from '@/components/AppIcon.vue'
-import DvIcon from './DvIcon.vue'
+// baskets (expandable), "יתר המיוצבים", guidelines and anchor dates.
+import { reactive } from 'vue'
 import SummaryBasket from './SummaryBasket.vue'
 import AnchorDatesEditor from './AnchorDatesEditor.vue'
-import { findTarget, fmtRange, uid, type Directive } from '@/data/directives'
+import GuidelinesEditor from './GuidelinesEditor.vue'
+import { findTarget, fmtRange, type Directive } from '@/data/directives'
 
 const props = defineProps<{ d: Directive; editable?: boolean }>()
 const emit = defineEmits<{ editRest: [] }>()
@@ -15,20 +14,6 @@ const openMap = reactive<Record<string, boolean>>(
   Object.fromEntries(props.d.baskets.map((b, i) => [b.id, i === 0])),
 )
 
-// --- notes ---
-const draftNote = ref('')
-const menuFor = ref<string | null>(null)
-function addNote() {
-  const text = draftNote.value.trim()
-  if (!text) return
-  props.d.notes.push({ id: uid('n'), author: 'ליה לנד', authorId: 'l1234567', text })
-  draftNote.value = ''
-}
-function removeNote(id: string) {
-  const i = props.d.notes.findIndex((n) => n.id === id)
-  if (i >= 0) props.d.notes.splice(i, 1)
-  menuFor.value = null
-}
 </script>
 
 <template>
@@ -64,36 +49,13 @@ function removeNote(id: string) {
         <p v-else class="none">לא הוגדרו מיוצבים נוספים</p>
       </section>
 
-      <!-- הערות -->
+      <!-- הערות והנחיות (from the first step) -->
       <section>
-        <h3 class="sec-title">הערות</h3>
-        <ul v-if="d.notes.length" class="notes-list">
-          <li v-for="n in d.notes" :key="n.id" class="note">
-            <div>
-              <b>{{ n.author }} {{ n.authorId }} :</b>
-              <p>{{ n.text }}</p>
-            </div>
-            <div class="kebab-wrap">
-              <button type="button" class="kebab" aria-label="אפשרויות" @click="menuFor = menuFor === n.id ? null : n.id">
-                <DvIcon name="more" :size="18" />
-              </button>
-              <div v-if="menuFor === n.id" class="menu">
-                <button type="button" @click="removeNote(n.id)">
-                  <DvIcon name="trash" :size="14" />
-                  מחיקת הערה
-                </button>
-              </div>
-            </div>
-          </li>
-        </ul>
-        <p v-else class="none">אין הערות עדיין</p>
-        <form class="add-note" @submit.prevent="addNote">
-          <input v-model="draftNote" class="dv-input" placeholder="הערה חדשה..." />
-          <button type="submit" class="btn btn-soft" :disabled="!draftNote.trim()">
-            <AppIcon name="plus" :size="14" />
-            הוספת הערה
-          </button>
-        </form>
+        <div class="dv-section-head">
+          <h3>הערות והנחיות</h3>
+          <small>דגשים, הנחיות והערות כלליות לדירקטיבה</small>
+        </div>
+        <GuidelinesEditor :items="d.guidelines" :editable="editable" />
       </section>
 
       <!-- תאריכי עוגן -->
@@ -143,13 +105,9 @@ function removeNote(id: string) {
   justify-content: space-between;
   margin-bottom: 16px;
 }
-.sec-head h3,
-.sec-title {
+.sec-head h3 {
   font-size: 16px;
   font-weight: 700;
-}
-.sec-title {
-  margin-bottom: 16px;
 }
 .rest td {
   height: 62px;
@@ -165,66 +123,6 @@ function removeNote(id: string) {
 .none {
   font-size: 14px;
   color: var(--c-muted);
-}
-.notes-list {
-  list-style: none;
-  padding: 0 0 0 0;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  max-height: 260px;
-  overflow: auto;
-}
-.note {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 12px 16px;
-  border-radius: 4px;
-  background: #f0f1f4;
-  font-size: 14px;
-}
-.note b {
-  font-weight: 700;
-}
-.note p {
-  margin-top: 4px;
-  line-height: 1.5;
-}
-.kebab-wrap {
-  position: relative;
-}
-.kebab {
-  color: var(--c-muted);
-}
-.menu {
-  position: absolute;
-  inset-inline-end: 0;
-  top: 22px;
-  z-index: 10;
-  padding: 4px;
-  background: #fff;
-  border: 1px solid #e2e8f8;
-  border-radius: 6px;
-  box-shadow: 0 6px 20px rgba(7, 25, 56, 0.12);
-}
-.menu button {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 12px;
-  font-size: 13px;
-  color: var(--c-danger);
-  white-space: nowrap;
-}
-.add-note {
-  display: flex;
-  gap: 10px;
-  margin-top: 20px;
-}
-.add-note .btn {
-  height: 42px;
-  border-radius: 4px;
 }
 .anchors {
   list-style: none;

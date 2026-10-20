@@ -5,6 +5,7 @@ import SearchSelect from './SearchSelect.vue'
 import MultiSelect from './MultiSelect.vue'
 import DateInput from './DateInput.vue'
 import AnchorDatesEditor from './AnchorDatesEditor.vue'
+import GuidelinesEditor from './GuidelinesEditor.vue'
 import TabOrderModal from './TabOrderModal.vue'
 import {
   cohortOptions,
@@ -94,6 +95,14 @@ const tabsOpen = ref(false)
         <small>טווחי תאריכים קבועים לפי יחידה</small>
       </div>
       <AnchorDatesEditor :anchors="d.anchors" :show-errors="showErrors" />
+    </section>
+
+    <section>
+      <div class="dv-section-head">
+        <h3>הערות והנחיות</h3>
+        <small>דגשים, הנחיות והערות כלליות לדירקטיבה</small>
+      </div>
+      <GuidelinesEditor :items="d.guidelines" editable />
     </section>
   </div>
 
