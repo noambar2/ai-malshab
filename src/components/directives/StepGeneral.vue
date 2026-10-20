@@ -139,6 +139,7 @@ const tabsOpen = ref(false)
 /* The section title doubles as the open/close control. */
 .toggle {
   width: 100%;
+  padding: 0;
   text-align: start;
   cursor: pointer;
 }
