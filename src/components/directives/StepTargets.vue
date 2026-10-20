@@ -8,7 +8,6 @@ import NoteLine from './NoteLine.vue'
 import type { Directive } from '@/data/directives'
 
 const props = defineProps<{ d: Directive; showErrors?: boolean; initialBasket?: string }>()
-const emit = defineEmits<{ editBaskets: [] }>()
 
 const activeId = ref(props.initialBasket ?? props.d.baskets[0]?.id ?? '')
 const active = computed(() => props.d.baskets.find((b) => b.id === activeId.value) ?? props.d.baskets[0])
@@ -40,10 +39,6 @@ const missing = (id: string) => {
       <div class="banner-name">
         <h2>{{ active.name }}</h2>
         <NoteLine v-if="active.notes" :text="active.notes" />
-        <p>
-          לעריכת הסל והיעדים יש
-          <button type="button" class="back-link" @click="emit('editBaskets')">לחזור אחורה לשלב הקודם</button>
-        </p>
       </div>
       <BasketStats :basket="active" tone="blue" />
     </div>
@@ -121,20 +116,11 @@ const missing = (id: string) => {
 }
 .banner h2 {
   font-size: 20px;
-  font-weight: 500;
+  font-weight: 700;
   color: var(--c-brand);
 }
 .banner :deep(.note-line) {
   color: var(--c-brand);
-}
-.banner p {
-  font-size: 13px;
-  color: var(--c-brand);
-}
-.back-link {
-  font-size: inherit;
-  color: inherit;
-  text-decoration: underline;
 }
 .cards {
   display: flex;

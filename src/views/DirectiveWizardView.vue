@@ -180,7 +180,6 @@ function saveDraft() {
         :d="d"
         :show-errors="showErrors"
         :initial-basket="focusBasket || undefined"
-        @edit-baskets="stage = 'baskets'"
       />
       <StepRest v-else-if="stage === 'rest'" :key="stageKey" :d="d" />
       <template v-else>
