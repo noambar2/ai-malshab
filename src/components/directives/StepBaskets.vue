@@ -16,7 +16,6 @@ const props = defineProps<{ d: Directive; error?: string }>()
 const editing = defineModel<string[]>('editing', { default: () => [] })
 
 const expanded = reactive<Record<string, boolean>>({})
-const targetOpen = reactive<Record<string, boolean>>({})
 
 function add() {
   const b = newBasket()
@@ -63,7 +62,8 @@ function remove(i: number) {
         </div>
 
         <div v-if="expanded[b.id]" class="body">
-          <MainTargetCard v-for="t in b.targets" :key="t.id" v-model:open="targetOpen[t.id]" :target="t" />
+          <!-- Placement targets are set in the next step, so the targets here are summary rows only. -->
+          <MainTargetCard v-for="t in b.targets" :key="t.id" :target="t" summary-only />
           <p v-if="!b.targets.length" class="empty">לא הוגדרו יעדים לסל זה</p>
           <div class="actions">
             <button type="button" class="btn btn-soft" @click="edit(b.id)">

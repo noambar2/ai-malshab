@@ -7,7 +7,13 @@ import DvIcon from './DvIcon.vue'
 import SearchSelect from './SearchSelect.vue'
 import { findTarget, hasNum, newSubTarget, targetCatalog, targetLabel, type MainTarget } from '@/data/directives'
 
-const props = defineProps<{ target: MainTarget; editable?: boolean; showErrors?: boolean }>()
+const props = defineProps<{
+  target: MainTarget
+  editable?: boolean
+  showErrors?: boolean
+  // Header only: no expand and no placement-targets count (used before that step is reached).
+  summaryOnly?: boolean
+}>()
 const open = defineModel<boolean>('open', { default: false })
 
 const info = computed(() => findTarget(props.target.targetCode))
@@ -28,7 +34,14 @@ function remove(i: number) {
 
 <template>
   <section class="mt" :class="{ open, editable }">
-    <button type="button" class="head" :aria-expanded="open" @click="open = !open">
+    <component
+      :is="summaryOnly ? 'div' : 'button'"
+      :type="summaryOnly ? undefined : 'button'"
+      class="head"
+      :class="{ static: summaryOnly }"
+      :aria-expanded="summaryOnly ? undefined : open"
+      @click="!summaryOnly && (open = !open)"
+    >
       <div class="title">
         <h3 :title="info?.name">
           <span class="nm">{{ info?.name ?? 'יעד לא נבחר' }}</span>
@@ -56,16 +69,16 @@ function remove(i: number) {
           <span>מיוצבים</span>
           <b>{{ info?.stabilized ?? 0 }}</b>
         </div>
-        <div class="dv-stat">
+        <div v-if="!summaryOnly" class="dv-stat">
           <span>יעדים לשיבוץ</span>
           <b v-if="target.subTargets.length">{{ target.subTargets.length }}</b>
           <b v-else class="warn"><DvIcon name="warning" :size="15" />0</b>
         </div>
       </div>
-      <AppIcon :name="open ? 'chevron-up' : 'chevron-down'" :size="22" class="chev" />
-    </button>
+      <AppIcon v-if="!summaryOnly" :name="open ? 'chevron-up' : 'chevron-down'" :size="22" class="chev" />
+    </component>
 
-    <div v-if="open" class="body">
+    <div v-if="open && !summaryOnly" class="body">
       <!-- Editable (wizard) -->
       <template v-if="editable">
         <div class="dv-section-head">
@@ -170,6 +183,9 @@ function remove(i: number) {
   min-height: 86px;
   padding: 16px 30px;
   text-align: start;
+}
+.head.static {
+  cursor: default;
 }
 .title {
   flex: 1;
