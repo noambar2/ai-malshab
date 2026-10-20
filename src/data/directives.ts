@@ -161,8 +161,6 @@ export const conditionFields: ConditionField[] = [
   { key: 'kaba', label: 'קב״א' },
   { key: 'tzadach', label: 'צד״כ' },
   { key: 'attention', label: 'קשב מתמשך' },
-  { key: 'english', label: 'רמת אנגלית' },
-  { key: 'gender', label: 'מגדר', options: ['זכר', 'נקבה'] },
   { key: 'education', label: 'השכלה', options: ['12 שנות לימוד', 'בגרות מלאה', 'הנדסאי', 'תואר ראשון'] },
 ]
 
