@@ -33,7 +33,7 @@ function remove(i: number) {
 </script>
 
 <template>
-  <section class="mt" :class="{ open, editable }">
+  <section class="mt" :class="{ open, editable, compact: summaryOnly }">
     <component
       :is="summaryOnly ? 'div' : 'button'"
       :type="summaryOnly ? undefined : 'button'"
@@ -269,5 +269,34 @@ function remove(i: number) {
   gap: 6px;
   font-size: 14px;
   color: var(--c-danger);
+}
+/* Compact summary row (basket step): one tight line per target instead of a full card. */
+.compact .head {
+  min-height: 0;
+  padding: 10px 0;
+  gap: 16px;
+}
+.compact .title h3 {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+.compact .title small {
+  font-size: 12px;
+}
+.compact .note {
+  margin-top: 2px;
+  font-size: 12px;
+}
+.compact .dv-stats .dv-stat {
+  padding: 0 12px;
+  gap: 2px;
+  font-size: 12px;
+}
+.compact .dv-stat b {
+  font-size: 14px;
+}
+.compact .dv-stat .code {
+  font-size: 12px;
 }
 </style>

@@ -18,7 +18,7 @@ const openMap = reactive<Record<string, boolean>>(
   <section class="sb" :class="{ open }">
     <button type="button" class="head" :aria-expanded="open" @click="open = !open">
       <div class="name">
-        <h2>{{ basket.name }}</h2>
+        <h2 :title="basket.name">{{ basket.name }}</h2>
         <NoteLine v-if="basket.notes" :text="basket.notes" :inverse="open" @click.stop />
       </div>
       <BasketStats :basket="basket" :tone="open ? 'inverse' : 'plain'" />
@@ -62,6 +62,10 @@ const openMap = reactive<Record<string, boolean>>(
   gap: 4px;
 }
 .head h2 {
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
   font-size: 24px;
   font-weight: 700;
   color: var(--c-primary-dark);

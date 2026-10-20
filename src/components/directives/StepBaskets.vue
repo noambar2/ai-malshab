@@ -54,7 +54,7 @@ function remove(i: number) {
           @keydown.enter.self="expanded[b.id] = !expanded[b.id]"
         >
           <div class="name">
-            <h2>{{ b.name }}</h2>
+            <h2 :title="b.name">{{ b.name }}</h2>
             <NoteLine v-if="b.notes" :text="b.notes" @click.stop />
           </div>
           <BasketStats :basket="b" />
@@ -134,6 +134,10 @@ function remove(i: number) {
   gap: 4px;
 }
 .name h2 {
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
   font-size: 24px;
   font-weight: 500;
   color: var(--c-primary-dark);
@@ -145,10 +149,13 @@ function remove(i: number) {
 .body {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 4px 30px 24px;
+  padding: 6px 30px 18px;
   border-top: 1px solid var(--c-divider);
-  padding-top: 20px;
+}
+/* The target rows read as one list, separated by hairlines. */
+.body > .mt + .mt {
+  border-top: 1px solid var(--c-divider);
+  border-radius: 0;
 }
 .empty {
   font-size: 14px;
@@ -157,7 +164,7 @@ function remove(i: number) {
 .actions {
   display: flex;
   justify-content: flex-end;
-  margin-top: 10px;
+  margin-top: 8px;
 }
 .err {
   margin-top: -14px;
