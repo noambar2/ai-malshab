@@ -5,7 +5,13 @@ import DvIcon from './DvIcon.vue'
 import DateRangeInput from './DateRangeInput.vue'
 import { anchorTitles, newAnchor, type AnchorDate } from '@/data/directives'
 
-const props = defineProps<{ anchors: AnchorDate[]; showErrors?: boolean; addLabel?: string }>()
+const props = defineProps<{
+  anchors: AnchorDate[]
+  showErrors?: boolean
+  addLabel?: string
+  // Smaller fields, to sit with the denser content of the summary page.
+  compact?: boolean
+}>()
 
 function add() {
   props.anchors.push(newAnchor())
@@ -16,7 +22,7 @@ function remove(i: number) {
 </script>
 
 <template>
-  <div class="anchors">
+  <div class="anchors" :class="{ compact }">
     <div v-for="(a, i) in anchors" :key="a.id" class="row">
       <label class="dv-field title">
         <span class="dv-label"><span class="req">כותרת</span></span>
@@ -70,5 +76,29 @@ function remove(i: number) {
 }
 .range {
   width: 267px;
+}
+.compact {
+  gap: 10px;
+}
+.compact .row {
+  gap: 12px;
+}
+.compact :deep(.dv-input) {
+  height: 34px;
+  font-size: 14px;
+}
+.compact :deep(.dv-label) {
+  font-size: 12px;
+}
+.compact .dv-trash {
+  width: 30px;
+  height: 30px;
+  margin-bottom: 2px;
+}
+.compact .title {
+  width: 180px;
+}
+.compact .range {
+  width: 240px;
 }
 </style>

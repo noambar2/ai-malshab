@@ -21,6 +21,9 @@ const tabsOpen = ref(false)
 function edit() {
   if (d.value) router.push({ path: '/directives/new', query: { edit: d.value.id } })
 }
+function fix(step: 'targets' | 'rest', basket?: string) {
+  if (d.value) router.push({ path: '/directives/new', query: { edit: d.value.id, step, ...(basket ? { basket } : {}) } })
+}
 function duplicate() {
   if (d.value) router.push({ path: '/directives/new', query: { from: d.value.id } })
 }
@@ -125,7 +128,7 @@ function duplicate() {
     </section>
 
     <h2 class="section-title">סלים ויעדים</h2>
-    <DirectiveSummary :key="d.id" :d="d" />
+    <DirectiveSummary :key="d.id" :d="d" :can-fix="!isPast(d)" @fix="fix" />
   </main>
 
   <main v-else class="dv-page missing">

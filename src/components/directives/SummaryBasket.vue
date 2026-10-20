@@ -1,31 +1,51 @@
 <script setup lang="ts">
-// A basket on the summary / detail page: collapsed white row, or expanded blue block with its main targets.
-import { reactive } from 'vue'
+// A basket on the summary / detail page (design "רשימה עם תוויות רמה"): a white card whose header
+// row carries a "סל N" label; when open, its main targets follow as indented rows.
+// Which basket and which target are open is decided by the parent (one of each at a time).
 import AppIcon from '@/components/AppIcon.vue'
-import BasketStats from './BasketStats.vue'
-import MainTargetCard from './MainTargetCard.vue'
 import NoteLine from './NoteLine.vue'
-import type { Basket } from '@/data/directives'
+import SummaryTargetRow from './SummaryTargetRow.vue'
+import { computed } from 'vue'
+import { basketStats, type Basket } from '@/data/directives'
 
-const props = defineProps<{ basket: Basket }>()
-const open = defineModel<boolean>('open', { default: false })
-const openMap = reactive<Record<string, boolean>>(
-  Object.fromEntries(props.basket.targets.map((t, i) => [t.id, i === 0])),
-)
+const props = defineProps<{ basket: Basket; index: number; open: boolean; openTarget: string | null; canFix?: boolean }>()
+const emit = defineEmits<{ toggle: []; toggleTarget: [id: string]; fix: [] }>()
+const st = computed(() => basketStats(props.basket))
 </script>
 
 <template>
   <section class="sb" :class="{ open }">
-    <button type="button" class="head" :aria-expanded="open" @click="open = !open">
+    <div
+      class="head sum-grid"
+      role="button"
+      tabindex="0"
+      :aria-expanded="open"
+      @click="emit('toggle')"
+      @keydown.enter.self="emit('toggle')"
+    >
+      <span class="level">סל {{ index + 1 }}</span>
       <div class="name">
         <h2 :title="basket.name">{{ basket.name }}</h2>
-        <NoteLine v-if="basket.notes" :text="basket.notes" :inverse="open" @click.stop />
+        <NoteLine v-if="basket.notes" :text="basket.notes" @click.stop />
       </div>
-      <BasketStats :basket="basket" :tone="open ? 'inverse' : 'plain'" />
-      <AppIcon :name="open ? 'chevron-up' : 'chevron-down'" :size="22" class="chev" />
-    </button>
+      <dl class="sum-stat"><dt>תוכניות</dt><dd>{{ st.plans }}</dd></dl>
+      <dl class="sum-stat"><dt>צפי הגעה</dt><dd>{{ st.arrival }}<span class="pct">{{ basket.arrivalPct ?? 0 }}%</span></dd></dl>
+      <dl class="sum-stat"><dt>צפי פינוי</dt><dd>{{ st.evac }}<span class="pct">{{ basket.evacPct ?? 0 }}%</span></dd></dl>
+      <dl class="sum-stat"><dt>סך מיוצבים</dt><dd>{{ st.stabilized }}</dd></dl>
+      <dl class="sum-stat"><dt>יעדים</dt><dd>{{ st.targets }}</dd></dl>
+      <AppIcon :name="open ? 'chevron-up' : 'chevron-down'" :size="22" class="sum-chev" />
+    </div>
+
     <div v-if="open" class="body">
-      <MainTargetCard v-for="t in basket.targets" :key="t.id" v-model:open="openMap[t.id]" :target="t" />
+      <SummaryTargetRow
+        v-for="t in basket.targets"
+        :key="t.id"
+        :target="t"
+        :open="openTarget === t.id"
+        :fix-label="canFix ? 'להגדרת יעדים לשיבוץ' : undefined"
+        @toggle="emit('toggleTarget', t.id)"
+        @fix="emit('fix')"
+      />
       <p v-if="!basket.targets.length" class="empty">לא הוגדרו יעדים לסל זה</p>
     </div>
   </section>
@@ -33,59 +53,57 @@ const openMap = reactive<Record<string, boolean>>(
 
 <style scoped>
 .sb {
-  border-radius: 8px;
   background: #fff;
+  border: 1px solid var(--c-border-2);
+  border-radius: 10px;
   overflow: hidden;
 }
-.sb.open {
-  background: #e2eafd;
-}
 .head {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  width: 100%;
-  min-height: 86px;
-  padding: 0 30px;
-  text-align: start;
+  padding-block: 14px;
+  cursor: pointer;
+  outline: none;
+}
+.head:hover {
+  background: #fafbff;
+}
+.head:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--c-primary);
 }
 .open .head {
-  background: #2f6eff;
-  color: #fff;
+  border-bottom: 1px solid var(--c-divider);
+}
+.level {
+  justify-self: start;
+  padding: 3px 10px;
+  border-radius: 10px;
+  background: var(--c-primary-soft);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--c-primary);
 }
 .name {
-  flex: 1;
   min-width: 0;
+  padding-inline-end: 16px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 4px;
+  gap: 2px;
 }
-.head h2 {
+h2 {
   max-width: 100%;
+  margin: 0;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  font-size: 24px;
-  font-weight: 700;
+  font-size: 18px;
+  font-weight: 600;
   color: var(--c-primary-dark);
 }
-.chev {
-  flex-shrink: 0;
-  color: var(--c-text);
-}
-.open .head h2,
-.open .chev {
-  color: #fff;
-}
-.body {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 20px 30px;
-}
 .empty {
-  font-size: 14px;
+  margin: 0;
+  padding: 14px 18px;
+  padding-inline-start: 114px;
+  font-size: 13px;
   color: var(--c-muted-2);
 }
 </style>

@@ -6,10 +6,10 @@ import MainTargetCard from './MainTargetCard.vue'
 import MetaLine from './MetaLine.vue'
 import type { Directive } from '@/data/directives'
 
-const props = defineProps<{ d: Directive; showErrors?: boolean }>()
+const props = defineProps<{ d: Directive; showErrors?: boolean; initialBasket?: string }>()
 const emit = defineEmits<{ editBaskets: [] }>()
 
-const activeId = ref(props.d.baskets[0]?.id ?? '')
+const activeId = ref(props.initialBasket ?? props.d.baskets[0]?.id ?? '')
 const active = computed(() => props.d.baskets.find((b) => b.id === activeId.value) ?? props.d.baskets[0])
 const openMap = reactive<Record<string, boolean>>({})
 

@@ -57,7 +57,10 @@ const modeLabel = isEdit
     ? `דירקטיבה חדשה - שכפול של #${fromId}`
     : 'דירקטיבה חדשה'
 
-const stage = ref<Stage>('general')
+// Arriving from a summary link (?step=targets&basket=…) opens straight on that step.
+const queryStep = typeof route.query.step === 'string' && (order as string[]).includes(route.query.step) ? (route.query.step as Stage) : null
+const stage = ref<Stage>(isEdit && queryStep ? queryStep : 'general')
+const focusBasket = ref(typeof route.query.basket === 'string' ? route.query.basket : '')
 const reachedIdx = ref(isEdit || fromId ? order.length - 1 : 0)
 const step = computed(() => stepOf(stage.value))
 const showErrors = ref(false)
@@ -141,6 +144,11 @@ function goStep(i: number) {
   stage.value = target
 }
 
+function onFix(target: 'targets' | 'rest', basketId?: string) {
+  focusBasket.value = basketId ?? ''
+  stage.value = target
+}
+
 function finish() {
   d.draft = false
   const id = saveDirective(d)
@@ -171,6 +179,7 @@ function saveDraft() {
         :key="stageKey"
         :d="d"
         :show-errors="showErrors"
+        :initial-basket="focusBasket || undefined"
         @edit-baskets="stage = 'baskets'"
       />
       <StepRest v-else-if="stage === 'rest'" :key="stageKey" :d="d" />
@@ -179,7 +188,7 @@ function saveDraft() {
           <h1 class="dv-title">סיכום</h1>
           <MetaLine :d="d" />
         </div>
-        <DirectiveSummary :key="stageKey" :d="d" editable @edit-rest="stage = 'rest'" />
+        <DirectiveSummary :key="stageKey" :d="d" editable can-fix @edit-rest="stage = 'rest'" @fix="onFix" />
       </template>
     </main>
 

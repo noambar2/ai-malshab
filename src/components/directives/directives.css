@@ -319,3 +319,46 @@ select.dv-input.placeholder {
 .dv-table.rest th:last-child {
   width: 40%;
 }
+
+/* Summary rows (baskets and their main targets) share one grid, so labels, names, the five
+   number columns and the chevron line up on the same guides at every level. */
+.sum-grid {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr) repeat(5, 108px) 32px;
+  align-items: center;
+  padding: 12px 18px;
+}
+.sum-stat {
+  min-width: 0;
+  padding: 0 12px;
+  border-inline-start: 1px solid var(--c-divider);
+}
+.sum-stat dt {
+  font-size: 11px;
+  color: var(--c-muted);
+  white-space: nowrap;
+}
+.sum-stat dd {
+  margin: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--c-text);
+}
+.sum-stat dd .pct,
+.sum-stat dd .code {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--c-muted);
+  margin-inline-start: 4px;
+}
+.sum-chev {
+  justify-self: end;
+  color: var(--c-muted-2);
+}
+/* Anything under a row (the placement-targets table) spans from the name column to the chevron. */
+.sum-span {
+  grid-column: 2 / -1;
+}

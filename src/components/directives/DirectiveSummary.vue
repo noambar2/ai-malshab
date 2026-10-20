@@ -1,27 +1,51 @@
 <script setup lang="ts">
 // Body of the "דף סיכום" page, shared by the wizard's last step and the read-only detail page:
 // baskets (expandable), "יתר המיוצבים", anchor dates and guidelines (same order as the first step).
-import { reactive } from 'vue'
+import { ref } from 'vue'
 import SummaryBasket from './SummaryBasket.vue'
-import MainTargetCard from './MainTargetCard.vue'
+import SummaryTargetRow from './SummaryTargetRow.vue'
 import AnchorDatesEditor from './AnchorDatesEditor.vue'
 import GuidelinesEditor from './GuidelinesEditor.vue'
 import { fmtRange, type Directive } from '@/data/directives'
 
-const props = defineProps<{ d: Directive; editable?: boolean }>()
-const emit = defineEmits<{ editRest: [] }>()
+const props = defineProps<{ d: Directive; editable?: boolean; canFix?: boolean }>()
+// fix: go to the wizard step where a missing part is filled in (with the basket to focus).
+const emit = defineEmits<{ editRest: []; fix: [stage: 'targets' | 'rest', basketId?: string] }>()
 
-// Like a basket's targets: the first one starts open so its placement targets are visible.
-const restOpen = reactive<Record<string, boolean>>(Object.fromEntries(props.d.rest.map((t, i) => [t.id, i === 0])))
-const openMap = reactive<Record<string, boolean>>(
-  Object.fromEntries(props.d.baskets.map((b, i) => [b.id, i === 0])),
-)
+// Strict accordion: one basket open, and one target open inside it; opening another closes the
+// current one. A basket opens with its first target showing. "יתר המיוצבים" works the same way.
+const firstTarget = (id: string | null) => props.d.baskets.find((b) => b.id === id)?.targets[0]?.id ?? null
+const openBasket = ref<string | null>(props.d.baskets[0]?.id ?? null)
+const openTarget = ref<string | null>(firstTarget(openBasket.value))
+const openRest = ref<string | null>(props.d.rest[0]?.id ?? null)
+
+function toggleBasket(id: string) {
+  openBasket.value = openBasket.value === id ? null : id
+  openTarget.value = firstTarget(openBasket.value)
+}
+function toggleTarget(id: string) {
+  openTarget.value = openTarget.value === id ? null : id
+}
+function toggleRest(id: string) {
+  openRest.value = openRest.value === id ? null : id
+}
 
 </script>
 
 <template>
   <div class="summary">
-    <SummaryBasket v-for="b in d.baskets" :key="b.id" v-model:open="openMap[b.id]" :basket="b" />
+    <SummaryBasket
+      v-for="(b, i) in d.baskets"
+      :key="b.id"
+      :basket="b"
+      :index="i"
+      :open="openBasket === b.id"
+      :open-target="openTarget"
+      :can-fix="canFix"
+      @toggle="toggleBasket(b.id)"
+      @toggle-target="toggleTarget"
+      @fix="emit('fix', 'targets', b.id)"
+    />
     <p v-if="!d.baskets.length" class="dv-card empty">לא הוגדרו סלים בדירקטיבה זו</p>
 
     <div class="dv-card extras">
@@ -32,7 +56,15 @@ const openMap = reactive<Record<string, boolean>>(
           <button v-if="editable" type="button" class="dv-link" @click="emit('editRest')">עריכה</button>
         </div>
         <div v-if="d.rest.length" class="rest-list">
-          <MainTargetCard v-for="t in d.rest" :key="t.id" v-model:open="restOpen[t.id]" :target="t" />
+          <SummaryTargetRow
+            v-for="t in d.rest"
+            :key="t.id"
+            :target="t"
+            :open="openRest === t.id"
+            :fix-label="canFix ? 'לעריכה בשלב יתר מיוצבים' : undefined"
+            @toggle="toggleRest(t.id)"
+            @fix="emit('fix', 'rest')"
+          />
         </div>
         <p v-else class="none">לא הוגדרו מיוצבים נוספים</p>
       </section>
@@ -43,7 +75,7 @@ const openMap = reactive<Record<string, boolean>>(
           <h3>תאריכי עוגן</h3>
           <small>טווחי תאריכים קבועים לפי יחידה</small>
         </div>
-        <AnchorDatesEditor v-if="editable" :anchors="d.anchors" add-label="הוספת תאריכים" />
+        <AnchorDatesEditor v-if="editable" :anchors="d.anchors" add-label="הוספת תאריכים" compact />
         <ul v-else-if="d.anchors.length" class="anchors">
           <li v-for="a in d.anchors" :key="a.id">
             <span class="dv-label">כותרת</span>
@@ -97,14 +129,11 @@ const openMap = reactive<Record<string, boolean>>(
   font-size: 16px;
   font-weight: 700;
 }
-/* Same light-blue ground as an open basket, so each target card's edges show. */
+/* Same list as the targets inside a basket. */
 .rest-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 20px;
-  border-radius: 8px;
-  background: #e2eafd;
+  border: 1px solid var(--c-border-2);
+  border-radius: 10px;
+  overflow: hidden;
 }
 .none {
   font-size: 14px;
