@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // Body of the "דף סיכום" page, shared by the wizard's last step and the read-only detail page:
-// baskets (expandable), "יתר המיוצבים", guidelines and anchor dates.
+// baskets (expandable), "יתר המיוצבים", anchor dates and guidelines (same order as the first step).
 import { reactive } from 'vue'
 import SummaryBasket from './SummaryBasket.vue'
 import MainTargetCard from './MainTargetCard.vue'
@@ -36,15 +36,6 @@ const openMap = reactive<Record<string, boolean>>(
         <p v-else class="none">לא הוגדרו מיוצבים נוספים</p>
       </section>
 
-      <!-- הערות והנחיות (from the first step) -->
-      <section>
-        <div class="dv-section-head">
-          <h3>הערות והנחיות</h3>
-          <small>דגשים, הנחיות והערות כלליות לדירקטיבה</small>
-        </div>
-        <GuidelinesEditor :items="d.guidelines" :editable="editable" />
-      </section>
-
       <!-- תאריכי עוגן -->
       <section>
         <div class="dv-section-head">
@@ -61,6 +52,15 @@ const openMap = reactive<Record<string, boolean>>(
           </li>
         </ul>
         <p v-else class="none">לא הוגדרו תאריכי עוגן</p>
+      </section>
+
+      <!-- הערות והנחיות (from the first step) -->
+      <section>
+        <div class="dv-section-head">
+          <h3>הערות והנחיות</h3>
+          <small>דגשים, הנחיות והערות כלליות לדירקטיבה</small>
+        </div>
+        <GuidelinesEditor :items="d.guidelines" :editable="editable" />
       </section>
     </div>
   </div>
