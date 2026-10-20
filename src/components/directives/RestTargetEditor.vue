@@ -172,16 +172,16 @@ const missing = (v: unknown) => showErrors.value && (typeof v === 'string' ? !v.
   white-space: nowrap;
   text-overflow: ellipsis;
   display: block;
-  line-height: 40px;
+  line-height: 34px;
 }
 .subs-head {
-  margin-top: 40px;
+  margin-top: 24px;
 }
 .sub {
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  margin-bottom: 20px;
+  margin-bottom: 14px;
 }
 .sub .dv-trash {
   flex-shrink: 0;
@@ -206,6 +206,6 @@ const missing = (v: unknown) => showErrors.value && (typeof v === 'string' ? !v.
   display: flex;
   justify-content: flex-end;
   gap: 10px;
-  margin-top: 40px;
+  margin-top: 24px;
 }
 </style>

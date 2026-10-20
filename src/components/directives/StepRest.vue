@@ -1,8 +1,8 @@
 <script setup lang="ts">
 // Wizard step 3 — "יתר מיוצבים": main targets outside the baskets, each with the targets its
-// recruits can be placed into (Figma "יתר מיוצבים"). Open targets are edited in place;
-// saved ones collapse into the same summary row as a basket's main target.
-import { ref } from 'vue'
+// recruits can be placed into (Figma "יתר מיוצבים"). Targets being edited show the editor;
+// saved ones are the same card as a basket's main target, opening into a read-only view.
+import { reactive, ref } from 'vue'
 import AppIcon from '@/components/AppIcon.vue'
 import MainTargetCard from './MainTargetCard.vue'
 import RestTargetEditor from './RestTargetEditor.vue'
@@ -13,6 +13,7 @@ const props = defineProps<{ d: Directive }>()
 
 // New or invalid targets start open; complete ones start collapsed.
 const editing = ref<string[]>(props.d.rest.filter((t) => !restTargetValid(t)).map((t) => t.id))
+const openMap = reactive<Record<string, boolean>>({})
 
 function add() {
   const t = { ...newMainTarget(), placementType: 'שוחררים' }
@@ -21,6 +22,7 @@ function add() {
 }
 function close(id: string) {
   editing.value = editing.value.filter((x) => x !== id)
+  openMap[id] = false
 }
 function open(id: string) {
   if (!editing.value.includes(id)) editing.value = [...editing.value, id]
@@ -40,7 +42,14 @@ function remove(i: number) {
   <div class="list">
     <template v-for="(t, i) in d.rest" :key="t.id">
       <RestTargetEditor v-if="editing.includes(t.id)" :target="t" @save="close(t.id)" @remove="remove(i)" />
-      <MainTargetCard v-else :target="t" :open="false" @update:open="open(t.id)" />
+      <MainTargetCard
+        v-else
+        v-model:open="openMap[t.id]"
+        :target="t"
+        editable
+        external-edit
+        @edit="open(t.id)"
+      />
     </template>
 
     <p v-if="!d.rest.length" class="none">לא הוגדרו מיוצבים נוספים. הוסיפו יעד ראשי אם יש מיוצבים שאינם משויכים לאף סל.</p>

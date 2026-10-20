@@ -89,7 +89,7 @@ onBeforeUnmount(() => document.removeEventListener('mousedown', onDoc))
   align-items: center;
   gap: 10px;
   height: auto;
-  min-height: 42px;
+  min-height: 36px;
   padding: 5px 12px 5px 8px;
   cursor: text;
 }

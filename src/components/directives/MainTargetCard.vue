@@ -13,7 +13,11 @@ const props = defineProps<{
   showErrors?: boolean
   // Header only: no expand and no placement-targets count (used before that step is reached).
   summaryOnly?: boolean
+  // "יתר מיוצבים": the whole target is edited in a separate editor, so the view's edit button
+  // asks the parent to switch to it instead of editing the placement targets in place.
+  externalEdit?: boolean
 }>()
+const emit = defineEmits<{ edit: [] }>()
 const open = defineModel<boolean>('open', { default: false })
 
 const info = computed(() => findTarget(props.target.targetCode))
@@ -26,11 +30,12 @@ const professionOf = (code: string) => {
 // In the wizard the placement targets have a view mode (read-only table) and an edit mode
 // (fields), like a basket. Incomplete targets start in edit mode.
 const subsValid = computed(() => props.target.subTargets.every((s) => !!s.targetCode && hasNum(s.quantity)))
-const editing = ref(!!props.editable && !subsValid.value)
+const editing = ref(!!props.editable && !props.externalEdit && !subsValid.value)
 const localErrors = ref(false)
 const errors = computed(() => !!props.showErrors || localErrors.value)
 
 function startEdit() {
+  if (props.externalEdit) return emit('edit')
   editing.value = true
   open.value = true
 }
@@ -41,6 +46,7 @@ function saveClose() {
   localErrors.value = false
 }
 function add() {
+  if (props.externalEdit) return emit('edit')
   props.target.subTargets.push(newSubTarget())
   editing.value = true
   open.value = true
@@ -186,7 +192,7 @@ function remove(i: number) {
         <div v-if="editable && target.subTargets.length" class="view-actions">
           <button type="button" class="btn btn-soft" @click="startEdit">
             <DvIcon name="edit" :size="14" />
-            עריכת יעדים לשיבוץ
+            {{ externalEdit ? 'עריכת יעד' : 'עריכת יעדים לשיבוץ' }}
           </button>
         </div>
         <div v-if="!target.subTargets.length" class="empty-row">
@@ -308,8 +314,8 @@ function remove(i: number) {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding-bottom: 20px;
-  margin-bottom: 20px;
+  padding-bottom: 14px;
+  margin-bottom: 14px;
   border-bottom: 1px solid var(--c-divider);
 }
 .sub-grid {

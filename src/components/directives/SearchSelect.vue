@@ -96,7 +96,7 @@ onBeforeUnmount(() => document.removeEventListener('mousedown', onDoc))
   border: 0;
   outline: none;
   background: transparent;
-  font-size: 16px;
+  font-size: 14px;
 }
 .q::placeholder,
 .ph {

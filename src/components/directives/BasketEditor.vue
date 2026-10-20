@@ -238,7 +238,7 @@ function pct(v: number | null) {
   white-space: nowrap;
   text-overflow: ellipsis;
   display: block;
-  line-height: 40px;
+  line-height: 34px;
 }
 .targets-head {
   margin-top: 50px;
