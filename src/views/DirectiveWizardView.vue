@@ -216,11 +216,10 @@ function saveDraft() {
   height: 72px;
   padding: 0 60px;
   /* Frosted glass: the page shows through, blurred, as it scrolls under the bar. */
-  background: rgba(255, 255, 255, 0.7);
-  -webkit-backdrop-filter: blur(16px) saturate(1.4);
-  backdrop-filter: blur(16px) saturate(1.4);
-  border-top: 1px solid rgba(13, 45, 143, 0.08);
-  box-shadow: 0 -6px 16px rgba(7, 25, 56, 0.04);
+  background: rgba(255, 255, 255, 0.28);
+  -webkit-backdrop-filter: blur(8px) saturate(1.3);
+  backdrop-filter: blur(8px) saturate(1.3);
+  border-top: 1px solid rgba(255, 255, 255, 0.6);
 }
 .draft {
   font-size: 13px;
