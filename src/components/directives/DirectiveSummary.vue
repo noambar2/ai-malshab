@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // Body of the "דף סיכום" page, shared by the wizard's last step and the read-only detail page:
 // baskets (expandable), "יתר המיוצבים", anchor dates and guidelines (same order as the first step).
-import { ref } from 'vue'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 import AppIcon from '@/components/AppIcon.vue'
 import SummaryBasket from './SummaryBasket.vue'
 import SummaryTargetRow from './SummaryTargetRow.vue'
@@ -37,6 +37,25 @@ function toggleRest(id: string) {
   openRests.value = openRests.value.includes(id) ? openRests.value.filter((x) => x !== id) : [id]
 }
 
+// While scrolling through a long basket, its header (and then the open main target) sticks under
+// the navbar and, in the wizard, under the stepper, so it's clear what is being looked at.
+// A small gap keeps the stuck header from touching the stepper.
+const STICKY_GAP = 12
+const stickyTop = ref(56 + STICKY_GAP)
+let bandObserver: ResizeObserver | undefined
+onMounted(() => {
+  // The page may not be attached to the document yet when this mounts, so look a tick later.
+  setTimeout(() => {
+    const band = document.querySelector<HTMLElement>('.stepper-band')
+    if (!band) return
+    const set = () => (stickyTop.value = 56 + band.offsetHeight + STICKY_GAP)
+    set()
+    bandObserver = new ResizeObserver(set)
+    bandObserver.observe(band)
+  })
+})
+onBeforeUnmount(() => bandObserver?.disconnect())
+
 function expandBaskets(open: boolean) {
   openBaskets.value = open ? props.d.baskets.map((b) => b.id) : []
   openTargets.value = open ? props.d.baskets.flatMap((b) => b.targets.map((t) => t.id)) : []
@@ -48,7 +67,7 @@ function expandRest(open: boolean) {
 </script>
 
 <template>
-  <div class="summary">
+  <div class="summary" :style="{ '--sticky-top': `${stickyTop}px` }">
     <div v-if="d.baskets.length" class="bulk">
       <button type="button" class="dv-link bulk-btn" @click="expandBaskets(true)">
         <AppIcon name="unfold-more" :size="16" />
@@ -193,7 +212,8 @@ function expandRest(open: boolean) {
 .rest-list {
   border: 1px solid var(--c-border-2);
   border-radius: 10px;
-  overflow: hidden;
+  /* clip, not hidden: rounds the corners without breaking the sticky rows inside. */
+  overflow: clip;
 }
 .none {
   font-size: 14px;
