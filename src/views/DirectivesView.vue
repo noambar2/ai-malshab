@@ -87,23 +87,26 @@ function duplicate(id: string) {
     </div>
 
     <section class="dv-card list-card">
+      <!-- Right: search and station. Left: status filter, then the cards / table switch. -->
       <div class="toolbar">
-        <div class="seg" role="tablist">
-          <button :class="{ on: status === 'all' }" @click="status = 'all'">הכל ({{ counts.all }})</button>
-          <button :class="{ on: status === 'scheduled' }" @click="status = 'scheduled'">
-            מתוכננות ({{ counts.scheduled }})
-          </button>
-          <button :class="{ on: status === 'draft' }" @click="status = 'draft'">טיוטות ({{ counts.draft }})</button>
-        </div>
         <div class="filters">
-          <select v-model="station" class="dv-input station" :class="{ placeholder: !station }">
-            <option value="">כל התחנות</option>
-            <option v-for="s in stations" :key="s" :value="s">{{ s }}</option>
-          </select>
           <label class="search">
             <AppIcon name="search" :size="18" />
             <input v-model="query" placeholder="חיפוש לפי שם, מספר, תחנה, אחראי או סל" />
           </label>
+          <select v-model="station" class="dv-input station" :class="{ placeholder: !station }">
+            <option value="">כל התחנות</option>
+            <option v-for="s in stations" :key="s" :value="s">{{ s }}</option>
+          </select>
+        </div>
+        <div class="filters">
+          <div class="seg" role="tablist">
+            <button :class="{ on: status === 'all' }" @click="status = 'all'">הכל ({{ counts.all }})</button>
+            <button :class="{ on: status === 'scheduled' }" @click="status = 'scheduled'">
+              מתוכננות ({{ counts.scheduled }})
+            </button>
+            <button :class="{ on: status === 'draft' }" @click="status = 'draft'">טיוטות ({{ counts.draft }})</button>
+          </div>
           <div class="view-toggle" role="group" aria-label="תצוגה">
             <button :class="{ on: view === 'cards' }" title="תצוגת כרטיסיות" aria-label="תצוגת כרטיסיות" :aria-pressed="view === 'cards'" @click="setView('cards')">
               <DvIcon name="grid" :size="18" />
