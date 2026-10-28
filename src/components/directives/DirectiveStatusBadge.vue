@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { directiveStatusLabel, type DirectiveStatus } from '@/data/directives'
 
-defineProps<{ status: DirectiveStatus }>()
+// subtle: a small colored dot and text, for lists where the name and date should lead.
+defineProps<{ status: DirectiveStatus; subtle?: boolean }>()
 </script>
 
 <template>
-  <span class="badge" :class="status">{{ directiveStatusLabel[status] }}</span>
+  <span class="badge" :class="[status, { subtle }]">{{ directiveStatusLabel[status] }}</span>
 </template>
 
 <style scoped>
@@ -36,5 +37,23 @@ defineProps<{ status: DirectiveStatus }>()
 .done {
   background: #e6e8f0;
   color: var(--c-muted-2);
+}
+.badge.subtle {
+  gap: 5px;
+  min-width: 0;
+  height: auto;
+  padding: 0;
+  background: none;
+  font-weight: 500;
+}
+.badge.subtle::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.badge.subtle.done {
+  color: var(--c-muted);
 }
 </style>

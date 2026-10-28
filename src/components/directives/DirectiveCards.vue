@@ -50,9 +50,9 @@ const initials = (name: string) =>
         @keydown.enter="open(d)"
       >
         <span v-if="isToday(d)" class="today-tag">היום</span>
+        <!-- Name and date lead; status, number and station follow in smaller type. -->
         <header class="top">
-          <DirectiveStatusBadge :status="directiveStatus(d)" />
-          <span class="id">#{{ d.id }}</span>
+          <h3 class="name">{{ d.name || d.station || 'ללא שם' }}</h3>
           <span class="acts" @click.stop>
             <button v-if="editable" class="act" title="עריכה" aria-label="עריכה" @click="edit(d)">
               <DvIcon name="edit" :size="16" />
@@ -63,18 +63,19 @@ const initials = (name: string) =>
           </span>
         </header>
 
-        <!-- The directive's name leads; without one, the station takes its place. -->
-        <div class="station">
-          <h3>{{ d.name || d.station || 'ללא תחנה' }}</h3>
-          <span v-if="d.name">{{ d.station || 'ללא תחנה' }} · {{ d.district || '-' }}</span>
-          <span v-else>{{ d.district || '-' }}</span>
-        </div>
-
         <div class="date">
           <span class="cal"><DvIcon name="calendar" :size="18" /></span>
           <span>
             <b>{{ d.date ? fmtDate(d.date) : '-' }}</b>
             <small>{{ relative(d) }}</small>
+          </span>
+        </div>
+
+        <div class="station">
+          <span>{{ d.station || 'ללא תחנה' }} · {{ d.district || '-' }}</span>
+          <span class="meta">
+            <DirectiveStatusBadge :status="directiveStatus(d)" subtle />
+            <span class="id">#{{ d.id }}</span>
           </span>
         </div>
 
@@ -111,7 +112,7 @@ const initials = (name: string) =>
           @click="open(d)"
           @keydown.enter="open(d)"
         >
-          <td><DirectiveStatusBadge :status="directiveStatus(d)" /></td>
+          <td><DirectiveStatusBadge :status="directiveStatus(d)" subtle /></td>
           <td class="name">
             <b>{{ d.name || '-' }}</b>
             <small>#{{ d.id }}</small>
@@ -194,8 +195,16 @@ const initials = (name: string) =>
 }
 .top {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
+}
+.name {
+  flex: 1;
+  min-width: 0;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--c-brand);
 }
 .id {
   font-size: 13px;
@@ -219,14 +228,18 @@ const initials = (name: string) =>
   opacity: 1;
   background: var(--c-primary-soft);
 }
-.station h3 {
-  font-size: 17px;
-  font-weight: 700;
-  color: var(--c-brand);
-}
-.station span {
+.station {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
   font-size: 13px;
-  color: var(--c-muted);
+  color: var(--c-muted-2);
+}
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
 }
 .date {
   display: flex;
@@ -249,7 +262,8 @@ const initials = (name: string) =>
 }
 .date b {
   display: block;
-  font-size: 15px;
+  font-size: 17px;
+  font-weight: 700;
 }
 .date small {
   font-size: 12px;
