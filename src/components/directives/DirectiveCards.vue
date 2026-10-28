@@ -312,7 +312,7 @@ const initials = (name: string) =>
 .dtable th:nth-child(4) { width: 17%; }
 .dtable th:nth-child(5) { width: 10%; }
 .dtable th:nth-child(6) { width: 13%; }
-.dtable th:nth-child(7) { width: 9%; }
+.dtable th:nth-child(7) { width: 128px; }
 .dtable th.acts-col { width: 84px; }
 /* All columns aligned to the right; name, date and last edit carry a second, smaller line. */
 .dtable th,
