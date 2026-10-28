@@ -114,19 +114,19 @@ const initials = (name: string) =>
             @keydown.enter="open(d)"
           >
             <td class="name">
-              {{ d.name || '-' }}
+              <span class="l1">{{ d.name || '-' }}</span>
               <small>#{{ d.id }}</small>
             </td>
             <td>
-              {{ d.date ? fmtDate(d.date) : '-' }}
-              <small v-if="isToday(d)" class="now">היום</small>
+              <span class="l1">{{ d.date ? fmtDate(d.date) : '-' }}</span>
+              <small :class="{ now: isToday(d) }">{{ relative(d) }}</small>
             </td>
             <td>{{ d.station || '-' }}</td>
             <td>{{ d.district || '-' }}</td>
             <td>{{ d.owner || '-' }}</td>
-            <td :data-tip="`${fmtDate(d.updatedAt)} · ${d.updatedBy}`">
-              {{ fmtDate(d.updatedAt) }}
-              <small>{{ d.updatedBy }}</small>
+            <td>
+              <span class="l1">{{ fmtDate(d.updatedAt) }}</span>
+              <small>ע״י {{ d.updatedBy }}</small>
             </td>
             <td><DirectiveStatusBadge :status="directiveStatus(d)" /></td>
             <td class="row-acts" @click.stop>
@@ -314,7 +314,19 @@ const initials = (name: string) =>
 .dtable th:nth-child(6) { width: 13%; }
 .dtable th:nth-child(7) { width: 9%; }
 .dtable th.acts-col { width: 84px; }
+/* All columns aligned to the right; name, date and last edit carry a second, smaller line. */
+.dtable th,
 .dtable td {
+  text-align: start;
+}
+.dtable td {
+  height: auto;
+  padding-block: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dtable .l1 {
+  display: block;
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -341,7 +353,7 @@ const initials = (name: string) =>
   color: var(--c-brand);
 }
 .dtable small {
-  margin-inline-start: 4px;
+  display: block;
   font-size: 12px;
   font-weight: 400;
   color: var(--c-muted);
