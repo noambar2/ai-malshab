@@ -171,6 +171,27 @@ function duplicate(id: string) {
   background-color: #f5f8fb;
   border-color: #f5f8fb;
 }
+.view-toggle {
+  display: flex;
+  padding: 2px;
+  border-radius: 16px;
+  background: #f5f8fb;
+}
+.view-toggle button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 28px;
+  padding: 0;
+  border-radius: 14px;
+  color: var(--c-muted-2);
+}
+.view-toggle button.on {
+  background: #fff;
+  color: var(--c-primary);
+  box-shadow: 0 1px 3px rgba(7, 25, 56, 0.12);
+}
 .seg {
   display: flex;
   padding: 2px;
