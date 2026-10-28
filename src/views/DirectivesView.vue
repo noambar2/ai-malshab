@@ -22,7 +22,7 @@ function matches(d: Directive) {
   const q = query.value.trim()
   if (station.value && d.station !== station.value) return false
   if (!q) return true
-  return [d.id, d.station, d.owner, d.district, ...d.cohorts, ...d.baskets.map((b) => b.name)].some((s) =>
+  return [d.name, d.id, d.station, d.owner, d.district, ...d.cohorts, ...d.baskets.map((b) => b.name)].some((s) =>
     s.includes(q),
   )
 }
@@ -83,7 +83,7 @@ function duplicate(id: string) {
           </select>
           <label class="search">
             <AppIcon name="search" :size="18" />
-            <input v-model="query" placeholder="חיפוש לפי מספר, תחנה, אחראי או סל" />
+            <input v-model="query" placeholder="חיפוש לפי שם, מספר, תחנה, אחראי או סל" />
           </label>
         </div>
       </div>

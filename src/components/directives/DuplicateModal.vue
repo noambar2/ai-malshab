@@ -12,7 +12,7 @@ const rows = computed(() => {
   const q = query.value.trim()
   return directivesState.list
     .filter((d) => !pastOnly.value || isPast(d))
-    .filter((d) => !q || [d.id, d.station, d.owner, ...d.baskets.map((b) => b.name)].some((s) => s.includes(q)))
+    .filter((d) => !q || [d.name, d.id, d.station, d.owner, ...d.baskets.map((b) => b.name)].some((s) => s.includes(q)))
     .sort((a, b) => b.date.localeCompare(a.date))
 })
 </script>
@@ -31,7 +31,7 @@ const rows = computed(() => {
         <div class="toolbar">
           <label class="search">
             <AppIcon name="search" :size="18" />
-            <input v-model="query" placeholder="חיפוש לפי מספר, תחנה, אחראי או סל" />
+            <input v-model="query" placeholder="חיפוש לפי שם, מספר, תחנה, אחראי או סל" />
           </label>
           <label class="check">
             <input v-model="pastOnly" type="checkbox" />
@@ -43,6 +43,7 @@ const rows = computed(() => {
             <thead>
               <tr>
                 <th>מס׳</th>
+                <th>שם</th>
                 <th>תחנה</th>
                 <th>אחראי/ת</th>
                 <th>תאריך</th>
@@ -54,7 +55,8 @@ const rows = computed(() => {
             <tbody>
               <tr v-for="d in rows" :key="d.id">
                 <td>{{ d.id }}</td>
-                <td class="strong">{{ d.station }}</td>
+                <td class="strong">{{ d.name || '-' }}</td>
+                <td>{{ d.station }}</td>
                 <td>{{ d.owner }}</td>
                 <td>{{ d.date ? fmtDate(d.date) : '-' }}</td>
                 <td>{{ directiveTotals(d).baskets }}</td>
