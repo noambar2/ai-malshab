@@ -15,6 +15,8 @@ const editing = defineModel<string[]>('editing', { default: () => [] })
 
 const expanded = reactive<Record<string, boolean>>({})
 const confirmDelete = ref<string | null>(null)
+// A main target's own delete confirmation (by target id), right on its row.
+const confirmTarget = ref<string | null>(null)
 const stats = (b: Basket) => basketStats(b)
 
 function add() {
@@ -27,6 +29,10 @@ function close(id: string) {
 }
 function edit(id: string) {
   if (!editing.value.includes(id)) editing.value = [...editing.value, id]
+}
+function removeTarget(b: Basket, id: string) {
+  b.targets = b.targets.filter((t) => t.id !== id)
+  confirmTarget.value = null
 }
 function remove(i: number) {
   const [b] = props.d.baskets.splice(i, 1)
@@ -101,6 +107,22 @@ function remove(i: number) {
             <dl class="sum-stat"><dt>סוג שיבוץ</dt><dd>{{ t.placementType || '-' }}</dd></dl>
             <dl class="sum-stat"><dt>יעד פינוי</dt><dd>{{ t.evacTarget || '-' }}</dd></dl>
             <dl class="sum-stat"><dt>מיוצבים</dt><dd>{{ findTarget(t.targetCode)?.stabilized ?? 0 }}</dd></dl>
+            <!-- Edit / delete a main target straight from its row, in the column of the basket's own icons. -->
+            <div class="head-acts">
+              <div v-if="confirmTarget === t.id" class="confirm">
+                <span class="confirm-q">למחוק את היעד?</span>
+                <button type="button" class="btn dv-btn-danger sm" @click="removeTarget(b, t.id)">מחיקה</button>
+                <button type="button" class="btn btn-soft sm" @click="confirmTarget = null">ביטול</button>
+              </div>
+              <template v-else>
+                <button type="button" class="act" title="עריכת היעד" aria-label="עריכת היעד" @click="edit(b.id)">
+                  <DvIcon name="edit" :size="16" />
+                </button>
+                <button type="button" class="act del" title="מחיקת היעד" aria-label="מחיקת היעד" @click="confirmTarget = t.id">
+                  <DvIcon name="trash" :size="16" />
+                </button>
+              </template>
+            </div>
           </div>
           <p v-if="!b.targets.length" class="empty">לא הוגדרו יעדים לסל זה</p>
         </div>

@@ -48,7 +48,9 @@ function remove(i: number) {
         :target="t"
         editable
         external-edit
+        row-actions
         @edit="open(t.id)"
+        @remove="remove(i)"
       />
     </template>
 

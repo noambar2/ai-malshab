@@ -17,8 +17,12 @@ const props = defineProps<{
   // "יתר מיוצבים": the whole target is edited in a separate editor, so the view's edit button
   // asks the parent to switch to it instead of editing the placement targets in place.
   externalEdit?: boolean
+  // Edit / delete icons on the header itself (יתר מיוצבים), so a saved target is changed or
+  // removed without opening it first.
+  rowActions?: boolean
 }>()
-const emit = defineEmits<{ edit: [] }>()
+const emit = defineEmits<{ edit: []; remove: [] }>()
+const confirmRemove = ref(false)
 const open = defineModel<boolean>('open', { default: false })
 
 const info = computed(() => findTarget(props.target.targetCode))
@@ -64,14 +68,31 @@ function toggle() {
       @keydown.enter.self="toggle"
     >
       <div class="title">
-        <h3>
-          <span class="nm">{{ info?.name ?? 'יעד לא נבחר' }}</span>
-          <small>{{ target.targetCode }}</small>
-        </h3>
-        <p class="note">
-          <AppIcon name="info" :size="14" />
-          <span>{{ target.notes || 'אין הערות ליעד הראשי' }}</span>
-        </p>
+        <div class="title-text">
+          <h3>
+            <span class="nm">{{ info?.name ?? 'יעד לא נבחר' }}</span>
+            <small>{{ target.targetCode }}</small>
+          </h3>
+          <p class="note">
+            <AppIcon name="info" :size="14" />
+            <span>{{ target.notes || 'אין הערות ליעד הראשי' }}</span>
+          </p>
+        </div>
+        <div v-if="rowActions" class="row-acts" @click.stop @keydown.stop>
+          <div v-if="confirmRemove" class="confirm">
+            <span class="confirm-q">למחוק את היעד?</span>
+            <button type="button" class="btn dv-btn-danger sm" @click="emit('remove')">מחיקה</button>
+            <button type="button" class="btn btn-soft sm" @click="confirmRemove = false">ביטול</button>
+          </div>
+          <template v-else>
+            <button type="button" class="act" title="עריכת היעד" aria-label="עריכת היעד" @click="emit('edit')">
+              <DvIcon name="edit" :size="16" />
+            </button>
+            <button type="button" class="act del" title="מחיקת היעד" aria-label="מחיקת היעד" @click="confirmRemove = true">
+              <DvIcon name="trash" :size="16" />
+            </button>
+          </template>
+        </div>
       </div>
       <!-- Same grid as the basket step: מקצוע spans two number columns, and the placement-targets
            count takes the column the basket uses for its edit / delete icons. -->
@@ -205,6 +226,61 @@ function toggle() {
 .title {
   min-width: 0;
   padding-inline-end: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.title-text {
+  flex: 1;
+  min-width: 0;
+}
+/* Edit / delete at the far end of the name cell, just before the numbers. */
+.row-acts {
+  position: relative;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.row-acts .confirm {
+  position: absolute;
+  inset-inline-end: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(7, 25, 56, 0.14);
+  white-space: nowrap;
+}
+.confirm-q {
+  font-size: 13px;
+  margin-inline-end: 4px;
+}
+.btn.sm {
+  height: 28px;
+  padding: 0 12px;
+}
+.act {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  color: var(--c-primary);
+}
+.act:hover {
+  background: var(--c-primary-soft);
+}
+.act.del {
+  color: var(--c-muted-2);
+}
+.act.del:hover {
+  background: #ffe8eb;
+  color: var(--c-danger);
 }
 .title h3 {
   display: flex;
