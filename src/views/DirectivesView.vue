@@ -92,7 +92,7 @@ function duplicate(id: string) {
         <div class="filters">
           <label class="search">
             <AppIcon name="search" :size="18" />
-            <input v-model="query" placeholder="חיפוש לפי שם, מספר, תחנה, אחראי או סל" />
+            <input v-model="query" placeholder="חיפוש כללי" />
           </label>
           <select v-model="station" class="dv-input station" :class="{ placeholder: !station }">
             <option value="">כל התחנות</option>
