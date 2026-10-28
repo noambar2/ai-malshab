@@ -68,7 +68,6 @@ function duplicate() {
     <!-- General settings -->
     <section class="dv-card general">
       <div class="g-head">
-        <h2>הגדרות כלליות</h2>
         <div class="kpis">
           <span><b>{{ totals?.baskets }}</b> סלים</span>
           <span><b>{{ totals?.targets }}</b> יעדים ראשיים</span>
@@ -194,12 +193,8 @@ function duplicate() {
 .g-head {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-self: stretch;
-}
-.g-head h2 {
-  font-size: 18px;
-  font-weight: 700;
 }
 .kpis {
   display: flex;
