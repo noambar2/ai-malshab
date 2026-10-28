@@ -4,6 +4,7 @@ import { computed, ref } from 'vue'
 import AppIcon from '@/components/AppIcon.vue'
 import DvIcon from './DvIcon.vue'
 import MainTargetFields from './MainTargetFields.vue'
+import TargetSummaryRow from './TargetSummaryRow.vue'
 import { basketStats, hasNum, newMainTarget, type Basket } from '@/data/directives'
 
 const props = defineProps<{ basket: Basket; index: number }>()
@@ -25,10 +26,30 @@ const valid = computed(() => {
 
 function save() {
   showErrors.value = true
-  if (valid.value) emit('save')
+  if (!valid.value) return
+  editingTargets.value = []
+  emit('save')
+}
+// Targets stay in view mode while the basket is edited; only the one whose pencil is pressed
+// (and new or incomplete ones) shows its fields.
+const targetValid = (t: Basket['targets'][number]) => !!t.targetCode && !!t.placementType
+const editingTargets = ref<string[]>(props.basket.targets.filter((t) => !targetValid(t)).map((t) => t.id))
+const rowErrors = ref<string[]>([])
+function editTarget(id: string) {
+  if (!editingTargets.value.includes(id)) editingTargets.value = [...editingTargets.value, id]
+}
+function doneTarget(t: Basket['targets'][number]) {
+  if (!targetValid(t)) {
+    rowErrors.value = [...rowErrors.value, t.id]
+    return
+  }
+  editingTargets.value = editingTargets.value.filter((x) => x !== t.id)
+  rowErrors.value = rowErrors.value.filter((x) => x !== t.id)
 }
 function addTarget() {
-  props.basket.targets.push(newMainTarget())
+  const t = newMainTarget()
+  props.basket.targets.push(t)
+  editTarget(t.id)
 }
 function removeTarget(i: number) {
   props.basket.targets.splice(i, 1)
@@ -125,11 +146,21 @@ function pct(v: number | null) {
       <small>היעדים הראשיים של הסל - מקצוע ומיוצבים מתמלאים אוטומטית לפי היעד</small>
     </div>
 
-    <MainTargetFields v-for="(t, i) in basket.targets" :key="t.id" :target="t" :show-errors="showErrors" class="trow">
-      <button type="button" class="dv-trash" aria-label="מחיקת יעד" @click="removeTarget(i)">
-        <DvIcon name="trash" :size="18" />
-      </button>
-    </MainTargetFields>
+    <div class="targets">
+      <template v-for="(t, i) in basket.targets" :key="t.id">
+        <div v-if="editingTargets.includes(t.id)" class="tedit">
+          <MainTargetFields :target="t" :show-errors="showErrors || rowErrors.includes(t.id)">
+            <button type="button" class="ok" title="שמירת היעד" aria-label="שמירת היעד" @click="doneTarget(t)">
+              <AppIcon name="check" :size="18" />
+            </button>
+            <button type="button" class="dv-trash" aria-label="מחיקת יעד" @click="removeTarget(i)">
+              <DvIcon name="trash" :size="18" />
+            </button>
+          </MainTargetFields>
+        </div>
+        <TargetSummaryRow v-else :target="t" @edit="editTarget(t.id)" @remove="removeTarget(i)" />
+      </template>
+    </div>
 
     <button type="button" class="dv-add add-target" @click="addTarget">
       <AppIcon name="plus" :size="16" />
@@ -188,11 +219,32 @@ function pct(v: number | null) {
 .targets-head {
   margin-top: 50px;
 }
-.trow {
-  margin-bottom: 20px;
+/* One list: view rows separated by hairlines; a row being edited sits on a light tint. */
+.targets {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
 }
-.trow .dv-trash {
-  margin-bottom: 0;
+.targets > * + * {
+  border-top: 1px solid var(--c-divider);
+}
+.tedit {
+  padding: 14px 16px;
+  margin-inline: -16px;
+  background: #f7f9ff;
+}
+.ok {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--c-primary);
+  color: #fff;
+}
+.ok:hover {
+  background: var(--c-primary-dark);
 }
 .tip {
   display: flex;

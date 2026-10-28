@@ -8,16 +8,15 @@ import DvIcon from './DvIcon.vue'
 import BasketEditor from './BasketEditor.vue'
 import MetaLine from './MetaLine.vue'
 import MainTargetFields from './MainTargetFields.vue'
+import TargetSummaryRow from './TargetSummaryRow.vue'
 import NoteLine from './NoteLine.vue'
-import { basketStats, findTarget, newBasket, type Basket, type Directive, type MainTarget } from '@/data/directives'
+import { basketStats, newBasket, type Basket, type Directive, type MainTarget } from '@/data/directives'
 
 const props = defineProps<{ d: Directive; error?: string }>()
 const editing = defineModel<string[]>('editing', { default: () => [] })
 
 const expanded = reactive<Record<string, boolean>>({})
 const confirmDelete = ref<string | null>(null)
-// A main target's own delete confirmation (by target id), right on its row.
-const confirmTarget = ref<string | null>(null)
 const stats = (b: Basket) => basketStats(b)
 
 function add() {
@@ -40,7 +39,6 @@ function startTargetEdit(t: MainTarget) {
   snapshot = JSON.parse(JSON.stringify(t))
   editTarget.value = t.id
   targetErrors.value = false
-  confirmTarget.value = null
 }
 function saveTarget(t: MainTarget) {
   targetErrors.value = true
@@ -55,7 +53,6 @@ function cancelTarget(t: MainTarget) {
 }
 function removeTarget(b: Basket, id: string) {
   b.targets = b.targets.filter((t) => t.id !== id)
-  confirmTarget.value = null
 }
 function remove(i: number) {
   const [b] = props.d.baskets.splice(i, 1)
@@ -123,40 +120,7 @@ function remove(i: number) {
               </button>
             </MainTargetFields>
           </div>
-          <div v-else class="trow bk-grid">
-            <div class="tname">
-              <h4>
-                <span class="nm">{{ findTarget(t.targetCode)?.name ?? 'יעד לא נבחר' }}</span>
-                <small>{{ t.targetCode }}</small>
-              </h4>
-              <NoteLine v-if="t.notes" :text="t.notes" />
-            </div>
-            <dl class="sum-stat wide">
-              <dt>מקצוע</dt>
-              <dd :data-tip="findTarget(t.targetCode) ? `${findTarget(t.targetCode)!.profession} ${findTarget(t.targetCode)!.professionCode}` : undefined">
-                {{ findTarget(t.targetCode)?.profession ?? '-' }}<span class="code">{{ findTarget(t.targetCode)?.professionCode }}</span>
-              </dd>
-            </dl>
-            <dl class="sum-stat"><dt>סוג שיבוץ</dt><dd>{{ t.placementType || '-' }}</dd></dl>
-            <dl class="sum-stat"><dt>יעד פינוי</dt><dd>{{ t.evacTarget || '-' }}</dd></dl>
-            <dl class="sum-stat"><dt>מיוצבים</dt><dd>{{ findTarget(t.targetCode)?.stabilized ?? 0 }}</dd></dl>
-            <!-- Edit / delete a main target straight from its row, in the column of the basket's own icons. -->
-            <div class="head-acts">
-              <div v-if="confirmTarget === t.id" class="confirm">
-                <span class="confirm-q">למחוק את היעד?</span>
-                <button type="button" class="btn dv-btn-danger sm" @click="removeTarget(b, t.id)">מחיקה</button>
-                <button type="button" class="btn btn-soft sm" @click="confirmTarget = null">ביטול</button>
-              </div>
-              <template v-else>
-                <button type="button" class="act" title="עריכת היעד" aria-label="עריכת היעד" @click="startTargetEdit(t)">
-                  <DvIcon name="edit" :size="16" />
-                </button>
-                <button type="button" class="act del" title="מחיקת היעד" aria-label="מחיקת היעד" @click="confirmTarget = t.id">
-                  <DvIcon name="trash" :size="16" />
-                </button>
-              </template>
-            </div>
-          </div>
+          <TargetSummaryRow v-else class="trow" :target="t" @edit="startTargetEdit(t)" @remove="removeTarget(b, t.id)" />
           </template>
           <p v-if="!b.targets.length" class="empty">לא הוגדרו יעדים לסל זה</p>
         </div>
@@ -249,34 +213,6 @@ function remove(i: number) {
 }
 .trow + .trow {
   border-top: 1px solid var(--c-divider);
-}
-.tname {
-  min-width: 0;
-  padding-inline-end: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.tname h4 {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  min-width: 0;
-  margin: 0;
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--c-text);
-}
-.tname .nm {
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-.tname small {
-  flex-shrink: 0;
-  font-size: 12px;
-  font-weight: 400;
-  color: var(--c-muted);
 }
 .body > .mt + .mt {
   border-top: 1px solid var(--c-divider);
