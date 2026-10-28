@@ -98,6 +98,16 @@
   border-color: #e2e8f8;
   cursor: default;
 }
+/* A free-text field that grows with its text (one line to start), so a long note stays readable. */
+textarea.dv-input.grow {
+  display: block;
+  height: auto;
+  min-height: 36px;
+  padding: 7px 12px;
+  line-height: 1.5;
+  resize: none;
+  field-sizing: content;
+}
 .dv-input.invalid {
   border-color: var(--c-danger);
 }

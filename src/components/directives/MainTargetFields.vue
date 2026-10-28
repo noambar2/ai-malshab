@@ -47,7 +47,7 @@ const targetOptions = targetCatalog.map((t) => ({ value: t.code, label: targetLa
     </label>
     <label class="dv-field">
       <span class="dv-label">הערות</span>
-      <input v-model="target.notes" class="dv-input" placeholder="טקסט חופשי" />
+      <textarea v-model="target.notes" class="dv-input grow" rows="1" placeholder="טקסט חופשי" />
     </label>
     <div class="end"><slot /></div>
   </div>
@@ -56,8 +56,10 @@ const targetOptions = targetCatalog.map((t) => ({ value: t.code, label: targetLa
 <style scoped>
 .target-row {
   display: grid;
-  grid-template-columns: 278px repeat(5, minmax(0, 1fr)) auto;
-  align-items: end;
+  /* הערות gets the widest of the five and grows downward with its text; the fields stay
+     top-aligned so a long note doesn't push the others down. */
+  grid-template-columns: 278px repeat(4, minmax(0, 1fr)) minmax(0, 1.6fr) auto;
+  align-items: start;
   gap: 20px;
 }
 .target-row .dv-field:first-child {
@@ -79,5 +81,7 @@ const targetOptions = targetCatalog.map((t) => ({ value: t.code, label: targetLa
   align-items: center;
   gap: 6px;
   min-height: 36px;
+  /* Level with the inputs, below the labels. */
+  margin-top: 21.6px;
 }
 </style>

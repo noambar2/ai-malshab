@@ -100,7 +100,7 @@ function remove(i: number) {
                 </label>
                 <label class="dv-field">
                   <span class="dv-label"><span :class="{ req: strict }">הערות</span></span>
-                  <input v-model="s.notes" class="dv-input" :class="{ invalid: strict && missing(s, s.notes) }" placeholder="טקסט חופשי" />
+                  <textarea v-model="s.notes" class="dv-input grow" rows="1" :class="{ invalid: strict && missing(s, s.notes) }" placeholder="טקסט חופשי" />
                 </label>
                 <div class="dv-field conds-field">
                   <span class="dv-label">תנאים לשיבוץ</span>
@@ -208,6 +208,7 @@ function remove(i: number) {
   display: grid;
   /* Row 1: יעד, מקצוע, a narrow כמה ניתן לשבץ, הערות. Row 2: the conditions alone. */
   grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) 120px minmax(0, 1fr);
+  align-items: start;
   gap: 8px 10px;
 }
 /* The conditions take the whole second row. */
