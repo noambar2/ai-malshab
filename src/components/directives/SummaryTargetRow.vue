@@ -94,15 +94,15 @@ const info = computed(() => findTarget(props.target.targetCode))
 }
 /* Only the open target's contents (its placement targets) are tinted; the row stays white. */
 .tr.open .subs {
-  background: #f4f7ff;
+  background: #fafbff;
   /* Same space above and below the contents. */
   padding-block: 10px;
 }
 .tr.open .subs .dv-table th {
-  border-bottom-color: #dfe6f8;
+  border-bottom-color: #e6ebf7;
 }
 .tr.open .subs .dv-table td {
-  border-bottom-color: #e6ecfa;
+  border-bottom-color: #edf0f8;
 }
 /* Same grid as the basket header; the hierarchy shows in the label, indented one step in. */
 .row {
