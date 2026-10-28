@@ -155,7 +155,7 @@ h4 small {
   color: var(--c-muted);
 }
 .subs .code {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--c-muted);
 }
 .warn {
@@ -169,7 +169,7 @@ h4 small {
   padding-top: 0;
 }
 .subs .dv-table {
-  font-size: 13px;
+  font-size: 14px;
 }
 .subs .dv-table td {
   padding: 8px 12px;

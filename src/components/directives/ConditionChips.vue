@@ -22,7 +22,7 @@ defineProps<{ conditions: Condition[] }>()
   padding: 1px 8px;
   border-radius: 10px;
   background: #eef2fd;
-  font-size: 12px;
+  font-size: 13px;
   white-space: nowrap;
   color: var(--c-brand);
 }

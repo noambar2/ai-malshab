@@ -276,6 +276,7 @@ select.dv-input.placeholder {
    tables of different targets line up and a long note wraps instead of squeezing the others. */
 .dv-table.subs-table {
   table-layout: fixed;
+  font-size: 15px;
 }
 .dv-table.subs-table th:nth-child(1) { width: 22%; }
 .dv-table.subs-table th:nth-child(2) { width: 18%; }
