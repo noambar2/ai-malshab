@@ -50,8 +50,11 @@ function go(i: number) {
   position: sticky;
   top: 56px;
   z-index: 15;
-  background: #fff;
-  border-bottom: 1px solid var(--c-divider);
+  /* Same frosted glass as the wizard's bottom bar: the page shows through, blurred. */
+  background: rgba(255, 255, 255, 0.72);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  box-shadow: 0 1px 0 #eceef5, 0 6px 16px rgba(7, 25, 56, 0.06);
 }
 .inner {
   max-width: 1300px;
