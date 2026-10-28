@@ -58,25 +58,40 @@ const st = computed(() => basketStats(props.basket))
   border-radius: 10px;
   overflow: hidden;
 }
+/* The basket header looks like the basket banner in "יעדים לשיבוץ": light blue, with the name,
+   labels and numbers in the brand blue, so it reads apart from the white main-target rows. */
 .head {
   padding-block: 14px;
+  background: #e2eafd;
   cursor: pointer;
   outline: none;
 }
 .head:hover {
-  background: #fafbff;
+  background: #dae4fc;
 }
 .head:focus-visible {
   box-shadow: inset 0 0 0 2px var(--c-primary);
 }
-.open .head {
-  border-bottom: 1px solid var(--c-divider);
+.sb.open {
+  border-color: #c3d1f7;
+}
+.head :deep(.sum-stat) {
+  border-inline-start-color: #c3d1f7;
+}
+.head :deep(.sum-stat dt),
+.head :deep(.sum-stat dd),
+.head :deep(.sum-stat dd .pct),
+.head :deep(.sum-chev) {
+  color: var(--c-brand);
+}
+.head :deep(.note-line) {
+  color: var(--c-brand);
 }
 .level {
   justify-self: start;
   padding: 3px 10px;
   border-radius: 10px;
-  background: var(--c-primary-soft);
+  background: #fff;
   font-size: 12px;
   font-weight: 700;
   color: var(--c-primary);
@@ -95,9 +110,10 @@ h2 {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--c-primary-dark);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  color: var(--c-brand);
 }
 .empty {
   margin: 0;
