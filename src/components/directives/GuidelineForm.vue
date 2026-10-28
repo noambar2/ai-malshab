@@ -77,8 +77,18 @@ onMounted(() => titleInput.value?.focus())
   font-size: 15px;
   font-weight: 700;
   color: var(--c-brand);
+  /* A hairline between the title and the text, so they read as two separate fields. */
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--c-divider);
+}
+.title:focus {
+  border-bottom-color: var(--c-primary);
+}
+.title.missing {
+  border-bottom-color: var(--c-danger);
 }
 .text {
+  padding-top: 6px;
   font-size: 14px;
   line-height: 1.6;
   color: var(--c-text);

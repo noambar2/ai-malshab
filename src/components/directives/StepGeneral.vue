@@ -30,9 +30,13 @@ const tabsOpen = ref(false)
   <div class="dv-card step">
     <section>
       <div class="dv-section-head">
-        <h3>בחירת תחנה ואחראי</h3>
-        <small>בחרו את התחנה שעבורה נבנית הדירקטיבה ואת האחראי/ת עליה</small>
+        <h3>שם, תחנה ואחראי</h3>
+        <small>תנו לדירקטיבה שם ובחרו את התחנה שעבורה היא נבנית ואת האחראי/ת עליה</small>
       </div>
+      <label class="dv-field name-field">
+        <span class="dv-label">שם דירקטיבה</span>
+        <input v-model="d.name" class="dv-input" placeholder="לדוגמה: סבב אפריל - מרפאות שיניים" />
+      </label>
       <div class="grid4">
         <div class="dv-field">
           <span class="dv-label"><span class="req">מתחם</span></span>
@@ -124,6 +128,11 @@ const tabsOpen = ref(false)
   flex-direction: column;
   gap: 40px;
   min-height: 734px;
+}
+/* The name takes two of the four columns below it. */
+.name-field {
+  width: calc(50% - 10px);
+  margin-bottom: 20px;
 }
 .grid4 {
   display: grid;

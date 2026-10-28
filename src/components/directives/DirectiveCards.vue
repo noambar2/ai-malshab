@@ -63,9 +63,11 @@ const initials = (name: string) =>
         </span>
       </header>
 
+      <!-- The directive's name leads; without one, the station takes its place. -->
       <div class="station">
-        <h3>{{ d.station || 'ללא תחנה' }}</h3>
-        <span>{{ d.district || '-' }}</span>
+        <h3>{{ d.name || d.station || 'ללא תחנה' }}</h3>
+        <span v-if="d.name">{{ d.station || 'ללא תחנה' }} · {{ d.district || '-' }}</span>
+        <span v-else>{{ d.district || '-' }}</span>
       </div>
 
       <div class="date">

@@ -42,6 +42,7 @@ function initial(): Directive {
   if (!editId) {
     // Duplicate: same structure, new directive.
     copy.id = ''
+    copy.name = copy.name ? `${copy.name} (עותק)` : ''
     copy.draft = true
     copy.date = ''
   }

@@ -38,7 +38,7 @@ function duplicate() {
     </RouterLink>
 
     <div class="dv-title-row head">
-      <h1 class="dv-title">דירקטיבה #{{ d.id }}</h1>
+      <h1 class="dv-title">{{ d.name || 'דירקטיבה' }} <span class="hid">#{{ d.id }}</span></h1>
       <DirectiveStatusBadge :status="directiveStatus(d)" />
       <div class="actions">
         <button class="btn btn-soft" @click="duplicate">
@@ -76,6 +76,10 @@ function duplicate() {
         </div>
       </div>
       <dl class="grid4">
+        <div>
+          <dt>שם דירקטיבה</dt>
+          <dd>{{ d.name || '-' }}</dd>
+        </div>
         <div>
           <dt>מתחם</dt>
           <dd>{{ d.district || '-' }}</dd>
@@ -214,7 +218,12 @@ dl {
   align-self: stretch;
 }
 .grid4 {
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
+}
+.hid {
+  font-size: 18px;
+  font-weight: 400;
+  color: var(--c-muted);
 }
 .grid3 {
   grid-template-columns: repeat(3, 1fr);

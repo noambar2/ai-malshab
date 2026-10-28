@@ -213,6 +213,8 @@ export interface Guideline {
 
 export interface Directive {
   id: string
+  /** Free-text name, shown on the directives page. */
+  name: string
   district: string
   station: string
   owner: string
@@ -331,6 +333,7 @@ export const newAnchor = (): AnchorDate => ({ id: uid('a'), title: '', from: '',
 export function emptyDirective(): Directive {
   return {
     id: '',
+    name: '',
     district: '',
     station: '',
     owner: '',
@@ -443,6 +446,7 @@ function seed(): Directive[] {
   return withGuidelines([
     {
       id: '1042',
+      name: 'שיבוץ בה״ד 20 ומרפאות שיניים',
       district: 'מתחם 60, שרשרת חיול 0100',
       station: 'קצין מיון או״ם 0100',
       owner: 'ליה לנד',
@@ -470,6 +474,7 @@ function seed(): Directive[] {
     },
     {
       id: '1045',
+      name: 'ניהול מוצר ומכירות - מאי',
       district: 'מתחם 61, שרשרת חיול 0200',
       station: 'קצין מיון באר שבע 0210',
       owner: 'נועה כהן',
@@ -498,6 +503,7 @@ function seed(): Directive[] {
     },
     {
       id: '1047',
+      name: 'תקשוב חיפה - יוני',
       district: 'מתחם 70, שרשרת חיול 0300',
       station: 'קצין מיון חיפה 0320',
       owner: 'דוד לוי',
@@ -517,6 +523,7 @@ function seed(): Directive[] {
     },
     {
       id: '1038',
+      name: 'סבב דצמבר או״ם',
       district: 'מתחם 60, שרשרת חיול 0100',
       station: 'קצין מיון או״ם 0100',
       owner: 'ליה לנד',
@@ -534,6 +541,7 @@ function seed(): Directive[] {
     },
     {
       id: '1031',
+      name: 'קרבי ומשא״ן ירושלים',
       district: 'מתחם 80, שרשרת חיול 0400',
       station: 'קצין מיון ירושלים 0410',
       owner: 'מאיה פרץ',
@@ -556,6 +564,7 @@ function seed(): Directive[] {
     },
     {
       id: '1027',
+      name: 'סבב מרץ תל השומר',
       district: 'מתחם 61, שרשרת חיול 0200',
       station: 'קצין מיון תל השומר 0110',
       owner: 'אבירן שלמה',

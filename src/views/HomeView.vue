@@ -229,8 +229,8 @@ onMounted(() => searchInput.value?.focus())
               <small>{{ fmtDate(d.date).slice(3, 5) }}/{{ fmtDate(d.date).slice(8) }}</small>
             </span>
             <span class="who">
-              <b>{{ d.station }}</b>
-              <small>{{ directiveTotals(d).baskets }} סלים · {{ directiveTotals(d).plans }} תוכניות · {{ d.owner }}</small>
+              <b>{{ d.name || d.station }}</b>
+              <small><template v-if="d.name">{{ d.station }} · </template>{{ directiveTotals(d).baskets }} סלים · {{ directiveTotals(d).plans }} תוכניות · {{ d.owner }}</small>
             </span>
             <span class="when" :class="{ soon: directiveStatus(d) === 'active' }">{{ daysUntil(d.date) }}</span>
           </li>
