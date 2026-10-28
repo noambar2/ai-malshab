@@ -67,13 +67,6 @@ function duplicate() {
 
     <!-- General settings -->
     <section class="dv-card general">
-      <div class="g-head">
-        <div class="kpis">
-          <span><b>{{ totals?.baskets }}</b> סלים</span>
-          <span><b>{{ totals?.targets }}</b> יעדים ראשיים</span>
-          <span><b>{{ totals?.plans }}</b> תוכניות</span>
-        </div>
-      </div>
       <dl class="grid4">
         <div>
           <dt>שם דירקטיבה</dt>
@@ -127,7 +120,10 @@ function duplicate() {
       </div>
     </section>
 
-    <h2 class="section-title">סלים ויעדים</h2>
+    <div class="section-title">
+      <h2>סלים ויעדים</h2>
+      <span class="kpis">{{ totals?.baskets }} סלים · {{ totals?.targets }} יעדים ראשיים · {{ totals?.plans }} תוכניות</span>
+    </div>
     <DirectiveSummary :key="d.id" :d="d" :can-fix="!isPast(d)" @fix="fix" />
   </main>
 
@@ -190,22 +186,9 @@ function duplicate() {
   align-items: flex-start;
   gap: 24px;
 }
-.g-head {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  align-self: stretch;
-}
 .kpis {
-  display: flex;
-  gap: 24px;
-  font-size: 14px;
-  color: var(--c-muted-2);
-}
-.kpis b {
-  font-size: 18px;
-  color: var(--c-brand);
-  margin-inline-end: 4px;
+  font-size: 13px;
+  color: var(--c-muted);
 }
 dl {
   display: grid;
@@ -256,7 +239,12 @@ dd {
   color: var(--c-primary);
 }
 .section-title {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
   margin: 36px 0 16px;
+}
+.section-title h2 {
   font-size: 20px;
   font-weight: 500;
   color: var(--c-primary-dark);
