@@ -82,11 +82,11 @@ function expandRest(open: boolean) {
             <template v-if="d.rest.length">
               <button type="button" class="dv-link bulk-btn" @click="expandRest(true)">
                 <AppIcon name="unfold-more" :size="16" />
-                פתיחת הכל
+                פתיחת כל היעדים
               </button>
               <button type="button" class="dv-link bulk-btn" @click="expandRest(false)">
                 <AppIcon name="unfold-less" :size="16" />
-                סגירת הכל
+                סגירת כל היעדים
               </button>
             </template>
             <button v-if="editable" type="button" class="dv-link" @click="emit('editRest')">עריכה</button>
