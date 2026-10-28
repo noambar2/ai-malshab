@@ -3,24 +3,14 @@
 import { computed, ref } from 'vue'
 import AppIcon from '@/components/AppIcon.vue'
 import DvIcon from './DvIcon.vue'
-import SearchSelect from './SearchSelect.vue'
-import {
-  basketStats,
-  findTarget,
-  hasNum,
-  newMainTarget,
-  placementTypes,
-  targetCatalog,
-  targetLabel,
-  type Basket,
-} from '@/data/directives'
+import MainTargetFields from './MainTargetFields.vue'
+import { basketStats, hasNum, newMainTarget, type Basket } from '@/data/directives'
 
 const props = defineProps<{ basket: Basket; index: number }>()
 const emit = defineEmits<{ save: []; remove: [] }>()
 
 const showErrors = ref(false)
 const stats = computed(() => basketStats(props.basket))
-const targetOptions = targetCatalog.map((t) => ({ value: t.code, label: targetLabel(t) }))
 
 const valid = computed(() => {
   const b = props.basket
@@ -135,49 +125,11 @@ function pct(v: number | null) {
       <small>היעדים הראשיים של הסל - מקצוע ומיוצבים מתמלאים אוטומטית לפי היעד</small>
     </div>
 
-    <div v-for="(t, i) in basket.targets" :key="t.id" class="target-row">
-      <div class="dv-field">
-        <span class="dv-label"><span class="req">יעד</span></span>
-        <SearchSelect
-          v-model="t.targetCode"
-          :options="targetOptions"
-          placeholder="התחילו להקליד שם או מזהה יעד..."
-          :invalid="showErrors && !t.targetCode"
-        />
-      </div>
-      <div class="dv-field">
-        <span class="dv-label">מקצוע</span>
-        <span class="dv-input readonly calc ellipsis" :title="findTarget(t.targetCode)?.profession">
-          {{ findTarget(t.targetCode) ? `${findTarget(t.targetCode)!.professionCode} - ${findTarget(t.targetCode)!.profession}` : 0 }}
-        </span>
-      </div>
-      <div class="dv-field">
-        <span class="dv-label">מיוצבים</span>
-        <span class="dv-input readonly calc">{{ findTarget(t.targetCode)?.stabilized ?? 0 }}</span>
-      </div>
-      <label class="dv-field">
-        <span class="dv-label"><span class="req">סוג שיבוץ</span></span>
-        <select
-          v-model="t.placementType"
-          class="dv-input"
-          :class="{ placeholder: !t.placementType, invalid: showErrors && !t.placementType }"
-        >
-          <option value="" disabled>לחצו לבחירה</option>
-          <option v-for="p in placementTypes" :key="p" :value="p">{{ p }}</option>
-        </select>
-      </label>
-      <label class="dv-field">
-        <span class="dv-label">יעד פינוי</span>
-        <input v-model="t.evacTarget" class="dv-input" placeholder="טקסט חופשי" />
-      </label>
-      <label class="dv-field">
-        <span class="dv-label">הערות</span>
-        <input v-model="t.notes" class="dv-input" placeholder="טקסט חופשי" />
-      </label>
+    <MainTargetFields v-for="(t, i) in basket.targets" :key="t.id" :target="t" :show-errors="showErrors" class="trow">
       <button type="button" class="dv-trash" aria-label="מחיקת יעד" @click="removeTarget(i)">
         <DvIcon name="trash" :size="18" />
       </button>
-    </div>
+    </MainTargetFields>
 
     <button type="button" class="dv-add add-target" @click="addTarget">
       <AppIcon name="plus" :size="16" />
@@ -233,28 +185,14 @@ function pct(v: number | null) {
   display: flex;
   align-items: center;
 }
-.ellipsis {
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  display: block;
-  line-height: 34px;
-}
 .targets-head {
   margin-top: 50px;
 }
-.target-row {
-  display: grid;
-  grid-template-columns: 278px repeat(5, 1fr) 36px;
-  align-items: end;
-  gap: 20px;
+.trow {
   margin-bottom: 20px;
 }
-.target-row .dv-field:first-child {
-  margin-inline-end: -10px;
-}
-.target-row .dv-trash {
-  margin-bottom: 3px;
+.trow .dv-trash {
+  margin-bottom: 0;
 }
 .tip {
   display: flex;

@@ -7,8 +7,9 @@ import AppIcon from '@/components/AppIcon.vue'
 import DvIcon from './DvIcon.vue'
 import BasketEditor from './BasketEditor.vue'
 import MetaLine from './MetaLine.vue'
+import MainTargetFields from './MainTargetFields.vue'
 import NoteLine from './NoteLine.vue'
-import { basketStats, findTarget, newBasket, type Basket, type Directive } from '@/data/directives'
+import { basketStats, findTarget, newBasket, type Basket, type Directive, type MainTarget } from '@/data/directives'
 
 const props = defineProps<{ d: Directive; error?: string }>()
 const editing = defineModel<string[]>('editing', { default: () => [] })
@@ -29,6 +30,28 @@ function close(id: string) {
 }
 function edit(id: string) {
   if (!editing.value.includes(id)) editing.value = [...editing.value, id]
+}
+// Editing one main target in place: only its row turns into fields; "עריכת הסל" still opens
+// the whole basket. Cancel puts back the values it had when editing started.
+const editTarget = ref<string | null>(null)
+const targetErrors = ref(false)
+let snapshot: MainTarget | null = null
+function startTargetEdit(t: MainTarget) {
+  snapshot = JSON.parse(JSON.stringify(t))
+  editTarget.value = t.id
+  targetErrors.value = false
+  confirmTarget.value = null
+}
+function saveTarget(t: MainTarget) {
+  targetErrors.value = true
+  if (!t.targetCode || !t.placementType) return
+  editTarget.value = null
+  snapshot = null
+}
+function cancelTarget(t: MainTarget) {
+  if (snapshot) Object.assign(t, snapshot)
+  editTarget.value = null
+  snapshot = null
 }
 function removeTarget(b: Basket, id: string) {
   b.targets = b.targets.filter((t) => t.id !== id)
@@ -90,7 +113,17 @@ function remove(i: number) {
         <div v-if="expanded[b.id]" class="body">
           <!-- Placement targets are set in the next step, so the targets here are summary rows only.
                They share the header's grid; מקצוע spans two of its number columns. -->
-          <div v-for="t in b.targets" :key="t.id" class="trow bk-grid">
+          <template v-for="t in b.targets" :key="t.id">
+          <div v-if="editTarget === t.id" class="trow tedit">
+            <MainTargetFields :target="t" :show-errors="targetErrors">
+              <button type="button" class="btn btn-soft sm" @click="cancelTarget(t)">ביטול</button>
+              <button type="button" class="btn btn-primary sm" @click="saveTarget(t)">
+                <AppIcon name="check" :size="14" />
+                שמירה
+              </button>
+            </MainTargetFields>
+          </div>
+          <div v-else class="trow bk-grid">
             <div class="tname">
               <h4>
                 <span class="nm">{{ findTarget(t.targetCode)?.name ?? 'יעד לא נבחר' }}</span>
@@ -115,7 +148,7 @@ function remove(i: number) {
                 <button type="button" class="btn btn-soft sm" @click="confirmTarget = null">ביטול</button>
               </div>
               <template v-else>
-                <button type="button" class="act" title="עריכת היעד" aria-label="עריכת היעד" @click="edit(b.id)">
+                <button type="button" class="act" title="עריכת היעד" aria-label="עריכת היעד" @click="startTargetEdit(t)">
                   <DvIcon name="edit" :size="16" />
                 </button>
                 <button type="button" class="act del" title="מחיקת היעד" aria-label="מחיקת היעד" @click="confirmTarget = t.id">
@@ -124,6 +157,7 @@ function remove(i: number) {
               </template>
             </div>
           </div>
+          </template>
           <p v-if="!b.targets.length" class="empty">לא הוגדרו יעדים לסל זה</p>
         </div>
       </section>
@@ -206,6 +240,12 @@ function remove(i: number) {
 /* The target rows read as one list, separated by hairlines. */
 .trow {
   padding: 10px 0;
+}
+/* The one main target being edited: its fields on a light tint, the full width of the row. */
+.trow.tedit {
+  margin-inline: -30px;
+  padding: 14px 30px;
+  background: #f7f9ff;
 }
 .trow + .trow {
   border-top: 1px solid var(--c-divider);
