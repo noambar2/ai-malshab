@@ -370,13 +370,38 @@ const sub = (targetCode: string, quantity: number, conditions: Condition[], note
 })
 const cond = (field: string, op: ConditionOp, value: string): Condition => ({ id: uid('c'), field, op, value })
 
+// Extra placement targets, so a main target that has any shows a realistic, longer list (targets
+// with none stay empty, to show the warning state).
+const extraSubs: [string, number, [string, ConditionOp, string][], string][] = [
+  ['4410288', 4, [['dapar', 'gte', '50'], ['profile', 'gte', '82']], 'קורס חובשים'],
+  ['3302190', 3, [['attention', 'gte', '2']], ''],
+  ['5512140', 2, [['kaba', 'gte', '45']], 'ראיון אישי לפני השיבוץ'],
+  ['8840011', 6, [['dapar', 'gte', '40']], ''],
+  ['2384395', 5, [['attention', 'gte', '3'], ['education', 'eq', 'בגרות מלאה']], 'מבחן תכנות'],
+  ['7730590', 2, [['dapar', 'gte', '60'], ['education', 'eq', 'תואר ראשון']], ''],
+  ['3301744', 4, [['kaba', 'lte', '49']], 'ללא התש'],
+  ['5512006', 3, [['profile', 'gte', '64']], 'עדיפות לתושבי הצפון'],
+  ['6620031', 2, [['dapar', 'gte', '70'], ['tzadach', 'gte', '50']], ''],
+  ['8840033', 5, [['kaba', 'gte', '41']], 'ירידה במאסף'],
+]
+const SUBS_PER_TARGET = 8
+function withExtras(mainCode: string, subs: SubTarget[]): SubTarget[] {
+  if (!subs.length) return subs
+  const used = new Set([mainCode, ...subs.map((x) => x.targetCode)])
+  const extra = extraSubs
+    .filter(([code]) => !used.has(code))
+    .slice(0, Math.max(0, SUBS_PER_TARGET - subs.length))
+    .map(([code, qty, conds, notes]) => sub(code, qty, conds.map(([f, o, v]) => cond(f, o, v)), notes))
+  return [...subs, ...extra]
+}
+
 const main = (targetCode: string, evacTarget: string, notes: string, subs: SubTarget[], placementType = 'שוחררים'): MainTarget => ({
   id: uid('t'),
   targetCode,
   placementType,
   evacTarget,
   notes,
-  subTargets: subs,
+  subTargets: withExtras(targetCode, subs),
 })
 
 const basket = (
