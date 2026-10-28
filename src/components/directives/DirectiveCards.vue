@@ -89,56 +89,58 @@ const initials = (name: string) =>
       </article>
     </div>
 
-    <!-- Table -->
-    <table v-else class="dv-table dtable">
-      <thead>
-        <tr>
-          <th>שם הדירקטיבה</th>
-          <th>תאריך</th>
-          <th>תחנה</th>
-          <th>מתחם</th>
-          <th>אחראי</th>
-          <th>נערך לאחרונה</th>
-          <th>סטטוס</th>
-          <th class="acts-col"><span class="sr-only">פעולות</span></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr
-          v-for="d in rows"
-          :key="d.id"
-          :class="{ past, today: isToday(d) }"
-          tabindex="0"
-          @click="open(d)"
-          @keydown.enter="open(d)"
-        >
-          <td class="name">
-            <b>{{ d.name || '-' }}</b>
-            <small>#{{ d.id }}</small>
-          </td>
-          <td>
-            <b class="dt">{{ d.date ? fmtDate(d.date) : '-' }}</b>
-            <small class="rel" :class="{ now: isToday(d) }">{{ relative(d) }}</small>
-          </td>
-          <td>{{ d.station || '-' }}</td>
-          <td class="muted-cell">{{ d.district || '-' }}</td>
-          <td>{{ d.owner || '-' }}</td>
-          <td>
-            {{ fmtDate(d.updatedAt) }}
-            <small class="by">{{ d.updatedBy }}</small>
-          </td>
-          <td><DirectiveStatusBadge :status="directiveStatus(d)" subtle /></td>
-          <td class="row-acts" @click.stop>
-            <button v-if="editable" class="act" title="עריכה" aria-label="עריכה" @click="edit(d)">
-              <DvIcon name="edit" :size="16" />
-            </button>
-            <button class="act" title="שכפול" aria-label="שכפול" @click="duplicate(d)">
-              <DvIcon name="copy" :size="16" />
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <!-- Table: the same look as the tables in the recruit profile (.table in main.css). -->
+    <div v-else class="table-wrap">
+      <table class="table clickable dtable">
+        <thead>
+          <tr>
+            <th>שם הדירקטיבה</th>
+            <th>תאריך</th>
+            <th>תחנה</th>
+            <th>מתחם</th>
+            <th>אחראי</th>
+            <th>נערך לאחרונה</th>
+            <th>סטטוס</th>
+            <th class="acts-col"><span class="sr-only">פעולות</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="d in rows"
+            :key="d.id"
+            :class="{ past, today: isToday(d) }"
+            tabindex="0"
+            @click="open(d)"
+            @keydown.enter="open(d)"
+          >
+            <td class="name">
+              {{ d.name || '-' }}
+              <small>#{{ d.id }}</small>
+            </td>
+            <td>
+              {{ d.date ? fmtDate(d.date) : '-' }}
+              <small v-if="isToday(d)" class="now">היום</small>
+            </td>
+            <td>{{ d.station || '-' }}</td>
+            <td>{{ d.district || '-' }}</td>
+            <td>{{ d.owner || '-' }}</td>
+            <td :data-tip="`${fmtDate(d.updatedAt)} · ${d.updatedBy}`">
+              {{ fmtDate(d.updatedAt) }}
+              <small>{{ d.updatedBy }}</small>
+            </td>
+            <td><DirectiveStatusBadge :status="directiveStatus(d)" /></td>
+            <td class="row-acts" @click.stop>
+              <button v-if="editable" class="act" title="עריכה" aria-label="עריכה" @click="edit(d)">
+                <DvIcon name="edit" :size="16" />
+              </button>
+              <button class="act" title="שכפול" aria-label="שכפול" @click="duplicate(d)">
+                <DvIcon name="copy" :size="16" />
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </template>
   <p v-else class="none">{{ empty }}</p>
 </template>
@@ -198,7 +200,7 @@ const initials = (name: string) =>
   align-items: flex-start;
   gap: 8px;
 }
-.name {
+.top .name {
   flex: 1;
   min-width: 0;
   font-size: 18px;
@@ -298,30 +300,32 @@ const initials = (name: string) =>
   font-size: 12px;
   color: var(--c-muted);
 }
-/* Fixed columns, so the future and past tables line up. */
+/* Fixed columns, so the future and past tables line up; long values end in "…". */
 .dtable {
   table-layout: fixed;
+  /* A notch under the profile tables' 16px, so a directive's long station and compound fit. */
+  font-size: 14px;
 }
-.dtable th:nth-child(1) { width: 24%; }
-.dtable th:nth-child(2) { width: 110px; }
-.dtable th:nth-child(5) { width: 110px; }
-.dtable th:nth-child(6) { width: 120px; }
-.dtable th:nth-child(7) { width: 110px; }
+.dtable th:nth-child(1) { width: 20%; }
+.dtable th:nth-child(2) { width: 11%; }
+.dtable th:nth-child(3) { width: 14%; }
+.dtable th:nth-child(4) { width: 17%; }
+.dtable th:nth-child(5) { width: 10%; }
+.dtable th:nth-child(6) { width: 13%; }
+.dtable th:nth-child(7) { width: 9%; }
+.dtable th.acts-col { width: 84px; }
 .dtable td {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.dtable tbody tr {
-  cursor: pointer;
-}
-.dtable tbody tr:hover {
-  background: #fafbff;
+.dtable tbody tr + tr td {
+  border-top: 1px solid var(--c-divider);
 }
 .dtable tbody tr:focus-visible {
   outline: 2px solid var(--c-primary);
   outline-offset: -2px;
 }
-.dtable tbody tr.past {
+.dtable tbody tr.past td {
   color: var(--c-muted-2);
 }
 /* Today's row: tinted, with a blue bar on its start edge. */
@@ -331,33 +335,23 @@ const initials = (name: string) =>
 .dtable tbody tr.today td:first-child {
   box-shadow: inset -3px 0 0 var(--c-primary);
 }
-.dtable .name b {
-  display: block;
+.dtable .name {
+  font-size: 14px;
   font-weight: 600;
   color: var(--c-brand);
 }
 .dtable small {
-  display: block;
+  margin-inline-start: 4px;
   font-size: 12px;
+  font-weight: 400;
   color: var(--c-muted);
 }
-.dtable .dt {
-  display: block;
-  font-weight: 600;
-}
-.dtable .rel.now {
+.dtable small.now {
   font-weight: 700;
   color: var(--c-primary);
 }
-.muted-cell {
-  color: var(--c-muted-2);
-}
-.acts-col {
-  width: 80px;
-}
 .row-acts {
   white-space: nowrap;
-  text-align: end;
 }
 .sr-only {
   position: absolute;
