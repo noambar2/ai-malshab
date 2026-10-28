@@ -57,7 +57,7 @@ function remove(i: number) {
 </script>
 
 <template>
-  <table v-if="subTargets.length" class="dv-table subs">
+  <table v-if="subTargets.length" class="dv-table subs-table subs">
     <thead>
       <tr>
         <th>יעד לשיבוץ</th>

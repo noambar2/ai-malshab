@@ -132,7 +132,7 @@ function toggle() {
 
       <!-- View mode: read-only table (also the summary / detail pages) -->
       <template v-else>
-        <table v-if="target.subTargets.length" class="dv-table">
+        <table v-if="target.subTargets.length" class="dv-table subs-table">
           <thead>
             <tr>
               <th>יעדים לשיבוץ</th>

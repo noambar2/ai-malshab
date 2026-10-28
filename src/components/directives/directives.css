@@ -272,6 +272,20 @@ select.dv-input.placeholder {
 .dv-table tr:last-child td {
   border-bottom: 0;
 }
+/* Placement-target tables (summary, view mode, editor): the same fixed columns everywhere, so
+   tables of different targets line up and a long note wraps instead of squeezing the others. */
+.dv-table.subs-table {
+  table-layout: fixed;
+}
+.dv-table.subs-table th:nth-child(1) { width: 22%; }
+.dv-table.subs-table th:nth-child(2) { width: 18%; }
+.dv-table.subs-table th:nth-child(3) { width: 10%; }
+.dv-table.subs-table th:nth-child(4) { width: 28%; }
+.dv-table.subs-table th:nth-child(5) { width: 22%; }
+.dv-table.subs-table th:nth-child(6) { width: 76px; }
+.dv-table.subs-table td {
+  overflow-wrap: anywhere;
+}
 .dv-table .muted {
   color: var(--c-muted);
   margin-inline-start: 6px;

@@ -53,7 +53,7 @@ const info = computed(() => findTarget(props.target.targetCode))
     </div>
 
     <div v-if="open" class="subs sum-grid">
-      <table v-if="target.subTargets.length" class="dv-table sum-span">
+      <table v-if="target.subTargets.length" class="dv-table subs-table sum-span">
         <thead>
           <tr>
             <th>יעד לשיבוץ</th>
