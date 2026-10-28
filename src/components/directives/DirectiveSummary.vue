@@ -7,7 +7,7 @@ import SummaryBasket from './SummaryBasket.vue'
 import SummaryTargetRow from './SummaryTargetRow.vue'
 import AnchorDatesEditor from './AnchorDatesEditor.vue'
 import GuidelinesEditor from './GuidelinesEditor.vue'
-import { fmtRange, type Directive } from '@/data/directives'
+import { findTarget, fmtRange, type Directive } from '@/data/directives'
 
 const props = defineProps<{ d: Directive; editable?: boolean; canFix?: boolean }>()
 // fix: go to the wizard step where a missing part is filled in (with the basket to focus).
@@ -37,25 +37,78 @@ function toggleRest(id: string) {
   openRests.value = openRests.value.includes(id) ? openRests.value.filter((x) => x !== id) : [id]
 }
 
-// While scrolling through a long basket, its header (and then the open main target) sticks under
-// the navbar and, in the wizard, under the stepper, so it's clear what is being looked at.
-// A small gap keeps the stuck header from touching the stepper (the stepper frosts it, see
-// WizardStepper).
-const STICKY_GAP = 12
-const stickyTop = ref(56 + STICKY_GAP)
+// A slim line under the stepper (or the navbar on the detail page) that says where the reader is
+// once a basket's header has scrolled out of view: "סל N · basket › open main target". Clicking it
+// scrolls back to that basket's header. It replaces sticking the full headers, which took about a
+// third of the screen.
+const barTop = ref(56)
+const crumb = ref<{ level: string; name: string; target?: string; el: HTMLElement } | null>(null)
 let bandObserver: ResizeObserver | undefined
+let frame = 0
+
+const zoom = () => Number(getComputedStyle(document.documentElement).zoom) || 1
+const targetName = (id: string | undefined) => {
+  const t = [...props.d.baskets.flatMap((b) => b.targets), ...props.d.rest].find((x) => x.id === id)
+  return t ? (findTarget(t.targetCode)?.name ?? t.targetCode) : undefined
+}
+
+function update() {
+  frame = 0
+  const z = zoom()
+  const line = (barTop.value + 36) * z
+  // The open main target the line is passing through, inside the given container.
+  const openTargetIn = (root: Element) =>
+    [...root.querySelectorAll<HTMLElement>('.tr.open')].find((tr) => {
+      const r = tr.getBoundingClientRect()
+      const row = tr.querySelector('.row')?.getBoundingClientRect()
+      return !!row && row.bottom < line && r.bottom > line
+    })?.dataset.target
+
+  for (const sb of document.querySelectorAll<HTMLElement>('.summary .sb')) {
+    const r = sb.getBoundingClientRect()
+    const head = sb.querySelector('.head')?.getBoundingClientRect()
+    if (head && head.bottom < line && r.bottom > line) {
+      const i = props.d.baskets.findIndex((b) => b.id === sb.dataset.basket)
+      crumb.value = { level: `סל ${i + 1}`, name: props.d.baskets[i]?.name ?? '', target: targetName(openTargetIn(sb)), el: sb }
+      return
+    }
+  }
+  const rest = document.querySelector<HTMLElement>('.summary .rest-list')
+  const restTarget = rest && openTargetIn(rest)
+  if (rest && restTarget) {
+    crumb.value = { level: 'יתר המיוצבים', name: '', target: targetName(restTarget), el: rest }
+    return
+  }
+  crumb.value = null
+}
+const onScroll = () => {
+  if (!frame) frame = requestAnimationFrame(update)
+}
+function jump() {
+  const el = crumb.value?.el
+  if (!el) return
+  // Land just below the stepper rather than under it.
+  el.style.scrollMarginTop = `${barTop.value + 12}px`
+  el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
+
 onMounted(() => {
+  window.addEventListener('scroll', onScroll, { passive: true })
   // The page may not be attached to the document yet when this mounts, so look a tick later.
   setTimeout(() => {
     const band = document.querySelector<HTMLElement>('.stepper-band')
     if (!band) return
-    const set = () => (stickyTop.value = 56 + band.offsetHeight + STICKY_GAP)
+    const set = () => (barTop.value = 56 + band.offsetHeight)
     set()
     bandObserver = new ResizeObserver(set)
     bandObserver.observe(band)
   })
 })
-onBeforeUnmount(() => bandObserver?.disconnect())
+onBeforeUnmount(() => {
+  window.removeEventListener('scroll', onScroll)
+  bandObserver?.disconnect()
+  if (frame) cancelAnimationFrame(frame)
+})
 
 function expandBaskets(open: boolean) {
   openBaskets.value = open ? props.d.baskets.map((b) => b.id) : []
@@ -68,7 +121,21 @@ function expandRest(open: boolean) {
 </script>
 
 <template>
-  <div class="summary" :style="{ '--sticky-top': `${stickyTop}px` }">
+  <div class="summary">
+    <!-- Zero-height sticky anchor: the line floats from it without taking space in the page. -->
+    <div class="crumb-anchor" :style="{ top: `${barTop}px` }">
+      <Transition name="crumb">
+        <button v-if="crumb" type="button" class="crumb" title="חזרה לראש הסל" @click="jump">
+          <span class="crumb-level">{{ crumb.level }}</span>
+          <b v-if="crumb.name">{{ crumb.name }}</b>
+          <template v-if="crumb.target">
+            <AppIcon v-if="crumb.name" name="chevron-left" :size="16" class="crumb-sep" />
+            <span class="crumb-target">{{ crumb.target }}</span>
+          </template>
+          <AppIcon name="chevron-up" :size="16" class="crumb-up" />
+        </button>
+      </Transition>
+    </div>
     <div v-if="d.baskets.length" class="bulk">
       <button type="button" class="dv-link bulk-btn" @click="expandBaskets(true)">
         <AppIcon name="unfold-more" :size="16" />
@@ -165,6 +232,74 @@ function expandRest(open: boolean) {
 .empty {
   color: var(--c-muted);
 }
+.crumb-anchor {
+  position: sticky;
+  z-index: 14;
+  height: 0;
+  /* Cancels the list's gap, so the anchor adds no space. */
+  margin-bottom: -20px;
+}
+/* Frosted like the stepper above it, with the basket's blue for its name. */
+.crumb {
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 16px;
+  border-radius: 0 0 10px 10px;
+  background: rgba(226, 234, 253, 0.9);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  box-shadow: 0 6px 16px rgba(7, 25, 56, 0.08);
+  font-size: 14px;
+  color: var(--c-brand);
+  text-align: start;
+  white-space: nowrap;
+}
+.crumb-level {
+  flex-shrink: 0;
+  padding: 1px 8px;
+  border-radius: 10px;
+  background: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--c-primary);
+}
+.crumb b {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.crumb-sep {
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+.crumb-target {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--c-text);
+}
+.crumb-up {
+  flex-shrink: 0;
+  margin-inline-start: auto;
+  opacity: 0.7;
+}
+.crumb:hover .crumb-up {
+  opacity: 1;
+}
+.crumb-enter-active,
+.crumb-leave-active {
+  transition: opacity 0.15s, transform 0.15s;
+}
+.crumb-enter-from,
+.crumb-leave-to {
+  opacity: 0;
+  transform: translateY(-6px);
+}
 /* Open / close every basket at once, at the far (left) end above the list. */
 .bulk {
   display: flex;
@@ -213,8 +348,7 @@ function expandRest(open: boolean) {
 .rest-list {
   border: 1px solid var(--c-border-2);
   border-radius: 10px;
-  /* clip, not hidden: rounds the corners without breaking the sticky rows inside. */
-  overflow: clip;
+  overflow: hidden;
 }
 .none {
   font-size: 14px;

@@ -5,31 +5,17 @@
 import AppIcon from '@/components/AppIcon.vue'
 import NoteLine from './NoteLine.vue'
 import SummaryTargetRow from './SummaryTargetRow.vue'
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed } from 'vue'
 import { basketStats, type Basket } from '@/data/directives'
 
 const props = defineProps<{ basket: Basket; index: number; open: boolean; openTargets: string[]; canFix?: boolean }>()
 const emit = defineEmits<{ toggle: []; toggleTarget: [id: string]; fix: [] }>()
 const st = computed(() => basketStats(props.basket))
-
-// The header's height, so an open main target can stick right below it.
-const head = ref<HTMLElement>()
-const headH = ref(0)
-let ro: ResizeObserver | undefined
-onMounted(() => {
-  if (!head.value) return
-  const set = () => (headH.value = head.value?.offsetHeight ?? 0)
-  set()
-  ro = new ResizeObserver(set)
-  ro.observe(head.value)
-})
-onBeforeUnmount(() => ro?.disconnect())
 </script>
 
 <template>
-  <section class="sb" :class="{ open }" :style="{ '--basket-head': `${headH}px` }">
+  <section class="sb" :class="{ open }" :data-basket="basket.id">
     <div
-      ref="head"
       class="head sum-grid"
       role="button"
       tabindex="0"
@@ -70,16 +56,11 @@ onBeforeUnmount(() => ro?.disconnect())
   background: #fff;
   border: 1px solid var(--c-border-2);
   border-radius: 10px;
-  /* clip, not hidden: rounds the corners without breaking the sticky header. */
-  overflow: clip;
+  overflow: hidden;
 }
 /* The basket header looks like the basket banner in "יעדים לשיבוץ": light blue, with the name,
    labels and numbers in the brand blue, so it reads apart from the white main-target rows. */
 .head {
-  /* Sticks under the navbar / stepper while its basket scrolls by. */
-  position: sticky;
-  top: var(--sticky-top, 56px);
-  z-index: 4;
   padding-block: 14px;
   background: #e2eafd;
   cursor: pointer;

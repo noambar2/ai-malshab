@@ -20,7 +20,7 @@ const info = computed(() => findTarget(props.target.targetCode))
 </script>
 
 <template>
-  <div class="tr" :class="{ open }">
+  <div class="tr" :class="{ open }" :data-target="target.id">
     <div
       class="row sum-grid"
       role="button"
@@ -104,18 +104,11 @@ const info = computed(() => findTarget(props.target.targetCode))
 .tr.open .subs .dv-table td {
   border-bottom-color: #edf0f8;
 }
-/* Same grid as the basket header; the hierarchy shows in the label, indented one step in.
-   An open target sticks right under its basket's sticky header while its table scrolls by. */
+/* Same grid as the basket header; the hierarchy shows in the label, indented one step in. */
 .row {
   cursor: pointer;
   outline: none;
   background: #fff;
-}
-.tr.open .row {
-  position: sticky;
-  top: calc(var(--sticky-top, 56px) + var(--basket-head, 0px));
-  z-index: 3;
-  box-shadow: 0 1px 0 var(--c-divider);
 }
 .row:hover {
   background: #fafbff;
