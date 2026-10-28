@@ -39,7 +39,8 @@ function toggleRest(id: string) {
 
 // While scrolling through a long basket, its header (and then the open main target) sticks under
 // the navbar and, in the wizard, under the stepper, so it's clear what is being looked at.
-// A small gap keeps the stuck header from touching the stepper.
+// A small gap keeps the stuck header from touching the stepper (the stepper frosts it, see
+// WizardStepper).
 const STICKY_GAP = 12
 const stickyTop = ref(56 + STICKY_GAP)
 let bandObserver: ResizeObserver | undefined
