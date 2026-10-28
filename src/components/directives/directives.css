@@ -335,7 +335,7 @@ select.dv-input.placeholder {
   border-inline-start: 1px solid var(--c-divider);
 }
 .sum-stat dt {
-  font-size: 11px;
+  font-size: 13px;
   color: var(--c-muted);
   white-space: nowrap;
 }
@@ -344,7 +344,7 @@ select.dv-input.placeholder {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
   color: var(--c-text);
 }
@@ -360,7 +360,7 @@ select.dv-input.placeholder {
 }
 .sum-stat dd .pct,
 .sum-stat dd .code {
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 400;
   color: var(--c-muted);
   margin-inline-start: 4px;
@@ -378,7 +378,7 @@ select.dv-input.placeholder {
    Shared by the basket step and the placement-targets step so their columns line up. */
 .bk-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) repeat(5, 108px) 80px 32px;
+  grid-template-columns: minmax(0, 1fr) repeat(5, 108px) 104px 32px;
   align-items: center;
 }
 /* Profession names are long: they take two number columns. */

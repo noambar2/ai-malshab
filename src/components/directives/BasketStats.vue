@@ -58,19 +58,19 @@ const s = computed(() => basketStats(props.basket))
 .blue {
   color: var(--c-brand);
 }
-/* Same sizes as the basket step's stats (.sum-stat): 11px labels, 13px values, 11px percentages. */
+/* Same sizes as the basket step's stats (.sum-stat): 13px labels, 15px values, 13px percentages. */
 .blue .dv-stat {
   gap: 0;
   padding: 0 12px;
-  font-size: 11px;
+  font-size: 13px;
 }
 .blue b {
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
   color: var(--c-brand);
 }
 .blue .pct {
-  font-size: 11px;
+  font-size: 13px;
   color: var(--c-brand);
 }
 .blue .dv-stat + .dv-stat {
