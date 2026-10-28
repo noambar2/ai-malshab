@@ -1,14 +1,14 @@
 <script setup lang="ts">
 // A basket on the summary / detail page (design "רשימה עם תוויות רמה"): a white card whose header
 // row carries a "סל N" label; when open, its main targets follow as indented rows.
-// Which basket and which target are open is decided by the parent (one of each at a time).
+// Which baskets and targets are open is decided by the parent.
 import AppIcon from '@/components/AppIcon.vue'
 import NoteLine from './NoteLine.vue'
 import SummaryTargetRow from './SummaryTargetRow.vue'
 import { computed } from 'vue'
 import { basketStats, type Basket } from '@/data/directives'
 
-const props = defineProps<{ basket: Basket; index: number; open: boolean; openTarget: string | null; canFix?: boolean }>()
+const props = defineProps<{ basket: Basket; index: number; open: boolean; openTargets: string[]; canFix?: boolean }>()
 const emit = defineEmits<{ toggle: []; toggleTarget: [id: string]; fix: [] }>()
 const st = computed(() => basketStats(props.basket))
 </script>
@@ -41,7 +41,7 @@ const st = computed(() => basketStats(props.basket))
         v-for="t in basket.targets"
         :key="t.id"
         :target="t"
-        :open="openTarget === t.id"
+        :open="openTargets.includes(t.id)"
         :fix-label="canFix ? 'מעבר לשלב יעדים לשיבוץ' : undefined"
         @toggle="emit('toggleTarget', t.id)"
         @fix="emit('fix')"

@@ -93,13 +93,13 @@ const initials = (name: string) =>
     <table v-else class="dv-table dtable">
       <thead>
         <tr>
-          <th>סטטוס</th>
           <th>שם הדירקטיבה</th>
+          <th>תאריך</th>
           <th>תחנה</th>
           <th>מתחם</th>
-          <th>תאריך</th>
           <th>אחראי</th>
           <th>נערך לאחרונה</th>
+          <th>סטטוס</th>
           <th class="acts-col"><span class="sr-only">פעולות</span></th>
         </tr>
       </thead>
@@ -112,22 +112,22 @@ const initials = (name: string) =>
           @click="open(d)"
           @keydown.enter="open(d)"
         >
-          <td><DirectiveStatusBadge :status="directiveStatus(d)" subtle /></td>
           <td class="name">
             <b>{{ d.name || '-' }}</b>
             <small>#{{ d.id }}</small>
           </td>
-          <td>{{ d.station || '-' }}</td>
-          <td class="muted-cell">{{ d.district || '-' }}</td>
           <td>
             <b class="dt">{{ d.date ? fmtDate(d.date) : '-' }}</b>
             <small class="rel" :class="{ now: isToday(d) }">{{ relative(d) }}</small>
           </td>
+          <td>{{ d.station || '-' }}</td>
+          <td class="muted-cell">{{ d.district || '-' }}</td>
           <td>{{ d.owner || '-' }}</td>
           <td>
             {{ fmtDate(d.updatedAt) }}
             <small class="by">{{ d.updatedBy }}</small>
           </td>
+          <td><DirectiveStatusBadge :status="directiveStatus(d)" subtle /></td>
           <td class="row-acts" @click.stop>
             <button v-if="editable" class="act" title="עריכה" aria-label="עריכה" @click="edit(d)">
               <DvIcon name="edit" :size="16" />
@@ -302,11 +302,11 @@ const initials = (name: string) =>
 .dtable {
   table-layout: fixed;
 }
-.dtable th:nth-child(1) { width: 120px; }
-.dtable th:nth-child(2) { width: 22%; }
+.dtable th:nth-child(1) { width: 24%; }
+.dtable th:nth-child(2) { width: 110px; }
 .dtable th:nth-child(5) { width: 110px; }
-.dtable th:nth-child(6) { width: 110px; }
-.dtable th:nth-child(7) { width: 120px; }
+.dtable th:nth-child(6) { width: 120px; }
+.dtable th:nth-child(7) { width: 110px; }
 .dtable td {
   overflow: hidden;
   text-overflow: ellipsis;
