@@ -170,40 +170,23 @@ function duplicate(id: string) {
 }
 .seg {
   display: flex;
-  gap: 6px;
-}
-.view-toggle {
-  display: flex;
   padding: 2px;
   border-radius: 16px;
   background: #f5f8fb;
 }
-.view-toggle button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
+/* Same segmented look as the cards / table toggle: the chosen one is a raised white pill. */
+.seg button {
   height: 28px;
-  padding: 0;
+  padding: 0 14px;
   border-radius: 14px;
+  font-size: 13px;
   color: var(--c-muted-2);
 }
-.view-toggle button.on {
+.seg button.on {
   background: #fff;
   color: var(--c-primary);
-  box-shadow: 0 1px 3px rgba(7, 25, 56, 0.12);
-}
-.seg button {
-  height: 32px;
-  padding: 0 16px;
-  border-radius: 16px;
-  font-size: 13px;
-  color: var(--c-text-2);
-}
-.seg button.on {
-  background: var(--c-primary-soft);
-  color: var(--c-primary);
   font-weight: 600;
+  box-shadow: 0 1px 3px rgba(7, 25, 56, 0.12);
 }
 .past-title {
   margin-top: 40px;
