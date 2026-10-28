@@ -4,6 +4,8 @@ import { reactive } from 'vue'
 
 /** The mockup's "today", so seed directives fall cleanly into future / past. */
 export const TODAY = '2025-04-07'
+/** The signed-in user in this mockup: author of new directives and of every save. */
+export const CURRENT_USER = 'ליה לנד'
 
 // ---------- Catalogs ----------
 
@@ -232,6 +234,8 @@ export interface Directive {
   guidelines: Guideline[]
   draft: boolean
   createdBy: string
+  /** Who saved it last, and when (updatedAt). */
+  updatedBy: string
   /** ISO yyyy-mm-dd */
   updatedAt: string
 }
@@ -347,7 +351,8 @@ export function emptyDirective(): Directive {
     rest: [],
     guidelines: [],
     draft: true,
-    createdBy: 'ליה לנד',
+    createdBy: CURRENT_USER,
+    updatedBy: CURRENT_USER,
     updatedAt: TODAY,
   }
 }
@@ -450,7 +455,8 @@ function seed(): Directive[] {
       district: 'מתחם 60, שרשרת חיול 0100',
       station: 'קצין מיון או״ם 0100',
       owner: 'ליה לנד',
-      date: '2025-04-10',
+      // Today, so the directives page has one to highlight.
+      date: TODAY,
       reasons: ['ראיון קצין מיון', 'הקפאת מג״ב', 'הקפאת פינוי מחנה 80', 'אפסנאי 596846'],
       forecasts: ['מרוצה ויתפנה', 'לא מרוצה ויתפנה', 'סרבן מג״ב'],
       cohorts: ['ינואר 2024', 'פברואר 2024', 'מרץ 2024'],
@@ -470,6 +476,7 @@ function seed(): Directive[] {
       rest: restRows(),
       draft: false,
       createdBy: 'ליה לנד',
+      updatedBy: 'דוד לוי',
       updatedAt: '2025-04-02',
     },
     {
@@ -499,6 +506,7 @@ function seed(): Directive[] {
       rest: restRows().slice(0, 2),
       draft: false,
       createdBy: 'נועה כהן',
+      updatedBy: 'ליה לנד',
       updatedAt: '2025-03-28',
     },
     {
@@ -519,6 +527,7 @@ function seed(): Directive[] {
       rest: [],
       draft: true,
       createdBy: 'דוד לוי',
+      updatedBy: 'נועה כהן',
       updatedAt: '2025-04-06',
     },
     {
@@ -537,6 +546,7 @@ function seed(): Directive[] {
       rest: restRows(),
       draft: false,
       createdBy: 'ליה לנד',
+      updatedBy: 'ליה לנד',
       updatedAt: '2024-12-01',
     },
     {
@@ -560,6 +570,7 @@ function seed(): Directive[] {
       rest: restRows().slice(1),
       draft: false,
       createdBy: 'מאיה פרץ',
+      updatedBy: 'מאיה פרץ',
       updatedAt: '2024-08-14',
     },
     {
@@ -578,6 +589,7 @@ function seed(): Directive[] {
       rest: [],
       draft: false,
       createdBy: 'אבירן שלמה',
+      updatedBy: 'אבירן שלמה',
       updatedAt: '2024-03-10',
     },
   ])
@@ -593,6 +605,7 @@ export const getDirective = (id: string) => directivesState.list.find((d) => d.i
 export function saveDirective(d: Directive): string {
   const copy = cloneDirective(d)
   copy.updatedAt = TODAY
+  copy.updatedBy = CURRENT_USER
   if (!copy.id) {
     const max = Math.max(1000, ...directivesState.list.map((x) => Number(x.id) || 0))
     copy.id = String(max + 1)

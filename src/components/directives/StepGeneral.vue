@@ -126,8 +126,14 @@ const tabsOpen = ref(false)
 .step {
   display: flex;
   flex-direction: column;
-  gap: 40px;
+  gap: 32px;
   min-height: 734px;
+}
+/* A divider between the groups: name / station / owner with the tab order, placement data,
+   anchor dates, and notes. */
+.step > section + section:not(.tabs-section) {
+  padding-top: 32px;
+  border-top: 1px solid var(--c-divider);
 }
 /* The name takes two of the four columns below it. */
 .name-field {
@@ -148,7 +154,7 @@ const tabsOpen = ref(false)
 /* The section title doubles as the open/close control. */
 /* Belongs with the station choice above it, so it sits closer to it. */
 .tabs-section {
-  margin-top: -14px;
+  margin-top: -8px;
 }
 .toggle {
   width: 100%;

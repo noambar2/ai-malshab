@@ -1,11 +1,14 @@
 <script setup lang="ts">
-// Directives on the main page as a grid of cards. Clicking a card opens the directive.
+// Directives on the main page, as a grid of cards or as table rows. Clicking one opens it.
+// Today's directive stands out in both.
 import { useRouter } from 'vue-router'
 import DvIcon from './DvIcon.vue'
 import DirectiveStatusBadge from './DirectiveStatusBadge.vue'
-import { TODAY, directiveStatus, directiveTotals, fmtDate, type Directive } from '@/data/directives'
+import { TODAY, directiveStatus, fmtDate, type Directive } from '@/data/directives'
 
-defineProps<{ rows: Directive[]; empty: string; editable?: boolean; past?: boolean }>()
+withDefaults(defineProps<{ rows: Directive[]; empty: string; editable?: boolean; past?: boolean; view?: 'cards' | 'table' }>(), {
+  view: 'cards',
+})
 const router = useRouter()
 
 const DAY = 24 * 60 * 60 * 1000
@@ -19,6 +22,11 @@ function relative(d: Directive) {
   if (days === -1) return 'אתמול'
   return `לפני ${-days} ימים`
 }
+const isToday = (d: Directive) => d.date === TODAY
+
+const open = (d: Directive) => router.push(`/directives/${d.id}`)
+const edit = (d: Directive) => router.push({ path: '/directives/new', query: { edit: d.id } })
+const duplicate = (d: Directive) => router.push({ path: '/directives/new', query: { from: d.id } })
 
 const initials = (name: string) =>
   name
@@ -29,84 +37,108 @@ const initials = (name: string) =>
 </script>
 
 <template>
-  <div v-if="rows.length" class="grid">
-    <article
-      v-for="d in rows"
-      :key="d.id"
-      class="dcard"
-      :class="{ past, draft: d.draft }"
-      tabindex="0"
-      @click="router.push(`/directives/${d.id}`)"
-      @keydown.enter="router.push(`/directives/${d.id}`)"
-    >
-      <header class="top">
-        <DirectiveStatusBadge :status="directiveStatus(d)" />
-        <span class="id">#{{ d.id }}</span>
-        <span class="acts" @click.stop>
-          <button
-            v-if="editable"
-            class="act"
-            title="עריכה"
-            aria-label="עריכה"
-            @click="router.push({ path: '/directives/new', query: { edit: d.id } })"
-          >
-            <DvIcon name="edit" :size="16" />
-          </button>
-          <button
-            class="act"
-            title="שכפול"
-            aria-label="שכפול"
-            @click="router.push({ path: '/directives/new', query: { from: d.id } })"
-          >
-            <DvIcon name="copy" :size="16" />
-          </button>
-        </span>
-      </header>
+  <template v-if="rows.length">
+    <!-- Cards -->
+    <div v-if="view === 'cards'" class="grid">
+      <article
+        v-for="d in rows"
+        :key="d.id"
+        class="dcard"
+        :class="{ past, draft: d.draft, today: isToday(d) }"
+        tabindex="0"
+        @click="open(d)"
+        @keydown.enter="open(d)"
+      >
+        <span v-if="isToday(d)" class="today-tag">היום</span>
+        <header class="top">
+          <DirectiveStatusBadge :status="directiveStatus(d)" />
+          <span class="id">#{{ d.id }}</span>
+          <span class="acts" @click.stop>
+            <button v-if="editable" class="act" title="עריכה" aria-label="עריכה" @click="edit(d)">
+              <DvIcon name="edit" :size="16" />
+            </button>
+            <button class="act" title="שכפול" aria-label="שכפול" @click="duplicate(d)">
+              <DvIcon name="copy" :size="16" />
+            </button>
+          </span>
+        </header>
 
-      <!-- The directive's name leads; without one, the station takes its place. -->
-      <div class="station">
-        <h3>{{ d.name || d.station || 'ללא תחנה' }}</h3>
-        <span v-if="d.name">{{ d.station || 'ללא תחנה' }} · {{ d.district || '-' }}</span>
-        <span v-else>{{ d.district || '-' }}</span>
-      </div>
-
-      <div class="date">
-        <span class="cal"><DvIcon name="calendar" :size="18" /></span>
-        <span>
-          <b>{{ d.date ? fmtDate(d.date) : '-' }}</b>
-          <small>{{ relative(d) }}</small>
-        </span>
-      </div>
-
-      <dl class="stats">
-        <div>
-          <dt>סלים</dt>
-          <dd>{{ directiveTotals(d).baskets }}</dd>
+        <!-- The directive's name leads; without one, the station takes its place. -->
+        <div class="station">
+          <h3>{{ d.name || d.station || 'ללא תחנה' }}</h3>
+          <span v-if="d.name">{{ d.station || 'ללא תחנה' }} · {{ d.district || '-' }}</span>
+          <span v-else>{{ d.district || '-' }}</span>
         </div>
-        <div>
-          <dt>יעדים</dt>
-          <dd>{{ directiveTotals(d).targets }}</dd>
-        </div>
-        <div>
-          <dt>תוכניות</dt>
-          <dd>{{ directiveTotals(d).plans }}</dd>
-        </div>
-      </dl>
 
-      <div v-if="d.cohorts.length" class="chips">
-        <span v-for="c in d.cohorts.slice(0, 3)" :key="c" class="chip">{{ c }}</span>
-        <span v-if="d.cohorts.length > 3" class="chip more">+{{ d.cohorts.length - 3 }}</span>
-      </div>
+        <div class="date">
+          <span class="cal"><DvIcon name="calendar" :size="18" /></span>
+          <span>
+            <b>{{ d.date ? fmtDate(d.date) : '-' }}</b>
+            <small>{{ relative(d) }}</small>
+          </span>
+        </div>
 
-      <footer class="foot">
-        <span class="owner">
-          <span class="avatar">{{ d.owner ? initials(d.owner) : '?' }}</span>
-          {{ d.owner || 'ללא אחראי' }}
-        </span>
-        <span class="updated">עודכן {{ fmtDate(d.updatedAt) }}</span>
-      </footer>
-    </article>
-  </div>
+        <footer class="foot">
+          <span class="owner" title="אחראי תחנה">
+            <span class="avatar">{{ d.owner ? initials(d.owner) : '?' }}</span>
+            {{ d.owner || 'ללא אחראי' }}
+          </span>
+          <span class="updated">נערך {{ fmtDate(d.updatedAt) }} · {{ d.updatedBy }}</span>
+        </footer>
+      </article>
+    </div>
+
+    <!-- Table -->
+    <table v-else class="dv-table dtable">
+      <thead>
+        <tr>
+          <th>סטטוס</th>
+          <th>שם הדירקטיבה</th>
+          <th>תחנה</th>
+          <th>מתחם</th>
+          <th>תאריך</th>
+          <th>אחראי</th>
+          <th>נערך לאחרונה</th>
+          <th class="acts-col"><span class="sr-only">פעולות</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          v-for="d in rows"
+          :key="d.id"
+          :class="{ past, today: isToday(d) }"
+          tabindex="0"
+          @click="open(d)"
+          @keydown.enter="open(d)"
+        >
+          <td><DirectiveStatusBadge :status="directiveStatus(d)" /></td>
+          <td class="name">
+            <b>{{ d.name || '-' }}</b>
+            <small>#{{ d.id }}</small>
+          </td>
+          <td>{{ d.station || '-' }}</td>
+          <td class="muted-cell">{{ d.district || '-' }}</td>
+          <td>
+            <b class="dt">{{ d.date ? fmtDate(d.date) : '-' }}</b>
+            <small class="rel" :class="{ now: isToday(d) }">{{ relative(d) }}</small>
+          </td>
+          <td>{{ d.owner || '-' }}</td>
+          <td>
+            {{ fmtDate(d.updatedAt) }}
+            <small class="by">{{ d.updatedBy }}</small>
+          </td>
+          <td class="row-acts" @click.stop>
+            <button v-if="editable" class="act" title="עריכה" aria-label="עריכה" @click="edit(d)">
+              <DvIcon name="edit" :size="16" />
+            </button>
+            <button class="act" title="שכפול" aria-label="שכפול" @click="duplicate(d)">
+              <DvIcon name="copy" :size="16" />
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </template>
   <p v-else class="none">{{ empty }}</p>
 </template>
 
@@ -133,6 +165,26 @@ const initials = (name: string) =>
   border-color: #b9c9ff;
   box-shadow: 0 8px 24px rgba(13, 45, 143, 0.1);
   transform: translateY(-2px);
+}
+.dcard {
+  position: relative;
+}
+/* Today's directive: a blue frame, a soft tint and a "היום" tag on the corner. */
+.dcard.today {
+  border: 2px solid var(--c-primary);
+  background: linear-gradient(180deg, #f1f5ff 0%, #fff 60%);
+  box-shadow: 0 6px 20px rgba(0, 70, 254, 0.12);
+}
+.today-tag {
+  position: absolute;
+  top: -11px;
+  inset-inline-start: 16px;
+  padding: 2px 10px;
+  border-radius: 10px;
+  background: var(--c-primary);
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
 }
 .dcard.draft {
   border-style: dashed;
@@ -203,39 +255,6 @@ const initials = (name: string) =>
   font-size: 12px;
   color: var(--c-muted);
 }
-.stats {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  padding: 10px 0;
-  border-block: 1px solid var(--c-divider);
-  text-align: center;
-}
-.stats div + div {
-  border-inline-start: 1px solid var(--c-divider);
-}
-.stats dt {
-  font-size: 12px;
-  color: var(--c-muted);
-}
-.stats dd {
-  font-size: 18px;
-  font-weight: 700;
-}
-.chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-.chip {
-  padding: 3px 10px;
-  border-radius: 12px;
-  background: #f5f6fa;
-  font-size: 12px;
-  color: var(--c-muted-2);
-}
-.chip.more {
-  color: var(--c-primary);
-}
 .foot {
   display: flex;
   align-items: center;
@@ -264,6 +283,74 @@ const initials = (name: string) =>
 .updated {
   font-size: 12px;
   color: var(--c-muted);
+}
+/* Fixed columns, so the future and past tables line up. */
+.dtable {
+  table-layout: fixed;
+}
+.dtable th:nth-child(1) { width: 120px; }
+.dtable th:nth-child(2) { width: 22%; }
+.dtable th:nth-child(5) { width: 110px; }
+.dtable th:nth-child(6) { width: 110px; }
+.dtable th:nth-child(7) { width: 120px; }
+.dtable td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dtable tbody tr {
+  cursor: pointer;
+}
+.dtable tbody tr:hover {
+  background: #fafbff;
+}
+.dtable tbody tr:focus-visible {
+  outline: 2px solid var(--c-primary);
+  outline-offset: -2px;
+}
+.dtable tbody tr.past {
+  color: var(--c-muted-2);
+}
+/* Today's row: tinted, with a blue bar on its start edge. */
+.dtable tbody tr.today td {
+  background: #eef3ff;
+}
+.dtable tbody tr.today td:first-child {
+  box-shadow: inset -3px 0 0 var(--c-primary);
+}
+.dtable .name b {
+  display: block;
+  font-weight: 600;
+  color: var(--c-brand);
+}
+.dtable small {
+  display: block;
+  font-size: 12px;
+  color: var(--c-muted);
+}
+.dtable .dt {
+  display: block;
+  font-weight: 600;
+}
+.dtable .rel.now {
+  font-weight: 700;
+  color: var(--c-primary);
+}
+.muted-cell {
+  color: var(--c-muted-2);
+}
+.acts-col {
+  width: 80px;
+}
+.row-acts {
+  white-space: nowrap;
+  text-align: end;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
 }
 .none {
   padding: 40px 0;

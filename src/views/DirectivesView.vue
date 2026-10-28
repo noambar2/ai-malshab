@@ -18,6 +18,25 @@ const station = ref('')
 const status = ref<'all' | 'draft' | 'scheduled'>('all')
 const dupOpen = ref(false)
 
+// Cards or table rows; remembered per browser (a convenience, so it may come back empty).
+const VIEW_KEY = 'directives-view'
+function savedView(): 'cards' | 'table' {
+  try {
+    return localStorage.getItem(VIEW_KEY) === 'table' ? 'table' : 'cards'
+  } catch {
+    return 'cards'
+  }
+}
+const view = ref<'cards' | 'table'>(savedView())
+function setView(v: 'cards' | 'table') {
+  view.value = v
+  try {
+    localStorage.setItem(VIEW_KEY, v)
+  } catch {
+    /* storage unavailable: the choice just isn't remembered */
+  }
+}
+
 function matches(d: Directive) {
   const q = query.value.trim()
   if (station.value && d.station !== station.value) return false
@@ -85,10 +104,19 @@ function duplicate(id: string) {
             <AppIcon name="search" :size="18" />
             <input v-model="query" placeholder="חיפוש לפי שם, מספר, תחנה, אחראי או סל" />
           </label>
+          <div class="view-toggle" role="group" aria-label="תצוגה">
+            <button :class="{ on: view === 'cards' }" title="תצוגת כרטיסיות" aria-label="תצוגת כרטיסיות" :aria-pressed="view === 'cards'" @click="setView('cards')">
+              <DvIcon name="grid" :size="18" />
+            </button>
+            <button :class="{ on: view === 'table' }" title="תצוגת טבלה" aria-label="תצוגת טבלה" :aria-pressed="view === 'table'" @click="setView('table')">
+              <DvIcon name="list" :size="18" />
+            </button>
+          </div>
         </div>
       </div>
       <DirectiveCards
         :rows="future"
+        :view="view"
         editable
         :empty="query || station ? 'לא נמצאו דירקטיבות עתידיות התואמות לחיפוש' : 'אין דירקטיבות עתידיות. לחצו על ״דירקטיבה חדשה״ כדי ליצור אחת.'"
       />
@@ -99,7 +127,7 @@ function duplicate(id: string) {
       <span class="count">{{ past.length }} דירקטיבות</span>
     </div>
     <section class="dv-card list-card">
-      <DirectiveCards :rows="past" past empty="לא נמצאו דירקטיבות עבר" />
+      <DirectiveCards :rows="past" :view="view" past empty="לא נמצאו דירקטיבות עבר" />
     </section>
 
     <DuplicateModal v-if="dupOpen" @close="dupOpen = false" @pick="duplicate" />
@@ -143,6 +171,27 @@ function duplicate(id: string) {
 .seg {
   display: flex;
   gap: 6px;
+}
+.view-toggle {
+  display: flex;
+  padding: 2px;
+  border-radius: 16px;
+  background: #f5f8fb;
+}
+.view-toggle button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 28px;
+  padding: 0;
+  border-radius: 14px;
+  color: var(--c-muted-2);
+}
+.view-toggle button.on {
+  background: #fff;
+  color: var(--c-primary);
+  box-shadow: 0 1px 3px rgba(7, 25, 56, 0.12);
 }
 .seg button {
   height: 32px;
